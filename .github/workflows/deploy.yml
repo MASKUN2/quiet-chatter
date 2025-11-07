@@ -50,30 +50,8 @@ jobs:
           username: ${{ secrets.LIGHTSAIL_USER }}
           key: ${{ secrets.DEPLOY_SSH_KEY }}
           script: |
-            # 1. 새 이미지 이름 정의
-            IMAGE_REPO=${{ secrets.DOCKER_USERNAME }}/quiet-chatter # 이미지 저장소 이름 (변경 없음)
-            CONTAINER_NAME=quiet-chatter # 👈 컨테이너 이름으로 사용할 짧은 이름으로 변경
-            IMAGE_TAG=latest
+            echo "이미지 풀"
+            docker compose pull app
             
-            # 2. 기존 컨테이너 중지 및 삭제 (CONTAINER_NAME 사용)
-            echo "Stopping and removing existing container..."
-            docker stop $CONTAINER_NAME || true
-            docker rm $CONTAINER_NAME || true
-
-            # 3. 새로운 Docker 이미지 Pull (IMAGE_REPO 사용)
-            echo "Pulling new image: $IMAGE_REPO:$IMAGE_TAG"
-            docker pull $IMAGE_REPO:$IMAGE_TAG
-            
-            # 4. 새 컨테이너 실행 (CONTAINER_NAME 및 IMAGE_REPO 사용)
-            echo "Starting new container..."
-            docker run -d \
-              --name $CONTAINER_NAME \
-              -p 8080:8080 \
-              -e SPRING_DATA_MONGODB_HOST=mongodb \
-              -e SPRING_DATA_MONGODB_PORT=27017 \
-              -e SPRING_DATA_MONGODB_USERNAME=${{ secrets.DB_USERNAME }} \
-              -e SPRING_DATA_MONGODB_PASSWORD=${{ secrets.DB_PASSWORD }} \
-              -e SPRING_DATA_MONGODB_DATABASE=${{ secrets.DB_NAME }} \
-              $IMAGE_REPO:$IMAGE_TAG
-            
-            echo "Deployment finished."
+            echo "재시작"
+            docker compose up -d --force-recreate app
