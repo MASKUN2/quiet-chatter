@@ -1,6 +1,11 @@
 spring:
   application:
     name: quiet-chatter
-  data:
-    mongodb:
-      uuid-representation: standard
+  jpa:
+    hibernate:
+      ddl-auto: update
+
+naver:
+  api:
+    client-id: hidden
+    client-secret: hidden

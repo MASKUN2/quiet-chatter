@@ -1,30 +1,31 @@
 package maskun.quietchatter.hexagon.domain;
 
-import java.util.UUID;
-import maskun.quietchatter.hexagon.domain.value.BookId;
+import jakarta.persistence.Embedded;
+import jakarta.persistence.Entity;
+import maskun.quietchatter.hexagon.domain.value.Isbn;
 import maskun.quietchatter.hexagon.domain.value.Title;
-import org.springframework.data.annotation.TypeAlias;
-import org.springframework.data.mongodb.core.mapping.Document;
 
-@Document(collection = "books")
-@TypeAlias(value = "book")
-public class Book{
-    private final BookId id;
-    private final Title title;
+@Entity(name = "Book")
+public class Book extends BaseEntity {
 
-    private Book(BookId id, Title title) {
-        this.id = id;
-        this.title = title;
-    }
-    public static Book newOf(Title title) {
-        BookId id = new BookId(UUID.randomUUID());
-        return new Book(id, title);
+    @Embedded
+    private Title title;
+
+    @Embedded
+    private Isbn isbn;
+
+    public static Book newOf(Title title, Isbn isbn) {
+        Book book = new Book();
+        book.title = title;
+        book.isbn = isbn;
+        return book;
     }
 
-    public BookId getId() {
-        return id;
-    }
     public Title getTitle() {
         return title;
+    }
+
+    public Isbn getIsbn() {
+        return isbn;
     }
 }
