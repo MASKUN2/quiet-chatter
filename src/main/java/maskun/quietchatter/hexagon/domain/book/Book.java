@@ -1,9 +1,8 @@
-package maskun.quietchatter.hexagon.domain;
+package maskun.quietchatter.hexagon.domain.book;
 
 import jakarta.persistence.Embedded;
 import jakarta.persistence.Entity;
-import maskun.quietchatter.hexagon.domain.value.Isbn;
-import maskun.quietchatter.hexagon.domain.value.Title;
+import maskun.quietchatter.hexagon.domain.BaseEntity;
 
 @Entity(name = "Book")
 public class Book extends BaseEntity {

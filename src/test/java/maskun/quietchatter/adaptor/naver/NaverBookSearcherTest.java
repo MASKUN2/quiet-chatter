@@ -4,7 +4,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.test.web.client.response.MockRestResponseCreators.withSuccess;
 
 import maskun.quietchatter.hexagon.application.value.Keyword;
-import maskun.quietchatter.hexagon.domain.Book;
+import maskun.quietchatter.hexagon.domain.book.Book;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,6 +24,7 @@ class NaverBookSearcherTest {
 
     @Autowired
     MockRestServiceServer mockServer;
+
     @MockitoBean
     private NaverApiEnvironment naverApiEnvironment;
 
@@ -43,8 +44,7 @@ class NaverBookSearcherTest {
                                             "isbn": "9788937460500"
                                         }
                                     ]
-                                }
-                                """,
+                                }""",
                         MediaType.APPLICATION_JSON
                 ));
 

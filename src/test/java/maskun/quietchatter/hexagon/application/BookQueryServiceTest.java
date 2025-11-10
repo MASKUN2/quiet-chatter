@@ -10,8 +10,8 @@ import static org.mockito.Mockito.when;
 
 import java.util.List;
 import maskun.quietchatter.hexagon.application.value.Keyword;
-import maskun.quietchatter.hexagon.domain.Book;
-import maskun.quietchatter.hexagon.domain.BookFixture;
+import maskun.quietchatter.hexagon.domain.book.Book;
+import maskun.quietchatter.hexagon.domain.book.BookFixture;
 import maskun.quietchatter.hexagon.outbound.BookRepository;
 import maskun.quietchatter.hexagon.outbound.ExternalBookSearcher;
 import org.junit.jupiter.api.AfterEach;

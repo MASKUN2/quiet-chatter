@@ -1,7 +1,7 @@
 package maskun.quietchatter.hexagon.inbound;
 
 import maskun.quietchatter.hexagon.application.value.Keyword;
-import maskun.quietchatter.hexagon.domain.Book;
+import maskun.quietchatter.hexagon.domain.book.Book;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 

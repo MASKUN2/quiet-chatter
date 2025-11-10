@@ -3,7 +3,7 @@ package maskun.quietchatter.adaptor.naver;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import maskun.quietchatter.hexagon.application.value.Keyword;
-import maskun.quietchatter.hexagon.domain.Book;
+import maskun.quietchatter.hexagon.domain.book.Book;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;

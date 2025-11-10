@@ -1,9 +1,7 @@
-package maskun.quietchatter.hexagon.domain;
+package maskun.quietchatter.hexagon.domain.book;
 
 import java.lang.reflect.Field;
 import java.util.UUID;
-import maskun.quietchatter.hexagon.domain.value.Isbn;
-import maskun.quietchatter.hexagon.domain.value.Title;
 import net.datafaker.Faker;
 import org.springframework.util.ReflectionUtils;
 

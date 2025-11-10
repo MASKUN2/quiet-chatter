@@ -2,7 +2,7 @@ package maskun.quietchatter.adaptor.book;
 
 import java.io.Serializable;
 import java.util.UUID;
-import maskun.quietchatter.hexagon.domain.Book;
+import maskun.quietchatter.hexagon.domain.book.Book;
 
 /**
  * DTO for {@link Book}

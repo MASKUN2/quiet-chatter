@@ -8,9 +8,8 @@ import java.util.List;
 import java.util.function.Supplier;
 import java.util.stream.IntStream;
 import maskun.quietchatter.hexagon.application.BookQueryService;
-import maskun.quietchatter.hexagon.application.value.Keyword;
-import maskun.quietchatter.hexagon.domain.Book;
-import maskun.quietchatter.hexagon.domain.BookFixture;
+import maskun.quietchatter.hexagon.domain.book.Book;
+import maskun.quietchatter.hexagon.domain.book.BookFixture;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
@@ -33,7 +32,6 @@ class BookApiTest {
         List<Book> books = IntStream.range(0, 10).mapToObj(i -> bookSupplier.get()).toList();
 
         PageRequest pageRequest = PageRequest.of(0, 10);
-        Keyword keyword = new Keyword("test");
 
         when(bookQueryService.findBy(any(), any()))
                 .thenReturn(new PageImpl<>(books, pageRequest, books.size()));
