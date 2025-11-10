@@ -1,7 +1,6 @@
 package maskun.quietchatter.hexagon.application;
 
-import static maskun.quietchatter.hexagon.domain.book.BookFixture.book;
-import static maskun.quietchatter.hexagon.domain.book.BookFixture.newBook;
+import static maskun.quietchatter.hexagon.domain.Fixture.book;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.instancio.Instancio.ofObject;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -56,12 +55,12 @@ class BookQueryServiceTest {
     void findBy() {
         //given
 
-        Book expectedExisted = newBook().create();
-        Book notExist1 = newBook().create();
-        Book notExist2 = newBook().create();
+        Book expectedExisted = book().asNew().create();
+        Book notExist1 = book().asNew().create();
+        Book notExist2 = book().asNew().create();
         List<Book> fetchedBooks = List.of(expectedExisted, notExist1, notExist2);
 
-        Book existed = Instancio.of(book().toModel())
+        Book existed = Instancio.of(book().asPersisted().toModel())
                 .set(Select.field(Book::getIsbn), expectedExisted.getIsbn())
                 .create();
 

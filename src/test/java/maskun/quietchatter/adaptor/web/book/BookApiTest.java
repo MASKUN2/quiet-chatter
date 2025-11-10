@@ -1,6 +1,6 @@
 package maskun.quietchatter.adaptor.web.book;
 
-import static maskun.quietchatter.hexagon.domain.book.BookFixture.newBook;
+import static maskun.quietchatter.hexagon.domain.Fixture.book;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
@@ -33,7 +33,7 @@ class BookApiTest {
     void search() {
 
         Faker faker = new Faker();
-        List<Book> books = Instancio.ofList(newBook().toModel())
+        List<Book> books = Instancio.ofList(book().asNew().toModel())
                 .size(10)
                 .create();
 
