@@ -10,6 +10,7 @@ import java.util.stream.Collectors;
 import maskun.quietchatter.hexagon.application.value.Keyword;
 import maskun.quietchatter.hexagon.domain.book.Book;
 import maskun.quietchatter.hexagon.domain.book.Isbn;
+import maskun.quietchatter.hexagon.domain.book.Title;
 import maskun.quietchatter.hexagon.inbound.BookQueryable;
 import maskun.quietchatter.hexagon.outbound.BookRepository;
 import maskun.quietchatter.hexagon.outbound.ExternalBookSearcher;
@@ -38,7 +39,7 @@ public class BookQueryService implements BookQueryable {
 
     private Page<Book> mergeOrPersist(Page<Book> fetchedBooks) {
         Set<Isbn> isbns = collectIsbn(fetchedBooks);
-        Map<Isbn, Book> existsMap = mapExistsBy(isbns);
+        Map<TitleAndIsbn, Book> existsMap = mapExistsBy(isbns);
         return fetchedBooks.map(updateOrSave(existsMap));
     }
 
@@ -48,18 +49,21 @@ public class BookQueryService implements BookQueryable {
                 .collect(Collectors.toUnmodifiableSet());
     }
 
-    private Map<Isbn, Book> mapExistsBy(Set<Isbn> isbns) {
+    private Map<TitleAndIsbn, Book> mapExistsBy(Set<Isbn> isbns) {
         List<Book> isbnIn = bookRepository.findByIsbnIn(isbns);
 
         return isbnIn.stream()
-                .collect(Collectors.toUnmodifiableMap(Book::getIsbn, book -> book));
+                .collect(Collectors.toUnmodifiableMap(book -> new TitleAndIsbn(book.getTitle(), book.getIsbn()),
+                        book -> book));
     }
 
-    private Function<Book, Book> updateOrSave(final Map<Isbn, Book> exists) {
+    private Function<Book, Book> updateOrSave(final Map<TitleAndIsbn, Book> exists) {
         return book -> {
+            Title title = book.getTitle();
             Isbn isbn = book.getIsbn();
+            TitleAndIsbn key = new TitleAndIsbn(title, isbn);
 
-            return Optional.ofNullable(exists.get(isbn))
+            return Optional.ofNullable(exists.get(key))
                     .map(updateAndGet(book))
                     .orElseGet(saveAndGet(book));
         };
@@ -78,5 +82,8 @@ public class BookQueryService implements BookQueryable {
 
     private Supplier<Book> saveAndGet(Book fecthedBook) {
         return () -> bookRepository.save(fecthedBook);
+    }
+
+    private record TitleAndIsbn(Title title, Isbn isbn) {
     }
 }
