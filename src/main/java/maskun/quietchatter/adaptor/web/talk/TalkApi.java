@@ -5,13 +5,16 @@ import lombok.RequiredArgsConstructor;
 import maskun.quietchatter.adaptor.web.shared.IdResponse;
 import maskun.quietchatter.hexagon.application.value.TalkCreateRequest;
 import maskun.quietchatter.hexagon.application.value.TalkQueryRequest;
+import maskun.quietchatter.hexagon.domain.talk.Content;
 import maskun.quietchatter.hexagon.domain.talk.Talk;
+import maskun.quietchatter.hexagon.domain.talk.Time;
 import maskun.quietchatter.hexagon.inbound.TalkCreatable;
 import maskun.quietchatter.hexagon.inbound.TalkQueryable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -27,11 +30,21 @@ public class TalkApi {
     private final TalkQueryable talkQueryable;
 
     @PostMapping
-    public ResponseEntity<IdResponse> post(@RequestBody TalkPostRequest request) {
-        TalkCreateRequest talkCreateRequest = request.toTalkCreateRequest();
-        Talk posted = talkCreatable.create(talkCreateRequest);
+    public ResponseEntity<IdResponse> post(@RequestBody TalkPostRequest webRequest,
+                                           @AuthenticationPrincipal UUID memberId) {
+        TalkCreateRequest createRequest = convert(webRequest, memberId);
+        Talk posted = talkCreatable.create(createRequest);
         IdResponse idResponse = new IdResponse(posted.getId());
         return ResponseEntity.ok(idResponse);
+    }
+
+    private TalkCreateRequest convert(TalkPostRequest request, UUID memberId) {
+        return new TalkCreateRequest(
+                request.bookId(),
+                memberId,
+                new Content(request.content()),
+                new Time(request.hidden())
+        );
     }
 
     @GetMapping

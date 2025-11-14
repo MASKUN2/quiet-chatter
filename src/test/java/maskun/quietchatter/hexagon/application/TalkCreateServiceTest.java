@@ -6,11 +6,13 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.eq;
 import static org.mockito.Mockito.when;
 
+import java.time.Instant;
 import java.util.UUID;
 import maskun.quietchatter.hexagon.application.value.TalkCreateRequest;
 import maskun.quietchatter.hexagon.domain.book.Book;
 import maskun.quietchatter.hexagon.domain.talk.Content;
 import maskun.quietchatter.hexagon.domain.talk.Talk;
+import maskun.quietchatter.hexagon.domain.talk.Time;
 import maskun.quietchatter.hexagon.outbound.BookRepository;
 import maskun.quietchatter.hexagon.outbound.TalkRepository;
 import org.instancio.Instancio;
@@ -39,7 +41,7 @@ class TalkCreateServiceTest {
     void create() {
         UUID bookId = UUID.randomUUID();
         Content content = Instancio.create(Content.class);
-        TalkCreateRequest request = new TalkCreateRequest(bookId, content);
+        TalkCreateRequest request = new TalkCreateRequest(bookId, UUID.randomUUID(), content, new Time(Instant.now()));
 
         Book mockBook = book().asPersisted()
                 .set(Select.field(Book::getId), bookId)

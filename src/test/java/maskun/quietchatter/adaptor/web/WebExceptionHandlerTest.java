@@ -3,13 +3,15 @@ package maskun.quietchatter.adaptor.web;
 import java.util.NoSuchElementException;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.security.servlet.SecurityAutoConfiguration;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.context.annotation.Import;
 import org.springframework.test.web.servlet.assertj.MockMvcTester;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-@WebMvcTest(controllers = WebExceptionHandlerTest.TestController.class)
+@WebMvcTest(controllers = WebExceptionHandlerTest.TestController.class,
+        excludeAutoConfiguration = SecurityAutoConfiguration.class)
 @Import({WebConfig.class, WebExceptionHandlerTest.TestController.class})
 class WebExceptionHandlerTest {
 
