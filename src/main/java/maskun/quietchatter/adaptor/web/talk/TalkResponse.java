@@ -15,9 +15,9 @@ public record TalkResponse(
         Instant timeToHidden,
         String content,
         long like_count,
-        boolean didILike,
+        Boolean didILike,
         long support_count,
-        boolean didISupport
+        Boolean didISupport
 ) implements Serializable {
 }
 

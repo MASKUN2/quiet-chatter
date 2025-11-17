@@ -44,6 +44,12 @@ public class BookQueryService implements BookQueryable {
         return mergeOrPersist(fetchedBooks);
     }
 
+    @Override
+    @Transactional(readOnly = true)
+    public List<Book> findBy(List<UUID> bookIds) {
+        return bookRepository.findByIdIn(bookIds);
+    }
+
     private Page<Book> mergeOrPersist(Page<Book> fetchedBooks) {
         Set<Isbn> isbns = collectIsbn(fetchedBooks);
         Map<TitleAndIsbn, Book> existsMap = mapExistsBy(isbns);

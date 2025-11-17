@@ -15,7 +15,8 @@ import maskun.quietchatter.hexagon.domain.BaseEntity;
 @Getter
 @Entity(name = "talk")
 @Table(indexes = {@Index(columnList = "book_id", name = "idx_talk_book_id"),
-        @Index(columnList = "member_id", name = "idx_talk_member_id")})
+        @Index(columnList = "member_id", name = "idx_talk_member_id"),
+        @Index(columnList = "created_at", name = "idx_talk_created_at")})
 public class Talk extends BaseEntity {
 
     @Column(name = "book_id")

@@ -1,10 +1,12 @@
 package maskun.quietchatter.hexagon.outbound;
 
+import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Optional;
 import java.util.UUID;
 import maskun.quietchatter.hexagon.domain.member.Member;
 import maskun.quietchatter.hexagon.domain.talk.Talk;
+import org.springframework.data.domain.Limit;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.repository.Repository;
@@ -22,4 +24,6 @@ public interface TalkRepository extends Repository<Talk, UUID> {
     Page<Talk> findByBookIdOrderByCreatedAtDesc(UUID bookId, Pageable pageRequest);
 
     Optional<Talk> findById(UUID id);
+
+    List<Talk> findByOrderByCreatedAtDesc(Limit limit);
 }

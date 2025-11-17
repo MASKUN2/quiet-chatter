@@ -21,4 +21,6 @@ public interface BookRepository extends Repository<Book, UUID> {
     Book save(Book book);
 
     List<Book> findByIsbnIn(Collection<Isbn> isbns);
+
+    List<Book> findByIdIn(Collection<UUID> ids);
 }

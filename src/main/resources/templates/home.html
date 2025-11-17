@@ -7,12 +7,110 @@
     <meta content="width=device-width, initial-scale=1.0" name="viewport">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="/css/style.css" rel="stylesheet">
+    <style>
+        .recent-talks-section {
+            background-color: #ffffff; /* White background */
+            padding: 1.5rem; /* Add some padding */
+            border-radius: 0.5rem; /* Rounded corners */
+            box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075); /* Subtle shadow */
+        }
+
+        .recent-talks-section .list-group-item {
+            max-width: 90%; /* Make items narrower than the container */
+            margin-left: auto; /* Center the items */
+            margin-right: auto;
+            margin-bottom: 0.5rem; /* Add some space between items */
+        }
+
+        /* Remove bottom margin for the last item */
+        .recent-talks-section .list-group-item:last-child {
+            margin-bottom: 0;
+        }
+    </style>
 </head>
 <body>
 
 <div class="container">
     <div th:replace="~{fragments/search :: book-search}"></div>
+
+    <!-- Recent BookTalks Section -->
+    <div class="recent-talks-section mt-5">
+        <h2 class="text-center">새로 올라온 북톡</h2>
+        <div class="list-group" id="recent-talks-container">
+            <!-- Recent talks will be dynamically inserted here -->
+        </div>
+    </div>
 </div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        fetchRecentTalksAndBooks();
+    });
+
+    async function fetchRecentTalksAndBooks() {
+        const container = document.getElementById('recent-talks-container');
+        try {
+            // 1. Fetch recent talks
+            const talksResponse = await fetch('/api/talks?recent-limit=4');
+            if (!talksResponse.ok) throw new Error('최근 북톡을 불러오는 데 실패했습니다.');
+            const talks = await talksResponse.json();
+
+            if (talks.length === 0) {
+                container.innerHTML = '<p class="text-muted">최근 등록된 북톡이 없습니다.</p>';
+                return;
+            }
+
+            // 2. Extract unique book IDs
+            const bookIds = [...new Set(talks.map(talk => talk.bookId))];
+
+            // 3. Fetch corresponding book info
+            const booksResponse = await fetch(`/api/books?id=${bookIds.join(',')}`);
+            if (!booksResponse.ok) throw new Error('책 정보를 불러오는 데 실패했습니다.');
+            const books = await booksResponse.json();
+
+            // Create a map for easy lookup
+            const booksMap = new Map(books.map(book => [book.id, book]));
+
+            // 4. Render the combined data
+            renderRecentTalks(talks, booksMap);
+
+        } catch (error) {
+            console.error('Error:', error);
+            container.innerHTML = `<div class="alert alert-danger">${error.message}</div>`;
+        }
+    }
+
+    function renderRecentTalks(talks, booksMap) {
+        const container = document.getElementById('recent-talks-container');
+        container.innerHTML = talks.map(talk => {
+            const book = booksMap.get(talk.bookId);
+            if (!book) return ''; // Skip if book info is not found for some reason
+
+            const truncatedContent = talk.content.length > 100 ? talk.content.substring(0, 100) + '...' : talk.content;
+
+            return `
+                    <a href="/books/${book.id}" class="list-group-item list-group-item-action text-decoration-none text-dark">
+                        <div class="d-flex w-100 align-items-center">
+                            <!-- Book Info -->
+                            <img src="${book.thumbnailImageUrl || '/images/quiet-chatter-icon.png'}" alt="${book.title}" class="me-3" style="width: 50px; height: auto; border-radius: 0.25rem; object-fit: cover;">
+                            
+                                                    <!-- Talk Content -->
+                                                    <div class="flex-grow-1">
+                                                        <h6 class="mb-1 text-truncate">${book.title}</h6>
+                                                        <small class="text-muted d-block mb-1">${book.author}</small> <!-- 저자 정보 추가 -->
+                                                        <p class="mb-1 text-muted"><em>"${truncatedContent}"</em></p> <!-- 이텔릭체와 인용표시 추가 -->
+                                                    </div>    
+                            <!-- Reactions -->
+                            <div class="text-nowrap ps-3">
+                                <span class="me-2">👍 ${talk.like_count}</span>
+                                <span>❤️ ${talk.support_count}</span>
+                            </div>
+                        </div>
+                    </a>
+                `;
+        }).join('');
+    }
+</script>
 
 </body>
 </html>
