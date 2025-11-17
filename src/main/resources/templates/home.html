@@ -45,7 +45,7 @@
     <div class="recent-talks-section mt-5 text-center"> <!-- text-center 추가 -->
         <h3 class="text-center">이렇게 사용해보세요 :)</h3>
         <img alt="사용 시연 GIF" class="img-fluid" src="/images/사용시연.gif"
-             style="max-width: 50%; height: auto; border-radius: 0.5rem; box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075); display: block; margin: 0 auto;">
+             style="max-width: 70%; height: auto; border-radius: 0.5rem; box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075); display: block; margin: 0 auto;">
         <!-- max-width 70% 및 중앙 정렬 추가 -->
     </div>
 </div>
@@ -97,25 +97,26 @@
             const truncatedContent = talk.content.length > 100 ? talk.content.substring(0, 100) + '...' : talk.content;
 
             return `
-                    <a href="/books/${book.id}" class="list-group-item list-group-item-action text-decoration-none text-dark">
-                        <div class="d-flex w-100 align-items-center">
-                            <!-- Book Info -->
-                            <img src="${book.thumbnailImageUrl || '/images/quiet-chatter-icon.png'}" alt="${book.title}" class="me-3" style="width: 50px; height: auto; border-radius: 0.25rem; object-fit: cover;">
-                            
-                                                    <!-- Talk Content -->
-                                                    <div class="flex-grow-1">
-                                                        <h6 class="mb-1 text-truncate">${book.title}</h6>
-                                                        <small class="text-muted d-block mb-1">${book.author}</small> <!-- 저자 정보 추가 -->
-                                                        <p class="mb-1 text-muted"><em>"${truncatedContent}"</em></p> <!-- 이텔릭체와 인용표시 추가 -->
-                                                    </div>    
-                            <!-- Reactions -->
-                            <div class="text-nowrap ps-3">
-                                <span class="me-2">👍 ${talk.like_count}</span>
-                                <span>❤️ ${talk.support_count}</span>
-                            </div>
+                <a href="/books/${book.id}" class="list-group-item list-group-item-action text-decoration-none text-dark">
+                    <div class="d-flex w-100 align-items-center">
+                        <!-- Book Info -->
+                        <img src="${book.thumbnailImageUrl || '/images/quiet-chatter-icon.png'}" alt="${book.title}" class="me-3" style="width: 50px; height: auto; border-radius: 0.25rem; object-fit: cover;">
+                        
+                        <!-- Talk Content -->
+                        <div class="flex-grow-1" style="min-width: 0;"> <!-- min-width: 0 to help with truncation -->
+                            <h6 class="mb-1 text-truncate">${book.title}</h6>
+                            <small class="text-muted d-block mb-1 text-truncate">${book.author}</small>
+                            <p class="mb-1 text-muted"><em>"${truncatedContent}"</em></p>
                         </div>
-                    </a>
-                `;
+
+                        <!-- Reactions -->
+                        <div class="ps-2"> <!-- Reduced padding -->
+                            <span class="d-block">👍 ${talk.like_count}</span>
+                            <span class="d-block">❤️ ${talk.support_count}</span>
+                        </div>
+                    </div>
+                </a>
+            `;
         }).join('');
     }
 </script>
