@@ -56,6 +56,16 @@
             border-radius: 0.5rem; /* Rounded corners */
             box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075); /* Subtle shadow */
         }
+
+        .reacted {
+            font-weight: bold;
+            color: #007bff; /* Bootstrap primary blue */
+        }
+
+        .reaction-btn {
+            cursor: pointer;
+            user-select: none; /* Prevent text selection on click */
+        }
     </style>
 </head>
 <body>
@@ -114,6 +124,7 @@
     const talksPaginationContainer = document.getElementById('talks-pagination');
     const talkForm = document.getElementById('talk-form');
     const talkContentInput = document.getElementById('talk-content');
+    let currentPage = 0;
     // talkHiddenInput removed
 
     document.addEventListener('DOMContentLoaded', function () {
@@ -220,6 +231,7 @@
     }
 
     function fetchTalks(bookId, page) {
+        currentPage = page;
         fetch(`/api/talks?bookId=${bookId}&page=${page}&size=6&sort=createdAt,desc`)
             .then(response => response.json())
             .then(data => {
@@ -243,7 +255,17 @@
             <div class="card mb-2">
                 <div class="card-body">
                     <p class="card-text">${talk.content}</p>
-                    <small class="text-muted">${new Date(talk.createdAt).toLocaleString()}</small>
+                    <div class="d-flex justify-content-between align-items-center">
+                        <small class="text-muted">${new Date(talk.createdAt).toLocaleString()}</small>
+                        <div>
+                            <span class="reaction-btn me-3 ${talk.didILike ? 'reacted' : ''}" data-talk-id="${talk.id}" data-reaction-type="LIKE" data-reacted="${talk.didILike}">
+                                👍 <span class="count">${talk.like_count}</span>
+                            </span>
+                            <span class="reaction-btn ${talk.didISupport ? 'reacted' : ''}" data-talk-id="${talk.id}" data-reaction-type="SUPPORT" data-reacted="${talk.didISupport}">
+                                ❤️ <span class="count">${talk.support_count}</span>
+                            </span>
+                        </div>
+                    </div>
                 </div>
             </div>
         `).join('');
@@ -298,6 +320,58 @@
             fetchTalks(bookId, page);
         }
     });
+
+    talksContainer.addEventListener('click', function (e) {
+        const target = e.target.closest('.reaction-btn');
+        if (target) {
+            const talkId = target.dataset.talkId;
+            const reactionType = target.dataset.reactionType;
+            const hasReacted = target.dataset.reacted === 'true';
+
+            handleReactionClick(target, talkId, reactionType, hasReacted);
+        }
+    });
+
+    function handleReactionClick(element, talkId, reactionType, hasReacted) {
+        const method = hasReacted ? 'DELETE' : 'POST';
+        fetch(`/api/talks/${talkId}/reactions`, {
+            method: method,
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({type: reactionType})
+        })
+            .then(response => {
+                if (!response.ok) {
+                    // 401 Unauthorized, 403 Forbidden etc.
+                    if (response.status === 401 || response.status === 403) {
+                        alert('로그인이 필요합니다.');
+                        return;
+                    }
+                    throw new Error('리액션 처리에 실패했습니다.');
+                }
+
+                // Optimistically update UI
+                const countSpan = element.querySelector('.count');
+                let currentCount = parseInt(countSpan.textContent, 10);
+
+                if (hasReacted) {
+                    element.classList.remove('reacted');
+                    element.dataset.reacted = 'false';
+                    countSpan.textContent = currentCount - 1;
+                } else {
+                    element.classList.add('reacted');
+                    element.dataset.reacted = 'true';
+                    countSpan.textContent = currentCount + 1;
+                }
+            })
+            .catch(error => {
+                console.error('Error processing reaction:', error);
+                alert(error.message);
+                // Re-fetch to reset state on error
+                fetchTalks(bookId, currentPage);
+            });
+    }
 </script>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>

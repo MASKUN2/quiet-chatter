@@ -32,6 +32,7 @@ public class TalkCreateService implements TalkCreatable {
         talk.updateBookId(request.bookId());
         talk.updateMemberId(request.memberId());
         talk.update(request.content());
+        talk.update(request.time());
 
         return talkRepository.save(talk);
     }

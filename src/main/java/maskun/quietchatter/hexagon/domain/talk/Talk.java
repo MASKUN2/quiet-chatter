@@ -1,6 +1,7 @@
 package maskun.quietchatter.hexagon.domain.talk;
 
 import jakarta.persistence.AttributeOverride;
+import jakarta.persistence.AttributeOverrides;
 import jakarta.persistence.Column;
 import jakarta.persistence.Embedded;
 import jakarta.persistence.Entity;
@@ -30,6 +31,18 @@ public class Talk extends BaseEntity {
     @AttributeOverride(name = "hidden", column = @Column(name = "time_to_hidden"))
     private Time time;
 
+    @Embedded
+    @AttributeOverrides(
+            value = {@AttributeOverride(name = "like", column = @Column(name = "like_count", updatable = false)),
+                    @AttributeOverride(name = "support", column = @Column(name = "support_count", updatable = false))}
+    )
+    private ReactionCount reactionCount;
+
+    public Talk() {
+        reactionCount = ReactionCount.zero();
+        time = new Time(null);
+    }
+
     public void updateBookId(UUID bookId) {
         this.bookId = bookId;
     }
@@ -40,6 +53,10 @@ public class Talk extends BaseEntity {
 
     public void update(Content content) {
         this.content = content;
+    }
+
+    public void update(Time time) {
+        this.time = time;
     }
 
     public boolean isHidden(Instant reference) {
