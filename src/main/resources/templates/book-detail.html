@@ -98,6 +98,11 @@
             border-radius: 0.25rem;
             background-color: #e0e0e0;
         }
+
+        .talk-content-text {
+            white-space: pre-wrap;
+            word-break: break-word;
+        }
     </style>
 </head>
 <body>
@@ -312,7 +317,7 @@
         talksContainer.innerHTML = talks.map(talk => `
             <div class="card mb-2">
                 <div class="card-body">
-                    <p class="card-text">${talk.content}</p>
+                    <p class="card-text talk-content-text">${talk.content}</p>
                     <div class="d-flex justify-content-between align-items-center">
                         <small class="text-muted">${new Date(talk.createdAt).toLocaleString()}</small>
                         <div>
