@@ -10,16 +10,18 @@
     <link href="/css/style.css" rel="stylesheet">
     <style>
         .book-detail-container {
-            background-color: #ffffff; /* White background */
-            padding: 1.5rem; /* Add some padding */
-            border-radius: 0.5rem; /* Rounded corners */
-            box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075); /* Subtle shadow */
+            background-color: #ffffff;
+            padding: 1.5rem;
+            border-radius: 0.5rem;
+            box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
             margin-top: 2rem;
+            min-height: 300px; /* Add min-height */
         }
 
         .book-image {
             max-width: 100%;
-            height: auto;
+            height: 350px; /* Fixed height to match skeleton */
+            object-fit: contain; /* Scale image correctly within fixed height */
             border-radius: 0.5rem;
             box-shadow: 0 0.25rem 0.5rem rgba(0, 0, 0, 0.1);
         }
@@ -39,10 +41,30 @@
             line-height: 1.6;
         }
 
-        /* Media query for mobile responsiveness */
+        .booktalk-section {
+            background-color: #ffffff;
+            padding: 1.5rem;
+            border-radius: 0.5rem;
+            box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+            min-height: 400px; /* Add min-height */
+        }
+
+        .reacted {
+            font-weight: bold;
+            color: #007bff;
+        }
+
+        .reaction-btn {
+            cursor: pointer;
+            user-select: none;
+            border: 1px solid #ced4da;
+            padding: 0.25rem 0.5rem;
+            border-radius: 0.25rem;
+        }
+
         @media (max-width: 767.98px) {
             .book-info h1 {
-                font-size: 1.75rem; /* Smaller font size for mobile */
+                font-size: 1.75rem;
             }
 
             .book-detail-container {
@@ -50,24 +72,31 @@
             }
         }
 
-        .booktalk-section {
-            background-color: #ffffff; /* White background */
-            padding: 1.5rem; /* Add some padding */
-            border-radius: 0.5rem; /* Rounded corners */
-            box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075); /* Subtle shadow */
+        /* Skeleton UI Styles */
+        .skeleton {
+            animation: skeleton-loading 1s linear infinite alternate;
         }
 
-        .reacted {
-            font-weight: bold;
-            color: #007bff; /* Bootstrap primary blue */
+        @keyframes skeleton-loading {
+            0% {
+                background-color: hsl(200, 20%, 80%);
+            }
+            100% {
+                background-color: hsl(200, 20%, 95%);
+            }
         }
 
-        .reaction-btn {
-            cursor: pointer;
-            user-select: none; /* Prevent text selection on click */
-            border: 1px solid #ced4da; /* Add a border */
-            padding: 0.25rem 0.5rem; /* Add some padding */
-            border-radius: 0.25rem; /* Rounded corners */
+        .skeleton-image {
+            width: 100%;
+            height: 350px;
+            border-radius: 0.5rem;
+        }
+
+        .skeleton-text {
+            height: 1rem;
+            margin-bottom: 0.75rem;
+            border-radius: 0.25rem;
+            background-color: #e0e0e0;
         }
     </style>
 </head>
@@ -80,19 +109,31 @@
     <div class="book-detail-container">
         <h2 class="mb-3">도서 상세정보</h2>
         <div class="row">
-            <!-- Explicitly stack on mobile -->
             <div class="col-12 col-md-4 text-center">
-                <img alt="Book cover" class="book-image" id="book-image" src="">
+                <!-- Skeleton for image, replaced by JS -->
+                <div id="book-image-container">
+                    <div class="skeleton skeleton-image"></div>
+                </div>
+                <img alt="Book cover" class="book-image d-none" id="book-image" src="">
             </div>
-            <!-- Add margin-top for mobile stacking -->
             <div class="col-12 col-md-8 book-info mt-3 mt-md-0">
-                <h1 id="book-title"></h1>
-                <p><strong>저자:</strong> <span id="book-author"></span></p>
-                <p><strong>ISBN:</strong> <span id="book-isbn"></span></p>
-                <p class="description" id="book-description"></p>
+                <!-- Skeletons for text, replaced by JS -->
+                <h1 id="book-title">
+                    <div class="skeleton skeleton-text" style="width: 80%;"></div>
+                </h1>
+                <p><strong>저자:</strong> <span id="book-author"><span class="skeleton skeleton-text d-inline-block"
+                                                                     style="width: 40%;"></span></span></p>
+                <p><strong>ISBN:</strong> <span id="book-isbn"><span class="skeleton skeleton-text d-inline-block"
+                                                                     style="width: 50%;"></span></span></p>
+                <div class="description" id="book-description">
+                    <div class="skeleton skeleton-text" style="width: 100%;"></div>
+                    <div class="skeleton skeleton-text" style="width: 100%;"></div>
+                    <div class="skeleton skeleton-text" style="width: 70%;"></div>
+                </div>
             </div>
         </div>
     </div>
+
 
     <!-- BookTalk Section -->
     <div class="booktalk-section mt-5">
@@ -105,10 +146,8 @@
                           required rows="3"></textarea>
             </div>
             <div class="d-flex justify-content-between align-items-center">
-                <!-- Replaced "비밀글" checkbox with clock icon and tooltip -->
                 <span class="text-muted" data-bs-placement="top" data-bs-toggle="tooltip"
                       title="이 글은 12개월 후 자동으로 숨김됩니다.">
-                    <i class="bi bi-clock"></i> <!-- Requires Bootstrap Icons -->
                     🕗
                 </span>
                 <button class="btn btn-primary" type="submit">등록</button>
@@ -128,14 +167,12 @@
     const talkForm = document.getElementById('talk-form');
     const talkContentInput = document.getElementById('talk-content');
     let currentPage = 0;
-    // talkHiddenInput removed
 
     document.addEventListener('DOMContentLoaded', function () {
         if (bookId) {
             fetchBookDetails(bookId);
             fetchTalks(bookId, 0); // Fetch first page of talks
         }
-        // Initialize Bootstrap tooltips
         var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
         var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
             return new bootstrap.Tooltip(tooltipTriggerEl)
@@ -145,14 +182,10 @@
     talkForm.addEventListener('submit', function (e) {
         e.preventDefault();
         const content = talkContentInput.value;
-        // hidden variable removed
-
         if (content) {
-            // Calculate hidden timestamp (current UTC time + 12 months)
             const now = new Date();
             now.setUTCMonth(now.getUTCMonth() + 12);
-            const hiddenTimestamp = now.toISOString(); // ISO 8601 format for API
-
+            const hiddenTimestamp = now.toISOString();
             postTalk(bookId, content, hiddenTimestamp);
         }
     });
@@ -160,14 +193,8 @@
     function postTalk(bookId, content, hiddenTimestamp) {
         fetch('/api/talks', {
             method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({
-                bookId: bookId,
-                content: content,
-                hidden: hiddenTimestamp // Use the calculated timestamp
-            })
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({bookId: bookId, content: content, hidden: hiddenTimestamp})
         })
             .then(response => {
                 if (!response.ok) {
@@ -178,10 +205,7 @@
                 return response.json();
             })
             .then(data => {
-                console.log('Talk posted successfully:', data);
-                // Clear the form
                 talkContentInput.value = '';
-                // Refresh the talk list to the first page
                 fetchTalks(bookId, 0);
             })
             .catch(error => {
@@ -193,9 +217,7 @@
     function fetchBookDetails(bookId) {
         fetch(`/api/books/${bookId}`)
             .then(response => {
-                if (!response.ok) {
-                    throw new Error('Book not found');
-                }
+                if (!response.ok) throw new Error('Book not found');
                 return response.json();
             })
             .then(book => {
@@ -210,37 +232,70 @@
     function renderBookDetail(book) {
         document.title = book.title + ' - Quiet Chatter';
 
+        // --- Image Handling ---
         const bookImage = document.getElementById('book-image');
+        const bookImageContainer = document.getElementById('book-image-container');
+
         if (book.thumbnailImageUrl) {
             bookImage.src = book.thumbnailImageUrl;
             bookImage.alt = book.title;
-            // Wrap image with a link
+            bookImage.classList.remove('d-none'); // Show actual image
+            bookImageContainer.classList.add('d-none'); // Hide image skeleton container
+
             if (book.externalLinkUrl) {
                 const link = document.createElement('a');
                 link.href = book.externalLinkUrl;
                 link.target = '_blank';
-                // Insert link before image, then move image inside link
-                bookImage.parentNode.insertBefore(link, bookImage);
-                link.appendChild(bookImage);
+                if (!bookImage.parentNode.isEqualNode(link)) {
+                    bookImage.parentNode.insertBefore(link, bookImage);
+                    link.appendChild(bookImage);
+                }
             }
         } else {
-            bookImage.style.display = 'none';
+            // If no thumbnail, hide the whole image area
+            bookImage.parentNode.parentNode.style.display = 'none';
         }
 
-        document.getElementById('book-title').textContent = book.title;
-        document.getElementById('book-author').textContent = book.author;
-        document.getElementById('book-isbn').textContent = book.isbn;
-        document.getElementById('book-description').textContent = book.description;
+        // --- Text Handling ---
+        // Directly setting innerHTML will replace all child nodes, including the skeletons.
+        document.getElementById('book-title').innerHTML = book.title;
+        document.getElementById('book-author').innerHTML = book.author;
+        document.getElementById('book-isbn').innerHTML = book.isbn;
+        document.getElementById('book-description').innerHTML = book.description;
+    }
+
+    function renderTalksSkeleton(count = 6) {
+        const skeletonHTML = Array(count).fill(0).map(() => `
+            <div class="card mb-2">
+                <div class="card-body">
+                    <div class="skeleton skeleton-text" style="width: 80%;"></div>
+                    <div class="skeleton skeleton-text" style="width: 60%;"></div>
+                    <div class="d-flex justify-content-between align-items-center mt-3">
+                        <div class="skeleton skeleton-text" style="width: 30%;"></div>
+                        <div class="d-flex">
+                            <div class="skeleton skeleton-text me-3" style="width: 50px;"></div>
+                            <div class="skeleton skeleton-text" style="width: 50px;"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        `).join('');
+        talksContainer.innerHTML = skeletonHTML;
     }
 
     function fetchTalks(bookId, page) {
         currentPage = page;
+        renderTalksSkeleton(); // Show skeleton UI first
+
         fetch(`/api/talks?bookId=${bookId}&page=${page}&size=6&sort=createdAt,desc`)
             .then(response => response.json())
             .then(data => {
                 if (data && data.content) {
                     renderTalks(data.content);
                     renderTalksPagination(data.page);
+                } else {
+                    talksContainer.innerHTML = '<p class="text-muted">작성된 북톡이 없습니다.</p>';
+                    renderTalksPagination({totalPages: 0}); // Clear pagination
                 }
             })
             .catch(error => {
@@ -281,15 +336,13 @@
         const ul = document.createElement('ul');
         ul.className = 'pagination justify-content-center';
 
-        // Previous button
-        if (page.number > 0) { // Check if it's not the first page
+        if (page.number > 0) {
             const prevLi = document.createElement('li');
             prevLi.className = 'page-item';
             prevLi.innerHTML = `<a class="page-link" href="#" data-page="${page.number - 1}">이전</a>`;
             ul.appendChild(prevLi);
         }
 
-        // Page numbers
         const maxPagesToShow = 10;
         let startPage = Math.max(0, page.number - Math.floor(maxPagesToShow / 2));
         let endPage = Math.min(page.totalPages - 1, startPage + maxPagesToShow - 1);
@@ -305,8 +358,7 @@
             ul.appendChild(li);
         }
 
-        // Next button
-        if (page.number < page.totalPages - 1) { // Check if it's not the last page
+        if (page.number < page.totalPages - 1) {
             const nextLi = document.createElement('li');
             nextLi.className = 'page-item';
             nextLi.innerHTML = `<a class="page-link" href="#" data-page="${page.number + 1}">다음</a>`;
@@ -339,25 +391,19 @@
         const method = hasReacted ? 'DELETE' : 'POST';
         fetch(`/api/talks/${talkId}/reactions`, {
             method: method,
-            headers: {
-                'Content-Type': 'application/json'
-            },
+            headers: {'Content-Type': 'application/json'},
             body: JSON.stringify({type: reactionType})
         })
             .then(response => {
                 if (!response.ok) {
-                    // 401 Unauthorized, 403 Forbidden etc.
                     if (response.status === 401 || response.status === 403) {
                         alert('로그인이 필요합니다.');
                         return;
                     }
                     throw new Error('리액션 처리에 실패했습니다.');
                 }
-
-                // Optimistically update UI
                 const countSpan = element.querySelector('.count');
                 let currentCount = parseInt(countSpan.textContent, 10);
-
                 if (hasReacted) {
                     element.classList.remove('reacted');
                     element.dataset.reacted = 'false';
@@ -371,7 +417,6 @@
             .catch(error => {
                 console.error('Error processing reaction:', error);
                 alert(error.message);
-                // Re-fetch to reset state on error
                 fetchTalks(bookId, currentPage);
             });
     }
