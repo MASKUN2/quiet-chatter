@@ -103,6 +103,23 @@
             white-space: pre-wrap;
             word-break: break-word;
         }
+
+        @media (max-width: 380px) {
+            .reaction-buttons-container {
+                display: flex;
+                flex-direction: column;
+                align-items: flex-end; /* Right-align the buttons */
+            }
+
+            .reaction-buttons-container .reaction-btn {
+                margin-right: 0 !important; /* Remove right margin */
+                margin-bottom: 0.5rem; /* Add some space between stacked buttons */
+            }
+
+            .reaction-buttons-container .reaction-btn:last-child {
+                margin-bottom: 0; /* No margin for the last button */
+            }
+        }
     </style>
 </head>
 <body>
@@ -320,7 +337,7 @@
                     <p class="card-text talk-content-text">${talk.content}</p>
                     <div class="d-flex justify-content-between align-items-center">
                         <small class="text-muted">${new Date(talk.createdAt).toLocaleString()}</small>
-                        <div>
+                        <div class="reaction-buttons-container">
                             <span class="reaction-btn me-3 ${talk.didILike ? 'reacted' : ''}" data-talk-id="${talk.id}" data-reaction-type="LIKE" data-reacted="${talk.didILike}">
                                 👍 <span class="count">${talk.like_count}</span>
                             </span>
