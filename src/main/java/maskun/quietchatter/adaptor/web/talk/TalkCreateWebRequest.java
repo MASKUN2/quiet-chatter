@@ -4,13 +4,13 @@ import java.time.Instant;
 import java.util.Objects;
 import java.util.UUID;
 
-public record TalkPostRequest(
+public record TalkCreateWebRequest(
         UUID bookId,
         String content,
         Instant hidden
 ) {
 
-    public TalkPostRequest {
+    public TalkCreateWebRequest {
         Objects.requireNonNull(bookId);
         Objects.requireNonNull(content);
     }
