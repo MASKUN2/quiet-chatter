@@ -1,4 +1,4 @@
-package maskun.quietchatter.hexagon.domain.member;
+package maskun.quietchatter.member.domain;
 
 import static org.assertj.core.api.Assertions.assertThat;
 

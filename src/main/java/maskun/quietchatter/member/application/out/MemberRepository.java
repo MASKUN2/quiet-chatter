@@ -1,9 +1,9 @@
-package maskun.quietchatter.hexagon.outbound;
+package maskun.quietchatter.member.application.out;
 
 import java.util.NoSuchElementException;
 import java.util.Optional;
 import java.util.UUID;
-import maskun.quietchatter.hexagon.domain.member.Member;
+import maskun.quietchatter.member.domain.Member;
 import org.springframework.data.repository.Repository;
 
 public interface MemberRepository extends Repository<Member, UUID> {

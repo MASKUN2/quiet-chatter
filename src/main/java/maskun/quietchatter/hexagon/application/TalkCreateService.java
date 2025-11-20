@@ -4,8 +4,8 @@ import maskun.quietchatter.hexagon.application.value.TalkCreateRequest;
 import maskun.quietchatter.hexagon.domain.talk.Talk;
 import maskun.quietchatter.hexagon.inbound.TalkCreatable;
 import maskun.quietchatter.hexagon.outbound.BookRepository;
-import maskun.quietchatter.hexagon.outbound.MemberRepository;
 import maskun.quietchatter.hexagon.outbound.TalkRepository;
+import maskun.quietchatter.member.application.out.MemberRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 

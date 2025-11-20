@@ -1,11 +1,11 @@
 package maskun.quietchatter.adaptor.web.security;
 
-import static maskun.quietchatter.hexagon.domain.member.Role.GUEST;
+import static maskun.quietchatter.member.domain.Role.GUEST;
 
 import java.util.List;
 import lombok.RequiredArgsConstructor;
-import maskun.quietchatter.hexagon.domain.member.Member;
-import maskun.quietchatter.hexagon.inbound.GuestRegistrable;
+import maskun.quietchatter.member.application.in.GuestRegistrable;
+import maskun.quietchatter.member.domain.Member;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;

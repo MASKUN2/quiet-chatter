@@ -1,4 +1,4 @@
-package maskun.quietchatter.hexagon.domain.member;
+package maskun.quietchatter.member.domain;
 
 import jakarta.persistence.AttributeOverride;
 import jakarta.persistence.AttributeOverrides;
@@ -46,10 +46,6 @@ public class Member extends BaseEntity {
         Assert.isTrue(role.equals(Role.GUEST), "회원이 게스트가 아닙니다");
         this.login = login;
         this.role = Role.REGULAR;
-    }
-
-    public boolean verify(Secret password, PasswordEncoder passwordEncoder) {
-        return passwordEncoder.matches(password, login.password());
     }
 
     @Nullable

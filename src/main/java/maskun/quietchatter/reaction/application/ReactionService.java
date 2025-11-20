@@ -1,8 +1,8 @@
 package maskun.quietchatter.reaction.application;
 
 import lombok.RequiredArgsConstructor;
-import maskun.quietchatter.hexagon.outbound.MemberRepository;
 import maskun.quietchatter.hexagon.outbound.TalkRepository;
+import maskun.quietchatter.member.application.out.MemberRepository;
 import maskun.quietchatter.reaction.application.in.ReactionModifiable;
 import maskun.quietchatter.reaction.application.out.ReactionEventPublisher;
 import org.springframework.stereotype.Service;

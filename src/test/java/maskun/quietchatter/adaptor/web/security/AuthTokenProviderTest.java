@@ -4,9 +4,9 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.instancio.Select.field;
 import static org.mockito.Mockito.when;
 
-import maskun.quietchatter.hexagon.domain.member.Member;
-import maskun.quietchatter.hexagon.domain.member.Role;
-import maskun.quietchatter.hexagon.inbound.GuestRegistrable;
+import maskun.quietchatter.member.application.in.GuestRegistrable;
+import maskun.quietchatter.member.domain.Member;
+import maskun.quietchatter.member.domain.Role;
 import org.instancio.Instancio;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;

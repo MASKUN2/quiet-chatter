@@ -1,15 +1,15 @@
-package maskun.quietchatter.hexagon.application;
+package maskun.quietchatter.member.application;
 
 import lombok.RequiredArgsConstructor;
-import maskun.quietchatter.hexagon.domain.member.Member;
-import maskun.quietchatter.hexagon.inbound.GuestRegistrable;
-import maskun.quietchatter.hexagon.outbound.MemberRepository;
+import maskun.quietchatter.member.application.in.GuestRegistrable;
+import maskun.quietchatter.member.application.out.MemberRepository;
+import maskun.quietchatter.member.domain.Member;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
-public class MemberRegistrator implements GuestRegistrable {
+class MemberRegistrator implements GuestRegistrable {
     private final MemberRepository memberRepository;
 
     @Override
