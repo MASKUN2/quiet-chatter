@@ -21,10 +21,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.security.servlet.SecurityAutoConfiguration;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.context.annotation.Import;
-import org.springframework.data.domain.Limit;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.assertj.MockMvcTester;
@@ -49,7 +47,6 @@ class TalkQueryApiTest {
 
     final int pageSize = 10;
     final int pageNumber = 0;
-    final int recentLimit = 4;
 
     @BeforeEach
     void setUp() {
@@ -59,33 +56,6 @@ class TalkQueryApiTest {
 
         when(talkQueryable.findBy(eq(request)))
                 .thenReturn(new PageImpl<>(talks, request.pageRequest(), talks.size()));
-
-        when(talkQueryable.getRecent(eq(Limit.of(recentLimit))))
-                .thenReturn(getTalkFixtures(recentLimit));
-    }
-
-    @Test
-    @DisplayName("최근 조회")
-    void getRecent() {
-        MvcTestResult result = tester.get()
-                .uri(getRecentUri())
-                .contentType(MediaType.APPLICATION_JSON)
-                .exchange();
-
-        assertThat(result)
-                .hasStatus(HttpStatus.OK)
-                .bodyJson()
-                .extractingPath("$")
-                .asArray()
-                .hasSize(recentLimit)
-                .allSatisfy(element -> {
-                    assertThat(element).extracting("id").isNotNull();
-                    assertThat(element).extracting("bookId").isNotNull();
-                    assertThat(element).extracting("memberId").isNotNull();
-                    assertThat(element).extracting("content").isNotNull();
-                    assertThat(element).extracting("like_count").isNotNull();
-                    assertThat(element).extracting("support_count").isNotNull();
-                });
     }
 
     @Test
@@ -106,12 +76,6 @@ class TalkQueryApiTest {
                 .hasPathSatisfying("$.content[*].id", value -> assertThat(value).isNotEmpty());
     }
 
-    private String getRecentUri() {
-        return UriComponentsBuilder.fromPath("/api/talks")
-                .queryParam("recent-limit", recentLimit)
-                .toUriString();
-    }
-
     private @NotNull String getPageUri() {
         return UriComponentsBuilder.fromPath("/api/talks")
                 .queryParam("size", pageSize)
@@ -124,12 +88,6 @@ class TalkQueryApiTest {
         return Instancio.ofList(Talk.class)
                 .size(size)
                 .set(field(Talk::getBookId), bookId)
-                .create();
-    }
-
-    private static List<Talk> getTalkFixtures(int size) {
-        return Instancio.ofList(Talk.class)
-                .size(size)
                 .create();
     }
 }

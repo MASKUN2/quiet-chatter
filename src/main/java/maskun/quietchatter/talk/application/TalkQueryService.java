@@ -1,20 +1,22 @@
 package maskun.quietchatter.talk.application;
 
-import java.util.List;
 import lombok.RequiredArgsConstructor;
+import maskun.quietchatter.talk.application.in.RecommendTalkQueryable;
+import maskun.quietchatter.talk.application.in.RecommendTalks;
 import maskun.quietchatter.talk.application.in.TalkQueryRequest;
 import maskun.quietchatter.talk.application.in.TalkQueryable;
+import maskun.quietchatter.talk.application.out.RecommendTalkRepository;
 import maskun.quietchatter.talk.application.out.TalkRepository;
 import maskun.quietchatter.talk.domain.Talk;
-import org.springframework.data.domain.Limit;
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
-class TalkQueryService implements TalkQueryable {
+class TalkQueryService implements TalkQueryable, RecommendTalkQueryable {
     private final TalkRepository talkRepository;
+    private final RecommendTalkRepository recommendTalkRepository;
 
     @Override
     @Transactional(readOnly = true)
@@ -24,7 +26,7 @@ class TalkQueryService implements TalkQueryable {
 
     @Override
     @Transactional(readOnly = true)
-    public List<Talk> getRecent(Limit limit) {
-        return talkRepository.findByOrderByCreatedAtDesc(limit);
+    public RecommendTalks get() {
+        return recommendTalkRepository.get();
     }
 }

@@ -81,9 +81,9 @@
 
     <!-- Recent BookTalks Section -->
     <div class="recent-talks-section mt-5">
-        <h2 class="text-center">새로 올라온 북톡</h2>
+        <h2 class="text-center">당신을 위한 북톡 <span style="color: #6c757d; font-size: 0.8em;">BookTalk</span></h2>
         <div class="list-group" id="recent-talks-container">
-            <!-- Recent talks will be dynamically inserted here -->
+            <!-- Recent items will be dynamically inserted here -->
         </div>
     </div>
 
@@ -101,6 +101,8 @@
     <div class="recent-talks-section mt-5">
         <h2 class="text-center">최근 업데이트 내용</h2>
         <ul class="list-unstyled mb-0 px-3">
+            <li>- 이제부터 시간을 두고 랜덤으로 북톡이 추천됩니다</li>
+            <li>- 일부 ui가 깨지는 현상을 수정했습니다</li>
             <li>- 보호를 위해 API rate limit를 설정했습니다</li>
             <li>- 홈 화면의 사용법 안내가 이제 동영상으로 표시되어 더 빠르게 보여집니다</li>
             <li>- 데이터를 불러오는 중의 화면 깜빡임 문제를 해결했습니다</li>
@@ -116,7 +118,7 @@
         fetchRecentTalksAndBooks();
     });
 
-    function renderRecentTalksSkeleton(count = 4) {
+    function renderRecentTalksSkeleton(count = 6) {
         const container = document.getElementById('recent-talks-container');
         const skeletonHTML = Array(count).fill(0).map(() => `
             <a class="list-group-item list-group-item-action text-decoration-none text-dark">
@@ -147,9 +149,9 @@
         renderRecentTalksSkeleton(); // Show skeleton UI first
 
         try {
-            // 1. Fetch recent talks
-            const talksResponse = await fetch('/api/talks?recent-limit=4');
-            if (!talksResponse.ok) throw new Error('최근 북톡을 불러오는 데 실패했습니다.');
+            // 1. Fetch recent items
+            const talksResponse = await fetch('/api/talks/recommend');
+            if (!talksResponse.ok) throw new Error('추천 북톡을 불러오는 데 실패했습니다.');
             const talks = await talksResponse.json();
 
             if (talks.length === 0) {

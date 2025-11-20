@@ -120,6 +120,14 @@
                 margin-bottom: 0; /* No margin for the last button */
             }
         }
+
+        /* Media query for mobile responsiveness */
+        @media (max-width: 576px) {
+            .container { /* Target the main container */
+                padding-left: 0 !important;
+                padding-right: 0 !important;
+            }
+        }
     </style>
 </head>
 <body>
@@ -193,7 +201,7 @@
     document.addEventListener('DOMContentLoaded', function () {
         if (bookId) {
             fetchBookDetails(bookId);
-            fetchTalks(bookId, 0); // Fetch first page of talks
+            fetchTalks(bookId, 0); // Fetch first page of items
         }
         var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
         var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {

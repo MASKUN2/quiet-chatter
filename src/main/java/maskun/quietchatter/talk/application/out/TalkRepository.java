@@ -1,12 +1,12 @@
 package maskun.quietchatter.talk.application.out;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Optional;
 import java.util.UUID;
 import maskun.quietchatter.member.domain.Member;
 import maskun.quietchatter.talk.domain.Talk;
-import org.springframework.data.domain.Limit;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.repository.Repository;
@@ -26,5 +26,5 @@ public interface TalkRepository extends Repository<Talk, UUID> {
 
     Optional<Talk> findById(UUID id);
 
-    List<Talk> findByOrderByCreatedAtDesc(Limit limit);
+    List<Talk> findAllByIdIn(Collection<UUID> ids);
 }

@@ -5,7 +5,6 @@ import static java.util.stream.Collectors.mapping;
 import static java.util.stream.Collectors.toSet;
 
 import java.time.Instant;
-import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
@@ -18,7 +17,6 @@ import maskun.quietchatter.talk.application.in.TalkQueryRequest;
 import maskun.quietchatter.talk.application.in.TalkQueryable;
 import maskun.quietchatter.talk.domain.Talk;
 import maskun.quietchatter.talk.domain.Time;
-import org.springframework.data.domain.Limit;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
@@ -56,24 +54,6 @@ class TalkQueryApi {
         });
 
         return ResponseEntity.ok(page);
-    }
-
-    @GetMapping(params = "recent-limit")
-    ResponseEntity<List<TalkResponse>> getRecent(@RequestParam("recent-limit") int size) {
-        List<Talk> talks = talkQueryable.getRecent(Limit.of(size));
-        List<TalkResponse> responses = talks.stream().map(talk -> new TalkResponse(
-                talk.getId(),
-                talk.getBookId(),
-                talk.getMemberId(),
-                talk.getCreatedAt(),
-                Optional.ofNullable(talk.getTime()).map(Time::hidden).orElse(null),
-                talk.getContent().value(),
-                talk.getReactionCount().like(),
-                false,
-                talk.getReactionCount().support(),
-                false
-        )).toList();
-        return ResponseEntity.ok(responses);
     }
 
     private static TalkResponse getTalkResponse(Talk talk, boolean didILike, boolean didISupport) {
