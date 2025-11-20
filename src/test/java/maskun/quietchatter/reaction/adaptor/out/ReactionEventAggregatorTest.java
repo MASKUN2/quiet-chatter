@@ -15,12 +15,11 @@ class ReactionEventAggregatorTest {
     @Test
     @DisplayName("집계처리가 잘되는지 테스트")
     void aggregationTest() {
-        List<ReactionEvent> requests = new ArrayList<>();
 
         List<ReactionEvent> inserts = Instancio.ofList(ReactionEvent.class).size(100)
                 .set(field(ReactionEvent::action), Action.INSERT)
                 .create();
-        requests.addAll(inserts);
+        List<ReactionEvent> requests = new ArrayList<>(inserts);
 
         List<ReactionEvent> conflicts = inserts.subList(0, 10).stream()
                 .map(request -> new ReactionEvent(request.talkId(), request.memberId(), request.type(),

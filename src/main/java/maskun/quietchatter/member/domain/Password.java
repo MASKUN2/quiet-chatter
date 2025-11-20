@@ -1,6 +1,7 @@
 package maskun.quietchatter.member.domain;
 
 import jakarta.persistence.Embeddable;
+import org.springframework.lang.NonNull;
 
 @Embeddable
 public record Password(String hash) {
@@ -12,6 +13,7 @@ public record Password(String hash) {
     }
 
     @Override
+    @NonNull
     public String toString() {
         return "숨겨짐";
     }

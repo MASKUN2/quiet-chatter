@@ -2,7 +2,6 @@ package maskun.quietchatter.talk.application;
 
 import java.util.List;
 import lombok.RequiredArgsConstructor;
-import maskun.quietchatter.book.application.out.BookRepository;
 import maskun.quietchatter.talk.application.in.TalkQueryRequest;
 import maskun.quietchatter.talk.application.in.TalkQueryable;
 import maskun.quietchatter.talk.application.out.TalkRepository;
@@ -15,7 +14,6 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 @RequiredArgsConstructor
 class TalkQueryService implements TalkQueryable {
-    private final BookRepository bookRepository;
     private final TalkRepository talkRepository;
 
     @Override

@@ -7,7 +7,6 @@ import jakarta.persistence.Embedded;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Index;
 import jakarta.persistence.Table;
-import java.time.Instant;
 import java.util.UUID;
 import lombok.Getter;
 import maskun.quietchatter.shared.persistence.BaseEntity;
@@ -58,11 +57,6 @@ public class Talk extends BaseEntity {
 
     public void update(Time time) {
         this.time = time;
-    }
-
-    public boolean isHidden(Instant reference) {
-        Instant hidden = time.hidden();
-        return reference.isAfter(hidden);
     }
 
     @Override

@@ -20,7 +20,6 @@ import org.springframework.test.context.ActiveProfiles;
 @Import({JpaConfig.class, ReactionBatchWorker.class})
 @ActiveProfiles("test")
 class ReactionBatchWorkerTest {
-    private final int size = 10;
 
     @Autowired
     private ReactionBatchWorker worker;

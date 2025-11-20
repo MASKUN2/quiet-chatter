@@ -31,6 +31,7 @@ import org.springframework.test.web.servlet.assertj.MockMvcTester;
 import org.springframework.test.web.servlet.assertj.MvcTestResult;
 import org.springframework.web.util.UriComponentsBuilder;
 
+@SuppressWarnings("SameParameterValue")
 @WebMvcTest(controllers = TalkQueryApi.class,
         excludeAutoConfiguration = SecurityAutoConfiguration.class)
 @Import(WebConfig.class)

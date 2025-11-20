@@ -11,6 +11,7 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+@SuppressWarnings({"FieldCanBeLocal", "ConstantValue"})
 @ExtendWith(MockitoExtension.class)
 class ReactionEventHandlerTest {
     private final int eventCount = 10_000;

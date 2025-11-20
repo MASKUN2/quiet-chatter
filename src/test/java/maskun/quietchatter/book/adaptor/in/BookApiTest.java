@@ -8,7 +8,6 @@ import java.util.List;
 import maskun.quietchatter.book.application.in.BookQueryable;
 import maskun.quietchatter.book.domain.Book;
 import maskun.quietchatter.shared.web.WebConfig;
-import net.datafaker.Faker;
 import org.instancio.Instancio;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -34,8 +33,6 @@ class BookApiTest {
     @Test
     @DisplayName("첵조회 페이지 테스트")
     void search() {
-
-        Faker faker = new Faker();
         List<Book> books = Instancio.ofList(Book.class).size(10).create();
 
         PageRequest pageRequest = PageRequest.of(0, 10);

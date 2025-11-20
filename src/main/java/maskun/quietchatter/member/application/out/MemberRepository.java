@@ -15,6 +15,4 @@ public interface MemberRepository extends Repository<Member, UUID> {
         return findById(id).orElseThrow(() ->
                 new NoSuchElementException("찾을 수 없음 [%s] id=%s".formatted(Member.class.getSimpleName(), id)));
     }
-
-    ;
 }
