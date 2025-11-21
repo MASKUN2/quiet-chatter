@@ -84,26 +84,52 @@
 <script type="module">
     import * as api from '/js/api.js';
 
-    document.addEventListener('DOMContentLoaded', function () {
-        fetchRecentTalksAndBooks();
-    });
+    // --- 상수 ---
+    const talksContainer = document.getElementById('recent-talks-container');
+
+    // --- 초기화 ---
+    document.addEventListener('DOMContentLoaded', fetchAndRenderPage);
+
+    // --- 데이터 로딩 및 총괄 ---
+    async function fetchAndRenderPage() {
+        renderRecentTalksSkeleton();
+        try {
+            const talks = await api.getRecommendedTalks();
+            if (talks.length === 0) {
+                renderNoTalks();
+                return;
+            }
+            const bookIds = [...new Set(talks.map(talk => talk.bookId))];
+            const books = await api.getBooksByIds(bookIds);
+            renderPageContent(talks, books);
+        } catch (error) {
+            console.error('Error fetching recent talks and books:', error);
+            talksContainer.innerHTML = `<div class="alert alert-danger">${error.message}</div>`;
+        }
+    }
+
+    // --- UI 렌더링 ---
+    function renderPageContent(talks, books) {
+        const booksMap = new Map(books.map(book => [book.id, book]));
+        talksContainer.innerHTML = talks
+            .map(talk => createTalkElement(talk, booksMap.get(talk.bookId)))
+            .join('');
+    }
+
+    function renderNoTalks() {
+        talksContainer.innerHTML = '<p class="text-muted">최근 등록된 북톡이 없습니다.</p>';
+    }
 
     function renderRecentTalksSkeleton(count = 6) {
-        const container = document.getElementById('recent-talks-container');
         const skeletonHTML = Array(count).fill(0).map(() => `
             <a class="list-group-item list-group-item-action text-decoration-none text-dark">
                 <div class="d-flex w-100 align-items-center">
-                    <!-- 스켈레톤 책 정보 -->
                     <div class="skeleton skeleton-avatar me-3"></div>
-
-                    <!-- 스켈레톤 북톡 내용 -->
                     <div class="flex-grow-1" style="min-width: 0;">
                         <div class="skeleton skeleton-text" style="width: 60%;"></div>
                         <div class="skeleton skeleton-text" style="width: 40%;"></div>
                         <div class="skeleton skeleton-text" style="width: 80%;"></div>
                     </div>
-
-                    <!-- 스켈레톤 리액션 -->
                     <div class="d-flex align-items-center gap-2 px-2">
                          <div class="skeleton skeleton-text" style="width: 25px;"></div>
                          <div class="skeleton skeleton-text" style="width: 25px;"></div>
@@ -111,68 +137,32 @@
                 </div>
             </a>
         `).join('');
-        container.innerHTML = skeletonHTML;
+        talksContainer.innerHTML = skeletonHTML;
     }
 
-    async function fetchRecentTalksAndBooks() {
-        const container = document.getElementById('recent-talks-container');
-        renderRecentTalksSkeleton(); // 먼저 스켈레톤 UI 표시
-
-        try {
-            // 1. 최근 북톡 가져오기
-            const talks = await api.getRecommendedTalks();
-
-            if (talks.length === 0) {
-                container.innerHTML = '<p class="text-muted">최근 등록된 북톡이 없습니다.</p>';
-                return;
-            }
-
-            // 2. 고유한 책 ID를 추출하고 해당하는 책 정보 가져오기
-            const bookIds = [...new Set(talks.map(talk => talk.bookId))];
-            const books = await api.getBooksByIds(bookIds);
-
-            // 3. 쉬운 조회를 위한 맵 생성
-            const booksMap = new Map(books.map(book => [book.id, book]));
-
-            // 4. 결합된 데이터 렌더링
-            renderRecentTalks(talks, booksMap);
-
-        } catch (error) {
-            console.error('Error fetching recent talks and books:', error);
-            container.innerHTML = `<div class="alert alert-danger">${error.message}</div>`;
-        }
-    }
-
-    function renderRecentTalks(talks, booksMap) {
-        const container = document.getElementById('recent-talks-container');
-        container.innerHTML = talks.map(talk => {
-            const book = booksMap.get(talk.bookId);
-            if (!book) return ''; // 어떤 이유로 책 정보를 찾을 수 없는 경우 건너뛰기
-
-            const truncatedContent = talk.content.length > 100 ? talk.content.substring(0, 100) + '...' : talk.content;
-
-            return `
-                <a href="/books/${book.id}" class="list-group-item list-group-item-action text-decoration-none text-dark">
-                    <div class="d-flex w-100 align-items-center">
-                        <!-- 책 정보 -->
-                        <img src="${book.thumbnailImageUrl || '/images/quiet-chatter-icon.png'}" alt="${book.title}" class="me-3" style="width: 50px; height: auto; border-radius: 0.25rem; object-fit: cover;">
-
-                        <!-- 북톡 내용 -->
-                        <div class="flex-grow-1" style="min-width: 0;"> <!-- 잘림을 돕기 위한 min-width: 0 -->
-                            <h6 class="mb-1 text-truncate">${book.title}</h6>
-                            <small class="text-muted d-block mb-1 text-truncate">${book.author}</small>
-                            <p class="mb-1 text-muted text-truncate"><em>"${truncatedContent}"</em></p>
-                        </div>
-
-                        <!-- 리액션 -->
-                        <div class="d-flex align-items-center gap-2 px-2">
-                            <span class="text-nowrap">👍 ${talk.like_count}</span>
-                            <span class="text-nowrap">❤️ ${talk.support_count}</span>
-                        </div>
+    // --- UI 헬퍼 ---
+    function createTalkElement(talk, book) {
+        if (!book) return '';
+        const truncatedContent = talk.content.length > 100 ? talk.content.substring(0, 100) + '...' : talk.content;
+        return `
+            <a href="/books/${book.id}" class="list-group-item list-group-item-action text-decoration-none text-dark">
+                <div class="d-flex w-100 align-items-center">
+                    <!-- 책 정보 -->
+                    <img src="${book.thumbnailImageUrl || '/images/quiet-chatter-icon.png'}" alt="${book.title}" class="me-3" style="width: 50px; height: auto; border-radius: 0.25rem; object-fit: cover;">
+                    <!-- 북톡 내용 -->
+                    <div class="flex-grow-1" style="min-width: 0;"> <!-- 잘림을 돕기 위한 min-width: 0 -->
+                        <h6 class="mb-1 text-truncate">${book.title}</h6>
+                        <small class="text-muted d-block mb-1 text-truncate">${book.author}</small>
+                        <p class="mb-1 text-muted text-truncate"><em>"${truncatedContent}"</em></p>
                     </div>
-                </a>
-            `;
-        }).join('');
+                    <!-- 리액션 -->
+                    <div class="d-flex align-items-center gap-2 px-2">
+                        <span class="text-nowrap">👍 ${talk.like_count}</span>
+                        <span class="text-nowrap">❤️ ${talk.support_count}</span>
+                    </div>
+                </div>
+            </a>
+        `;
     }
 </script>
 

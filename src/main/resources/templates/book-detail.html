@@ -154,252 +154,279 @@
 <script type="module">
     import * as api from '/js/api.js';
 
-    // --- 상수 및 상태 ---
-    const bookId = window.location.pathname.split('/').pop();
-    const talksContainer = document.getElementById('talks-container');
-    const talksPaginationContainer = document.getElementById('talks-pagination');
-    const talkForm = document.getElementById('talk-form');
-    const talkContentInput = document.getElementById('talk-content');
-    let currentPage = 0;
+    // --- Constants ---
+    const BOOK_ID = window.location.pathname.split('/').pop();
 
-    // --- 초기화 ---
-    document.addEventListener('DOMContentLoaded', () => {
+    // --- DOM Elements ---
+    const elements = {
+        bookDetailContainer: document.querySelector('.book-detail-container'),
+        bookImage: document.getElementById('book-image'),
+        bookImageContainer: document.getElementById('book-image-container'),
+        bookTitle: document.getElementById('book-title'),
+        bookAuthor: document.getElementById('book-author'),
+        bookIsbn: document.getElementById('book-isbn'),
+        bookDescription: document.getElementById('book-description'),
+        talksContainer: document.getElementById('talks-container'),
+        talksPagination: document.getElementById('talks-pagination'),
+        talkForm: document.getElementById('talk-form'),
+        talkContentInput: document.getElementById('talk-content'),
+    };
 
-        if (bookId) {
-            fetchBookDetails(bookId);
-            fetchTalks(bookId, 0);
-        }
-        initializeTooltips();
-        setupEventListeners();
-    });
+    // --- State ---
+    const state = {
+        currentPage: 0,
+    };
 
-    function initializeTooltips() {
-        const tooltipTriggerList = Array.from(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
-        tooltipTriggerList.map(tooltipTriggerEl => new bootstrap.Tooltip(tooltipTriggerEl));
-    }
+    // --- UI ---
+    const ui = {
+        renderBookDetail(book) {
+            document.title = `${book.title} - Quiet Chatter`;
+            this.renderBookImage(book);
+            elements.bookTitle.textContent = book.title;
+            elements.bookAuthor.textContent = book.author;
+            elements.bookIsbn.textContent = book.isbn;
+            elements.bookDescription.textContent = book.description;
+        },
 
-    function setupEventListeners() {
-        talkForm.addEventListener('submit', handleTalkSubmit);
-        talksPaginationContainer.addEventListener('click', handlePaginationClick);
-        talksContainer.addEventListener('click', handleReactionContainerClick);
-    }
-
-    // --- 이벤트 핸들러 ---
-    async function handleTalkSubmit(e) {
-        e.preventDefault();
-        const content = talkContentInput.value;
-        if (!content) return;
-        try {
-            await api.postTalk(bookId, content);
-            talkContentInput.value = '';
-            await fetchTalks(bookId, 0);
-        } catch (error) {
-            console.error('Error posting talk:', error);
-            alert(error.message);
-        }
-    }
-
-    function handlePaginationClick(e) {
-
-        if (e.target.tagName === 'A' && e.target.dataset.page) {
-            e.preventDefault();
-            const page = parseInt(e.target.dataset.page, 10);
-            fetchTalks(bookId, page);
-        }
-    }
-
-    function handleReactionContainerClick(e) {
-        const target = e.target.closest('.reaction-btn');
-        if (target) {
-            const {talkId, reactionType, reacted} = target.dataset;
-            handleReactionClick(target, talkId, reactionType, reacted === 'true');
-        }
-    }
-
-    async function handleReactionClick(element, talkId, reactionType, hasReacted) {
-        try {
-            const response = await api.handleReaction(talkId, reactionType, hasReacted);
-            if (!response.ok) {
-                return await handleReactionError(response);
+        renderBookImage(book) {
+            if (!book.thumbnailImageUrl) {
+                elements.bookImage.closest('.col-12').style.display = 'none';
+                return;
             }
-            updateReactionUI(element, hasReacted);
-        } catch (error) {
-            console.error('Error processing reaction:', error);
-            alert(error.message);
-            await fetchTalks(bookId, currentPage); // 실패 시 서버와 재동기화
-        }
-    }
 
-    // --- 데이터 가져오기 ---
-    async function fetchBookDetails(id) {
+            elements.bookImage.src = book.thumbnailImageUrl;
+            elements.bookImage.alt = book.title;
+            elements.bookImage.classList.remove('d-none');
+            elements.bookImageContainer.classList.add('d-none');
 
-        try {
-            const book = await api.getBookDetails(id);
-            renderBookDetail(book);
-        } catch (error) {
-            console.error('Error fetching book details:', error);
-            document.querySelector('.book-detail-container').innerHTML = `<div class="alert alert-danger">${error.message}</div>`;
-        }
-    }
-
-    async function fetchTalks(id, page) {
-        currentPage = page;
-        renderTalksSkeleton();
-
-        try {
-            const pageData = await api.getTalks(id, page);
-            renderTalksPage(pageData);
-        } catch (error) {
-            console.error('Error fetching talks:', error);
-            talksContainer.innerHTML = `<div class="alert alert-danger">${error.message}</div>`;
-        }
-    }
-
-    // --- UI 렌더링 ---
-    function renderBookDetail(book) {
-        document.title = `${book.title} - Quiet Chatter`;
-
-        renderBookImage(book);
-
-        document.getElementById('book-title').textContent = book.title;
-        document.getElementById('book-author').textContent = book.author;
-        document.getElementById('book-isbn').textContent = book.isbn;
-        document.getElementById('book-description').textContent = book.description;
-    }
-
-    function renderBookImage(book) {
-        const bookImage = document.getElementById('book-image');
-        const bookImageContainer = document.getElementById('book-image-container');
-        if (!book.thumbnailImageUrl) {
-            bookImage.closest('.col-12').style.display = 'none';
-            return;
-        }
-
-        bookImage.src = book.thumbnailImageUrl;
-        bookImage.alt = book.title;
-        bookImage.classList.remove('d-none');
-        bookImageContainer.classList.add('d-none');
-
-        if (book.externalLinkUrl) {
-            const link = document.createElement('a');
-            link.href = book.externalLinkUrl;
-            link.target = '_blank';
-            if (!bookImage.parentNode.isEqualNode(link)) {
-                bookImage.parentNode.insertBefore(link, bookImage);
-                link.appendChild(bookImage);
+            if (book.externalLinkUrl) {
+                const link = document.createElement('a');
+                link.href = book.externalLinkUrl;
+                link.target = '_blank';
+                if (!elements.bookImage.parentNode.isEqualNode(link)) {
+                    elements.bookImage.parentNode.insertBefore(link, elements.bookImage);
+                    link.appendChild(elements.bookImage);
+                }
             }
-        }
-    }
+        },
 
-    function renderTalksPage(pageData) {
-        if (pageData && pageData.content && pageData.content.length > 0) {
-            renderTalks(pageData.content);
-            renderTalksPagination(pageData.pageInfo);
-        } else {
-            talksContainer.innerHTML = '<p class="text-muted">작성된 북톡이 없습니다.</p>';
-            renderTalksPagination({totalPages: 0});
-        }
-    }
+        renderTalksPage(pageData) {
+            if (pageData?.content?.length > 0) {
+                this.renderTalks(pageData.content);
+                this.renderTalksPagination(pageData.pageInfo);
+            } else {
+                elements.talksContainer.innerHTML = '<p class="text-muted">작성된 북톡이 없습니다.</p>';
+                this.clearTalksPagination();
+            }
+        },
 
-    function renderTalks(talks) {
-        talksContainer.innerHTML = talks.map(talk => `
-            <div class="card mb-2">
-                <div class="card-body">
-                    <p class="card-text talk-content-text">${talk.content}</p>
-                    <div class="d-flex justify-content-between align-items-center">
-                        <small class="text-muted">${talk.getFormattedCreatedAt()}</small>
-                        <div class="reaction-buttons-container">
-                            <span class="reaction-btn me-3 ${talk.didILike ? 'reacted' : ''}" data-talk-id="${talk.id}" data-reaction-type="LIKE" data-reacted="${talk.didILike}">
-                                👍 <span class="count">${talk.like_count}</span>
-                            </span>
-                            <span class="reaction-btn ${talk.didISupport ? 'reacted' : ''}" data-talk-id="${talk.id}" data-reaction-type="SUPPORT" data-reacted="${talk.didISupport}">
-                                ❤️ <span class="count">${talk.support_count}</span>
-                            </span>
+        renderTalks(talks) {
+            elements.talksContainer.innerHTML = talks.map(talk => `
+                <div class="card mb-2">
+                    <div class="card-body">
+                        <p class="card-text talk-content-text">${talk.content}</p>
+                        <div class="d-flex justify-content-between align-items-center">
+                            <small class="text-muted">${talk.getFormattedCreatedAt()}</small>
+                            <div class="reaction-buttons-container">
+                                <span class="reaction-btn me-3 ${talk.didILike ? 'reacted' : ''}" data-talk-id="${talk.id}" data-reaction-type="LIKE" data-reacted="${talk.didILike}">
+                                    👍 <span class="count">${talk.like_count}</span>
+                                </span>
+                                <span class="reaction-btn ${talk.didISupport ? 'reacted' : ''}" data-talk-id="${talk.id}" data-reaction-type="SUPPORT" data-reacted="${talk.didISupport}">
+                                    ❤️ <span class="count">${talk.support_count}</span>
+                                </span>
+                            </div>
                         </div>
                     </div>
-                </div>
-            </div>`).join('');
-    }
+                </div>`).join('');
+        },
 
-    function renderTalksPagination(pageInfo) {
-        talksPaginationContainer.innerHTML = '';
-        if (pageInfo.totalPages <= 1) return;
-        const ul = document.createElement('ul');
-        ul.className = 'pagination justify-content-center';
+        renderTalksPagination(pageInfo) {
+            this.clearTalksPagination();
+            if (pageInfo.totalPages <= 1) return;
 
-        if (pageInfo.number > 0) {
-            const prevLi = document.createElement('li');
-            prevLi.className = 'page-item';
-            prevLi.innerHTML = `<a class="page-link" href="#" data-page="${pageInfo.number - 1}">이전</a>`;
-            ul.appendChild(prevLi);
-        }
-        const maxPagesToShow = 10;
-        let startPage = Math.max(0, pageInfo.number - Math.floor(maxPagesToShow / 2));
-        let endPage = Math.min(pageInfo.totalPages - 1, startPage + maxPagesToShow - 1);
+            const ul = document.createElement('ul');
+            ul.className = 'pagination justify-content-center';
 
-        if (endPage - startPage + 1 < maxPagesToShow) {
-            startPage = Math.max(0, endPage - maxPagesToShow + 1);
-        }
+            if (pageInfo.number > 0) {
+                ul.appendChild(this.createPageLink('이전', pageInfo.number - 1));
+            }
 
-        for (let i = startPage; i <= endPage; i++) {
+            const {startPage, endPage} = this.calculatePaginationRange(pageInfo);
+            for (let i = startPage; i <= endPage; i++) {
+                ul.appendChild(this.createPageLink(i + 1, i, i === pageInfo.number));
+            }
+
+            if (pageInfo.number < pageInfo.totalPages - 1) {
+                ul.appendChild(this.createPageLink('다음', pageInfo.number + 1));
+            }
+            elements.talksPagination.appendChild(ul);
+        },
+
+        createPageLink(text, page, isActive = false) {
             const li = document.createElement('li');
-            li.className = `page-item ${i === pageInfo.number ? 'active' : ''}`;
-            li.innerHTML = `<a class="page-link" href="#" data-page="${i}">${i + 1}</a>`;
-            ul.appendChild(li);
+            li.className = `page-item ${isActive ? 'active' : ''}`;
+            li.innerHTML = `<a class="page-link" href="#" data-page="${page}">${text}</a>`;
+            return li;
+        },
 
-        }
+        calculatePaginationRange(pageInfo) {
+            const maxPagesToShow = 10;
+            let startPage = Math.max(0, pageInfo.number - Math.floor(maxPagesToShow / 2));
+            let endPage = Math.min(pageInfo.totalPages - 1, startPage + maxPagesToShow - 1);
+            if (endPage - startPage + 1 < maxPagesToShow) {
+                startPage = Math.max(0, endPage - maxPagesToShow + 1);
+            }
+            return {startPage, endPage};
+        },
 
-        if (pageInfo.number < pageInfo.totalPages - 1) {
-            const nextLi = document.createElement('li');
-
-            nextLi.className = 'page-item';
-            nextLi.innerHTML = `<a class="page-link" href="#" data-page="${pageInfo.number + 1}">다음</a>`;
-            ul.appendChild(nextLi);
-        }
-        talksPaginationContainer.appendChild(ul);
-
-    }
-
-
-    function renderTalksSkeleton(count = 6) {
-        talksContainer.innerHTML = Array(count).fill(0).map(() => `
-            <div class="card mb-2">
-                <div class="card-body">
-                    <div class="skeleton skeleton-text" style="width: 80%;"></div>
-                    <div class="skeleton skeleton-text" style="width: 60%;"></div>
-                    <div class="d-flex justify-content-between align-items-center mt-3">
-                        <div class="skeleton skeleton-text" style="width: 30%;"></div>
-                        <div class="d-flex">
-                            <div class="skeleton skeleton-text me-3" style="width: 50px;"></div>
-                            <div class="skeleton skeleton-text" style="width: 50px;"></div>
+        renderTalksSkeleton(count = 6) {
+            elements.talksContainer.innerHTML = Array(count).fill(0).map(() => `
+                <div class="card mb-2">
+                    <div class="card-body">
+                        <div class="skeleton skeleton-text" style="width: 80%;"></div>
+                        <div class="skeleton skeleton-text" style="width: 60%;"></div>
+                        <div class="d-flex justify-content-between align-items-center mt-3">
+                            <div class="skeleton skeleton-text" style="width: 30%;"></div>
+                            <div class="d-flex">
+                                <div class="skeleton skeleton-text me-3" style="width: 50px;"></div>
+                                <div class="skeleton skeleton-text" style="width: 50px;"></div>
+                            </div>
                         </div>
                     </div>
-                </div>
-            </div>`).join('');
+                </div>`).join('');
+        },
 
-    }
+        updateReaction(element, hasReacted) {
+            const countSpan = element.querySelector('.count');
+            const currentCount = parseInt(countSpan.textContent, 10);
+            const reacted = !hasReacted;
 
-    function updateReactionUI(element, hasReacted) {
-        const countSpan = element.querySelector('.count');
-        const currentCount = parseInt(countSpan.textContent, 10);
-        const reacted = !hasReacted;
+            element.classList.toggle('reacted', reacted);
+            element.dataset.reacted = String(reacted);
+            countSpan.textContent = reacted ? currentCount + 1 : currentCount - 1;
+        },
 
-        element.classList.toggle('reacted', reacted);
-        element.dataset.reacted = reacted;
+        clearTalksPagination() {
+            elements.talksPagination.innerHTML = '';
+        },
 
-        countSpan.textContent = reacted ? currentCount + 1 : currentCount - 1;
-    }
+        clearTalkInput() {
+            elements.talkContentInput.value = '';
+        },
 
-    // --- 오류 처리 ---
-    async function handleReactionError(response) {
-        if (response.status === 401 || response.status === 403) {
-            alert('로그인이 필요합니다.');
-            return;
+        displayError(container, error) {
+            console.error(error);
+            container.innerHTML = `<div class="alert alert-danger">${error.message}</div>`;
+        },
+
+        initializeTooltips() {
+            const tooltipTriggerList = Array.from(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+            tooltipTriggerList.forEach(el => new bootstrap.Tooltip(el));
         }
+    };
 
-        const err = await response.json().catch(() => ({message: '리액션 처리에 실패했습니다.'}));
-        throw new Error(err.message);
-    }
+    // --- Event Handlers ---
+    const eventHandlers = {
+        async handleTalkSubmit(e) {
+            e.preventDefault();
+            const content = elements.talkContentInput.value.trim();
+            if (!content) return;
+
+            try {
+                await api.postTalk(BOOK_ID, content);
+                ui.clearTalkInput();
+                await app.loadTalks(0); // Reload talks from the first page
+            } catch (error) {
+                console.error('Error posting talk:', error);
+                alert(error.message);
+            }
+        },
+
+        handlePaginationClick(e) {
+            if (e.target.tagName === 'A' && e.target.dataset.page) {
+                e.preventDefault();
+                const page = parseInt(e.target.dataset.page, 10);
+                app.loadTalks(page);
+            }
+        },
+
+        handleReactionContainerClick(e) {
+            const reactionButton = e.target.closest('.reaction-btn');
+            if (reactionButton) {
+                this.handleReaction(reactionButton);
+            }
+        },
+
+        async handleReaction(button) {
+            const {talkId, reactionType, reacted} = button.dataset;
+            const hasReacted = reacted === 'true';
+
+            try {
+                const response = await api.handleReaction(talkId, reactionType, hasReacted);
+                if (!response.ok) {
+                    return await this.handleReactionError(response);
+                }
+                ui.updateReaction(button, hasReacted);
+            } catch (error) {
+                console.error('Error processing reaction:', error);
+                alert(error.message);
+                await app.loadTalks(state.currentPage); // Resync with server on failure
+            }
+        },
+
+        async handleReactionError(response) {
+            if (response.status === 401 || response.status === 403) {
+                alert('로그인이 필요합니다.');
+                return;
+            }
+            const err = await response.json().catch(() => ({message: '리액션 처리에 실패했습니다.'}));
+            throw new Error(err.message);
+        }
+    };
+
+    // --- App Initialization ---
+    const app = {
+        async init() {
+            if (!BOOK_ID) return;
+            ui.initializeTooltips();
+            this.setupEventListeners();
+            await this.loadInitialData();
+        },
+
+        setupEventListeners() {
+            elements.talkForm.addEventListener('submit', eventHandlers.handleTalkSubmit);
+            elements.talksPagination.addEventListener('click', eventHandlers.handlePaginationClick);
+            elements.talksContainer.addEventListener('click', (e) => eventHandlers.handleReactionContainerClick(e));
+        },
+
+        async loadInitialData() {
+            this.loadBookDetails();
+            this.loadTalks(state.currentPage);
+        },
+
+        async loadBookDetails() {
+            try {
+                const book = await api.getBookDetails(BOOK_ID);
+                ui.renderBookDetail(book);
+            } catch (error) {
+                ui.displayError(elements.bookDetailContainer, error);
+            }
+        },
+
+        async loadTalks(page) {
+            state.currentPage = page;
+            ui.renderTalksSkeleton();
+            try {
+                const pageData = await api.getTalks(BOOK_ID, page);
+                ui.renderTalksPage(pageData);
+            } catch (error) {
+                ui.displayError(elements.talksContainer, error);
+            }
+        }
+    };
+
+    // --- Start ---
+    document.addEventListener('DOMContentLoaded', () => app.init());
 
 </script>
 
