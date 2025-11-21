@@ -5,9 +5,9 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 
 @Configuration
-public class CacheUpdateExecutorConfig {
+class CacheUpdateExecutorConfig {
     @Bean
-    public ThreadPoolTaskExecutor cacheUpdateExecutor() {
+    ThreadPoolTaskExecutor cacheUpdateExecutor() {
 
         ThreadPoolTaskExecutor executor = new ThreadPoolTaskExecutor();
         executor.setCorePoolSize(1);
