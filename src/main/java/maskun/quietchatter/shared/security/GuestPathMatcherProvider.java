@@ -15,6 +15,7 @@ class GuestPathMatcherProvider implements GuestPromotion {
         Builder builder = PathPatternRequestMatcher.withDefaults();
         return List.of(
                 builder.matcher(HttpMethod.POST, "/api/items"),
+                builder.matcher(HttpMethod.POST, "/api/talks"),
                 builder.matcher(HttpMethod.POST, "/api/reactions"),
                 builder.matcher(HttpMethod.DELETE, "/api/reactions")
         );
