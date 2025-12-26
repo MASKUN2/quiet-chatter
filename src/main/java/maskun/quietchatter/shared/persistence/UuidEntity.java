@@ -1,41 +1,33 @@
 package maskun.quietchatter.shared.persistence;
 
 import jakarta.persistence.EntityListeners;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.MappedSuperclass;
 import java.io.Serializable;
 import java.time.Instant;
 import java.util.Objects;
+import java.util.StringJoiner;
 import java.util.UUID;
+import org.hibernate.annotations.UuidGenerator;
+import org.hibernate.annotations.UuidGenerator.Style;
 import org.hibernate.proxy.HibernateProxy;
+import org.jspecify.annotations.Nullable;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
-import org.springframework.lang.Nullable;
 
 @MappedSuperclass
-@EntityListeners(AuditingEntityListener.class)
-public abstract class BaseEntity implements Serializable {
+public abstract class UuidEntity implements Serializable {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.UUID)
+    @UuidGenerator(style = Style.VERSION_7)
     private UUID id;
 
-    @CreatedDate
-    private Instant createdAt;
-
-    protected BaseEntity() {
+    protected UuidEntity() {
     }
 
     @Nullable
     public UUID getId() {
         return id;
-    }
-
-    @Nullable
-    public Instant getCreatedAt() {
-        return createdAt;
     }
 
     @Override
@@ -55,7 +47,7 @@ public abstract class BaseEntity implements Serializable {
         if (thisEffectiveClass != oEffectiveClass) {
             return false;
         }
-        BaseEntity that = (BaseEntity) o;
+        UuidEntity that = (UuidEntity) o;
         return getId() != null && Objects.equals(getId(), that.getId());
     }
 
@@ -68,9 +60,9 @@ public abstract class BaseEntity implements Serializable {
 
     @Override
     public String toString() {
-        return getClass().getSimpleName() + "(" +
-                "id = " + id + ", " +
-                "createdAt = " + createdAt + ")";
+        return new StringJoiner(", ", UuidEntity.class.getSimpleName() + "[", "]")
+                .add("id=" + id)
+                .toString();
     }
 }
 

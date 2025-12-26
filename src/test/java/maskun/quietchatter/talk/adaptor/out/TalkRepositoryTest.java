@@ -6,7 +6,7 @@ import static org.instancio.Select.fields;
 
 import java.util.List;
 import java.util.UUID;
-import maskun.quietchatter.shared.persistence.BaseEntity;
+import maskun.quietchatter.shared.persistence.AuditableUuidEntity;
 import maskun.quietchatter.shared.persistence.JpaConfig;
 import maskun.quietchatter.talk.application.out.TalkRepository;
 import maskun.quietchatter.talk.domain.Talk;
@@ -29,7 +29,7 @@ class TalkRepositoryTest {
 
     @Test
     void save() {
-        final Talk talk = Instancio.of(Talk.class).ignore(fields().declaredIn(BaseEntity.class)).create();
+        final Talk talk = Instancio.of(Talk.class).ignore(fields().declaredIn(AuditableUuidEntity.class)).create();
 
         final Talk saved = repository.save(talk);
 
@@ -44,7 +44,7 @@ class TalkRepositoryTest {
     void findByBookOrderByCreatedAtPage() {
         UUID bookId = UUID.randomUUID();
         Model<Talk> talkModel = Instancio.of(Talk.class)
-                .ignore(fields().declaredIn(BaseEntity.class))
+                .ignore(fields().declaredIn(AuditableUuidEntity.class))
                 .set(field(Talk::getBookId), bookId).toModel();
 
         List<Talk> talks = Instancio.ofList(talkModel).size(100).create();

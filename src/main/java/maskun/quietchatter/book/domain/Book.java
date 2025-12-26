@@ -7,13 +7,13 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.Index;
 import jakarta.persistence.Table;
 import lombok.Getter;
-import maskun.quietchatter.shared.persistence.BaseEntity;
+import maskun.quietchatter.shared.persistence.AuditableUuidEntity;
 
 @Getter
 @Entity(name = "book")
 @Table(indexes = {@Index(columnList = "isbn", name = "idx_book_isbn")
         , @Index(columnList = "title", name = "idx_book_title")})
-public class Book extends BaseEntity {
+public class Book extends AuditableUuidEntity {
 
     @Embedded
     @AttributeOverride(name = "value", column = @Column(name = "title"))

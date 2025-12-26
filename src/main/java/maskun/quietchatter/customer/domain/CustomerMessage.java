@@ -4,11 +4,11 @@ import jakarta.persistence.AttributeOverride;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import lombok.Getter;
-import maskun.quietchatter.shared.persistence.BaseEntity;
+import maskun.quietchatter.shared.persistence.AuditableUuidEntity;
 
 @Getter
 @Entity(name = "customer_message")
-public class CustomerMessage extends BaseEntity {
+public class CustomerMessage extends AuditableUuidEntity {
 
     @AttributeOverride(
             name = "content", column = @Column(name = "message", columnDefinition = "TEXT")

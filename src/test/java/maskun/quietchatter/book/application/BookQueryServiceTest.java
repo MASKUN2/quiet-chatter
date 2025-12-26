@@ -17,7 +17,7 @@ import maskun.quietchatter.book.application.in.Keyword;
 import maskun.quietchatter.book.application.out.BookRepository;
 import maskun.quietchatter.book.application.out.ExternalBookSearcher;
 import maskun.quietchatter.book.domain.Book;
-import maskun.quietchatter.shared.persistence.BaseEntity;
+import maskun.quietchatter.shared.persistence.AuditableUuidEntity;
 import org.instancio.Instancio;
 import org.instancio.Model;
 import org.junit.jupiter.api.AfterEach;
@@ -57,7 +57,7 @@ class BookQueryServiceTest {
     @Test
     void findBy() {
         //given
-        Model<Book> bookModel = of(Book.class).ignore(fields().declaredIn(BaseEntity.class)).toModel();
+        Model<Book> bookModel = of(Book.class).ignore(fields().declaredIn(AuditableUuidEntity.class)).toModel();
         Book expectedExisted = Instancio.of(bookModel).create();
         Book notExist1 = Instancio.of(bookModel).create();
         Book notExist2 = Instancio.of(bookModel).create();

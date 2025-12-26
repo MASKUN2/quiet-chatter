@@ -7,7 +7,7 @@ import static org.instancio.Select.fields;
 
 import java.util.NoSuchElementException;
 import maskun.quietchatter.book.domain.Book;
-import maskun.quietchatter.shared.persistence.BaseEntity;
+import maskun.quietchatter.shared.persistence.AuditableUuidEntity;
 import maskun.quietchatter.shared.persistence.JpaConfig;
 import org.instancio.Instancio;
 import org.junit.jupiter.api.DisplayName;
@@ -27,7 +27,7 @@ class BookRepositoryTest {
     @Test
     void save() {
 
-        Book book = Instancio.of(Book.class).ignore(fields().declaredIn(BaseEntity.class)).create();
+        Book book = Instancio.of(Book.class).ignore(fields().declaredIn(AuditableUuidEntity.class)).create();
         Book saved = repository.save(book);
 
         assertThat(saved).isNotNull();

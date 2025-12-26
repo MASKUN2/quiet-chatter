@@ -10,14 +10,14 @@ import jakarta.persistence.Enumerated;
 import jakarta.persistence.Index;
 import jakarta.persistence.Table;
 import lombok.Getter;
-import maskun.quietchatter.shared.persistence.BaseEntity;
+import maskun.quietchatter.shared.persistence.AuditableUuidEntity;
 import org.springframework.lang.Nullable;
 import org.springframework.util.Assert;
 
 @Getter
 @Entity(name = "member")
 @Table(indexes = @Index(columnList = "login_id", name = "idx_member_login_id"))
-public class Member extends BaseEntity {
+public class Member extends AuditableUuidEntity {
 
     @Enumerated(EnumType.STRING)
     private Role role;

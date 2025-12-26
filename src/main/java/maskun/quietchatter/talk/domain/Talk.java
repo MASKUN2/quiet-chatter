@@ -9,14 +9,14 @@ import jakarta.persistence.Index;
 import jakarta.persistence.Table;
 import java.util.UUID;
 import lombok.Getter;
-import maskun.quietchatter.shared.persistence.BaseEntity;
+import maskun.quietchatter.shared.persistence.AuditableUuidEntity;
 
 @Getter
 @Entity(name = "talk")
 @Table(indexes = {@Index(columnList = "book_id", name = "idx_talk_book_id"),
         @Index(columnList = "member_id", name = "idx_talk_member_id"),
         @Index(columnList = "created_at", name = "idx_talk_created_at")})
-public class Talk extends BaseEntity {
+public class Talk extends AuditableUuidEntity {
 
     @Column(name = "book_id")
     private UUID bookId;
