@@ -1,6 +1,6 @@
 services:
   postgresql:
-    image: 'postgres:latest'
+    image: 'postgres:18.1-bookworm'
     environment:
       - 'POSTGRES_DB=mydatabase'
       - 'POSTGRES_PASSWORD=secret'
