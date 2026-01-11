@@ -5,11 +5,10 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.util.List;
+import java.util.Collection;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.jspecify.annotations.NonNull;
-import org.springframework.security.authentication.AnonymousAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.util.matcher.RequestMatcher;
@@ -19,17 +18,12 @@ import org.springframework.web.filter.OncePerRequestFilter;
 @RequiredArgsConstructor
 class GuestAuthenticationFilter extends OncePerRequestFilter {
     private final GuestAuthenticationProvider guestAuthenticationProvider;
-    private final List<RequestMatcher> requestMatchers;
+    private final Collection<RequestMatcher> requestMatchers;
 
     @Override
     protected void doFilterInternal(@NonNull HttpServletRequest request,
                                     @NonNull HttpServletResponse response,
                                     @NonNull FilterChain filterChain) throws ServletException, IOException {
-
-        if (!isTarget(request)) {
-            filterChain.doFilter(request, response);
-            return;
-        }
 
         Authentication auth = guestAuthenticationProvider.create();
         SecurityContextHolder.getContext().setAuthentication(auth);
@@ -37,21 +31,9 @@ class GuestAuthenticationFilter extends OncePerRequestFilter {
         filterChain.doFilter(request, response);
     }
 
-    private boolean isTarget(HttpServletRequest request) {
-        if (!isMatch(request)) {
-            return false;
-        }
-
-        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        return isPromotable(auth);
+    @Override
+    protected boolean shouldNotFilter(@NonNull HttpServletRequest request) {
+        return requestMatchers.stream().noneMatch(matcher -> matcher.matches(request));
     }
 
-    private boolean isMatch(HttpServletRequest request) {
-        return requestMatchers.stream()
-                .anyMatch(matcher -> matcher.matches(request));
-    }
-
-    private static boolean isPromotable(Authentication auth) {
-        return auth == null || !auth.isAuthenticated() || auth instanceof AnonymousAuthenticationToken;
-    }
 }
