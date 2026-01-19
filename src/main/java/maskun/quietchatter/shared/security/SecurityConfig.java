@@ -1,6 +1,7 @@
 package maskun.quietchatter.shared.security;
 
 import static org.springframework.security.config.http.SessionCreationPolicy.IF_REQUIRED;
+import static org.springframework.security.config.http.SessionCreationPolicy.STATELESS;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
@@ -20,13 +21,11 @@ class SecurityConfig {
     @Bean
     SecurityFilterChain securityFilterChain(HttpSecurity http,
                                             GuestAuthenticationProvider authenticationProvider,
-                                                   GuestPromotion guestPromotion) throws Exception {
+                                            GuestPromotion guestPromotion) throws Exception {
 
         return http
                 .anonymous(Customizer.withDefaults())
-                .sessionManagement(
-                        session -> session.sessionCreationPolicy(IF_REQUIRED)
-                )
+                .sessionManagement(session -> session.sessionCreationPolicy(STATELESS))
                 .addFilterBefore(
                         new GuestAuthenticationFilter(authenticationProvider, guestPromotion.getRequestMatchers()),
                         AnonymousAuthenticationFilter.class
