@@ -32,14 +32,17 @@ dependencies {
     developmentOnly 'org.springframework.boot:spring-boot-docker-compose'
     developmentOnly 'org.springframework.boot:spring-boot-devtools'
     runtimeOnly 'org.postgresql:postgresql'
-    testImplementation 'org.testcontainers:postgresql'
-    testImplementation 'org.springframework.boot:spring-boot-starter-test'
     testImplementation 'org.testcontainers:junit-jupiter'
+    testImplementation 'org.testcontainers:postgresql'
+    testImplementation 'com.redis:testcontainers-redis:2.2.4'
+    testImplementation 'org.springframework.boot:spring-boot-starter-test'
     testImplementation 'org.springframework.boot:spring-boot-testcontainers'
     testImplementation 'net.datafaker:datafaker:2.5.3'
     testImplementation 'org.instancio:instancio-junit:5.5.1'
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
     annotationProcessor("org.projectlombok:lombok")
+    testCompileOnly 'org.projectlombok:lombok'
+    testAnnotationProcessor 'org.projectlombok:lombok'
 }
 
 tasks.named('test', Test) {
@@ -47,6 +50,7 @@ tasks.named('test', Test) {
     useJUnitPlatform {
         excludeTags("external-api")
     }
+    environment("TESTCONTAINERS_REUSE_ENABLE", "true")
 }
 
 tasks.register("testExternalApi", Test) {
@@ -62,4 +66,5 @@ tasks.register("testExternalApi", Test) {
 
     systemProperty naverApiClientIdName, project.property(naverApiClientIdName)
     systemProperty naverApiClientSecretName, project.property(naverApiClientSecretName)
+    environment("TESTCONTAINERS_REUSE_ENABLE", "true")
 }
