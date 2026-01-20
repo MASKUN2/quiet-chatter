@@ -1,0 +1,9 @@
+spring:
+  jpa:
+    show-sql: true
+    hibernate:
+      ddl-auto: update
+naver:
+  api:
+    client-id: hidden
+    client-secret: hidden
