@@ -1,36 +1,42 @@
-package maskun.quietchatter.shared.security;
+package maskun.quietchatter.security.internal;
 
 import java.time.Duration;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
-import maskun.quietchatter.member.application.out.MemberRepository;
+import maskun.quietchatter.member.application.in.MemberQueryable;
+import maskun.quietchatter.member.application.in.MemberRegistrable;
 import maskun.quietchatter.member.domain.Member;
-import org.jspecify.annotations.NonNull;
-import org.jspecify.annotations.Nullable;
+import maskun.quietchatter.security.AuthMember;
+import maskun.quietchatter.security.AuthMemberNotFoundException;
+import org.jspecify.annotations.NullMarked;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 
+@NullMarked
 @Service
-public class CacheableAuthMemberQueryService implements AuthMemberQueryable {
+class AuthMemberService {
     private final RedisTemplate<String, AuthMember> redisTemplate;
-    private final MemberRepository memberRepository;
+    private final MemberQueryable memberQueryable;
+    private final MemberRegistrable memberRegistrable;
     private static final String KEY_PREFIX = "auth:member:";
 
-    public CacheableAuthMemberQueryService(
-            RedisTemplate<String, AuthMember> redisTemplate, MemberRepository memberRepository) {
+    AuthMemberService(
+            RedisTemplate<String, AuthMember> redisTemplate,
+            MemberQueryable memberQueryable,
+            MemberRegistrable memberRegistrable) {
         this.redisTemplate = redisTemplate;
-        this.memberRepository = memberRepository;
+        this.memberQueryable = memberQueryable;
+        this.memberRegistrable = memberRegistrable;
     }
 
-    @Override
     public Optional<AuthMember> findById(UUID id) {
         Optional<AuthMember> cachedAuthMember = getCachedAuthMember(id);
         if (cachedAuthMember.isPresent()) {
             return cachedAuthMember;
         }
 
-        Optional<Member> foundMember = memberRepository.findById(id);
+        Optional<Member> foundMember = memberQueryable.findById(id);
         if (foundMember.isEmpty()) {
             return Optional.empty();
         }
@@ -38,6 +44,17 @@ public class CacheableAuthMemberQueryService implements AuthMemberQueryable {
         AuthMember authMember = getAuthMember(foundMember.get());
         saveIntoCache(authMember);
         return Optional.of(authMember);
+    }
+
+    public AuthMember findOrThrow(UUID id) {
+        return findById(id).orElseThrow(() -> new AuthMemberNotFoundException("member not found for id: " + id));
+    }
+
+    public AuthMember createNewGuest() {
+        Member guest = memberRegistrable.createNewGuest();
+        AuthMember authMember = getAuthMember(guest);
+        saveIntoCache(authMember);
+        return authMember;
     }
 
     private AuthMember getAuthMember(Member member) {

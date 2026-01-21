@@ -1,6 +1,9 @@
 spring:
   application:
     name: quiet-chatter
+  web:
+    resources:
+      add-mappings: false
   datasource:
     url: hidden
     username: hidden
@@ -23,3 +26,6 @@ server:
         http-only: true
         same-site: lax
         secure: true
+
+jwt:
+  secret-key: veryveryveryveryLongSecretKeyForLocalDevelopment
