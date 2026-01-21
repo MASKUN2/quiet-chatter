@@ -20,6 +20,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.testcontainers.service.connection.ServiceConnection;
 import org.springframework.data.redis.core.RedisCallback;
 import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.serializer.RedisSerializer;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
@@ -40,6 +41,16 @@ class CacheableAuthMemberQueryServiceTest implements WithTestContainerDatabases 
     @BeforeEach
     void cleanupRedis() {
         redisTemplate.execute((RedisCallback<Object>)  conn -> {conn.serverCommands().flushDb(); return null;});
+    }
+
+    @Test
+    void serializableValue(){
+        AuthMember authMember = new AuthMember(UUID.randomUUID(), Role.GUEST);
+        RedisSerializer<AuthMember> valueSerializer = (RedisSerializer<AuthMember>) redisTemplate.getValueSerializer();
+        byte[] serialized = valueSerializer.serialize(authMember);
+        assertThat(serialized).isNotNull();
+        AuthMember deserialized = valueSerializer.deserialize(serialized);
+        assertThat(deserialized).isEqualTo(authMember);
     }
 
     @Test
