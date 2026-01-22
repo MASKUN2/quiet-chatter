@@ -17,6 +17,8 @@ spring:
   data:
     redis:
       url: redis://localhost:6379
+      repositories:
+        enabled: false
 naver:
   api:
     client-id: hidden
