@@ -20,6 +20,7 @@ record TalkResponse(
         long support_count,
         Boolean didISupport
 ) implements Serializable {
+
 }
 
 

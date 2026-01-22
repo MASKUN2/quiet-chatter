@@ -1,93 +1,61 @@
 package maskun.quietchatter.talk.adaptor.in;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.instancio.Select.field;
-import static org.mockito.Mockito.eq;
-import static org.mockito.Mockito.when;
+import static org.assertj.core.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.*;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.authentication;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 
-import java.util.List;
 import java.util.UUID;
-import maskun.quietchatter.reaction.application.in.ReactionQueryable;
+import maskun.quietchatter.member.domain.Role;
+import maskun.quietchatter.security.AuthMember;
+import maskun.quietchatter.security.AuthMemberToken;
 import maskun.quietchatter.shared.web.WebConfig;
-import maskun.quietchatter.talk.application.in.TalkQueryRequest;
 import maskun.quietchatter.talk.application.in.TalkQueryable;
-import maskun.quietchatter.talk.domain.Talk;
 import org.instancio.Instancio;
-import org.jetbrains.annotations.NotNull;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.security.servlet.SecurityAutoConfiguration;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.context.annotation.Import;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.http.MediaType;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.assertj.MockMvcTester;
-import org.springframework.test.web.servlet.assertj.MvcTestResult;
-import org.springframework.web.util.UriComponentsBuilder;
 
-@SuppressWarnings("SameParameterValue")
-@WebMvcTest(controllers = TalkQueryApi.class,
-        excludeAutoConfiguration = SecurityAutoConfiguration.class)
+@WebMvcTest(controllers = TalkQueryApi.class)
 @Import(WebConfig.class)
 class TalkQueryApiTest {
+
     @MockitoBean
     private TalkQueryable talkQueryable;
-
     @MockitoBean
-    private ReactionQueryable reactionQueryable;
-
+    private TalkResponseMapper mapper;
     @Autowired
     private MockMvcTester tester;
 
-    final UUID bookId = UUID.randomUUID();
-
-    final int pageSize = 10;
-    final int pageNumber = 0;
-
-    @BeforeEach
-    void setUp() {
-        List<Talk> talks = getTalkFixtures(bookId, pageSize);
-
-        TalkQueryRequest request = new TalkQueryRequest(bookId, PageRequest.of(pageNumber, pageSize));
-
-        when(talkQueryable.findBy(eq(request)))
-                .thenReturn(new PageImpl<>(talks, request.pageRequest(), talks.size()));
-    }
-
     @Test
-    @DisplayName("페이징 조회")
+    @DisplayName("페이징 조회 - Mapper 위임 확인")
     void getByPage() {
-        MvcTestResult result = tester.get()
-                .uri(getPageUri())
-                .contentType(MediaType.APPLICATION_JSON)
-                .exchange();
+        // Given
+        UUID bookId = UUID.randomUUID();
+        Page<TalkResponse> responsePage = new PageImpl<>(Instancio.ofList(TalkResponse.class).size(5).create());
 
-        assertThat(result).hasStatusOk()
+        when(talkQueryable.findBy(any())).thenReturn(Page.empty());
+        when(mapper.mapToResponse(any(), any(AuthMember.class))).thenReturn(responsePage);
+
+        // When & Then
+        tester.get().uri("/api/talks")
+                .queryParam("bookId", bookId.toString())
+                .queryParam("page", "0")
+                .queryParam("size", "10")
+                .with(authentication(new AuthMemberToken(new AuthMember(UUID.randomUUID(), Role.REGULAR))))
+                .with(csrf())
+                .exchange()
+                .assertThat()
+                .hasStatusOk()
                 .bodyJson()
-                .hasPathSatisfying("$.page.totalElements", value -> assertThat(value).isEqualTo(10))
-                .hasPathSatisfying("$.page.totalPages", value -> assertThat(value).isEqualTo(1))
-                .hasPathSatisfying("$.page.number", value -> assertThat(value).isEqualTo(0))
-                .hasPathSatisfying("$.content[*].content", value -> assertThat(value).isNotEmpty())
-                .hasPathSatisfying("$.content[*].bookId", value -> assertThat(value).isNotEmpty())
-                .hasPathSatisfying("$.content[*].id", value -> assertThat(value).isNotEmpty());
-    }
-
-    private @NotNull String getPageUri() {
-        return UriComponentsBuilder.fromPath("/api/talks")
-                .queryParam("size", pageSize)
-                .queryParam("page", pageNumber)
-                .queryParam("bookId", bookId)
-                .toUriString();
-    }
-
-    private static List<Talk> getTalkFixtures(UUID bookId, int size) {
-        return Instancio.ofList(Talk.class)
-                .size(size)
-                .set(field(Talk::getBookId), bookId)
-                .create();
+                .hasPathSatisfying("$.page.totalElements", v -> assertThat(v).isEqualTo(5))
+                .hasPathSatisfying("$.content", v -> assertThat(v).isNotNull());
     }
 }

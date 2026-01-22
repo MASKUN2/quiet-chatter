@@ -16,7 +16,9 @@ class ReactionQueryService implements ReactionQueryable {
 
     @Override
     public List<Reaction> getAllBy(UUID memberId, Collection<UUID> talkIds) {
+        if (talkIds.isEmpty()) {
+            return List.of();
+        }
         return reactionRepository.findByMemberIdAndTalkIdIn(memberId, talkIds);
-
     }
 }
