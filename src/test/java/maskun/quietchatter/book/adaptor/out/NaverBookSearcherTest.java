@@ -1,32 +1,32 @@
 package maskun.quietchatter.book.adaptor.out;
 
-import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.*;
 import static org.springframework.test.web.client.response.MockRestResponseCreators.withSuccess;
 
 import maskun.quietchatter.book.application.in.Keyword;
 import maskun.quietchatter.book.domain.Book;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.client.RestClientTest;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.http.MediaType;
-import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.client.ExpectedCount;
 import org.springframework.test.web.client.MockRestServiceServer;
 import org.springframework.test.web.client.match.MockRestRequestMatchers;
+import org.springframework.web.client.RestClient;
 
-@RestClientTest(NaverBookSearcher.class)
 class NaverBookSearcherTest {
-    @Autowired
+
     private NaverBookSearcher naverBookSearcher;
+    private MockRestServiceServer mockServer;
 
-    @Autowired
-    MockRestServiceServer mockServer;
-
-    @MockitoBean
-    private NaverApiEnvironment naverApiEnvironment;
+    @BeforeEach
+    void setUp() {
+        RestClient.Builder builder = RestClient.builder();
+        mockServer = MockRestServiceServer.bindTo(builder).build();
+        naverBookSearcher = new NaverBookSearcher(builder.build());
+    }
 
     @Test
     @DisplayName("API 모킹 단위 테스트")

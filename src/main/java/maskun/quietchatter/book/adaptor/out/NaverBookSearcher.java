@@ -12,6 +12,7 @@ import maskun.quietchatter.book.domain.ExternalLink;
 import maskun.quietchatter.book.domain.Isbn;
 import maskun.quietchatter.book.domain.ThumbnailImage;
 import maskun.quietchatter.book.domain.Title;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
@@ -23,12 +24,8 @@ import org.springframework.web.util.UriBuilder;
 class NaverBookSearcher implements ExternalBookSearcher {
     private final RestClient naverClient;
 
-    NaverBookSearcher(RestClient.Builder applicationClientBuilder, NaverApiEnvironment naverApiEnvironment) {
-        this.naverClient = applicationClientBuilder
-                .baseUrl("https://openapi.naver.com/v1/search/book.json")
-                .defaultHeader("X-Naver-Client-Id", naverApiEnvironment.getClientId())
-                .defaultHeader("X-Naver-Client-Secret", naverApiEnvironment.getClientSecret())
-                .build();
+    NaverBookSearcher(@Qualifier("naverRestClient") RestClient naverClient) {
+        this.naverClient = naverClient;
     }
 
     @Override

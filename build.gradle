@@ -61,10 +61,5 @@ tasks.register("testExternalApi", Test) {
         includeTags("external-api")
     }
 
-    def naverApiClientIdName = 'naver.api.client-id'
-    def naverApiClientSecretName = 'naver.api.client-secret'
-
-    systemProperty naverApiClientIdName, project.property(naverApiClientIdName)
-    systemProperty naverApiClientSecretName, project.property(naverApiClientSecretName)
     environment("TESTCONTAINERS_REUSE_ENABLE", "true")
 }
