@@ -1,6 +1,6 @@
-package maskun.quietchatter.shared.security;
+package maskun.quietchatter.security.internal;
 
-import static org.springframework.security.config.http.SessionCreationPolicy.IF_REQUIRED;
+import static org.springframework.security.config.http.SessionCreationPolicy.STATELESS;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
@@ -18,17 +18,18 @@ import org.springframework.security.web.authentication.AnonymousAuthenticationFi
 class SecurityConfig {
 
     @Bean
-    SecurityFilterChain securityFilterChain(HttpSecurity http,
-                                            GuestAuthenticationProvider authenticationProvider,
-                                                   GuestPromotion guestPromotion) throws Exception {
+    SecurityFilterChain securityFilterChain(HttpSecurity http, AuthTokenService authTokenService,
+                                            AuthMemberService authMemberService) throws Exception {
 
         return http
                 .anonymous(Customizer.withDefaults())
-                .sessionManagement(
-                        session -> session.sessionCreationPolicy(IF_REQUIRED)
-                )
+                .sessionManagement(session -> session.sessionCreationPolicy(STATELESS))
                 .addFilterBefore(
-                        new GuestAuthenticationFilter(authenticationProvider, guestPromotion.getRequestMatchers()),
+                        new AuthFilter(authTokenService, authMemberService),
+                        AnonymousAuthenticationFilter.class
+                )
+                .addFilterAfter(
+                        new AnonymousToGuestPromotionFilter(authTokenService, authMemberService),
                         AnonymousAuthenticationFilter.class
                 )
                 .authorizeHttpRequests(authorize -> authorize.anyRequest().permitAll())

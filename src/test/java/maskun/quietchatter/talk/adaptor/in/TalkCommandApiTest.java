@@ -7,7 +7,6 @@ import static org.mockito.Mockito.when;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import maskun.quietchatter.TestSecurityConfig;
 import maskun.quietchatter.shared.web.WebConfig;
 import maskun.quietchatter.talk.application.in.TalkCreatable;
 import maskun.quietchatter.talk.domain.Talk;
@@ -24,7 +23,7 @@ import org.springframework.test.web.servlet.assertj.MockMvcTester;
 import org.springframework.test.web.servlet.assertj.MvcTestResult;
 
 @WebMvcTest(controllers = TalkCommandApi.class)
-@Import({WebConfig.class, TestSecurityConfig.class})
+@Import({WebConfig.class})
 class TalkCommandApiTest {
 
     @MockitoBean
@@ -42,7 +41,6 @@ class TalkCommandApiTest {
     }
 
     @Test
-    @WithUserDetails(TestSecurityConfig.TEST_GUEST)
     @DisplayName("북톡 등록 성공")
     void post() throws JsonProcessingException {
         TalkCreateWebRequest request = create(TalkCreateWebRequest.class);

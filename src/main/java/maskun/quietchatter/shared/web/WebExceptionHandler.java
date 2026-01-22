@@ -7,9 +7,12 @@ import static org.springframework.http.ResponseEntity.status;
 
 import java.util.NoSuchElementException;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.boot.autoconfigure.web.servlet.WebMvcProperties.Problemdetails;
+import org.springframework.http.ProblemDetail;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.servlet.NoHandlerFoundException;
 
 @Slf4j
 @ControllerAdvice
@@ -34,5 +37,10 @@ class WebExceptionHandler {
         ErrorResponse errorResponse = new ErrorResponse(ERROR_UNCAUGHT);
 
         return internalServerError().body(errorResponse);
+    }
+
+    @ExceptionHandler(NoHandlerFoundException.class)
+    ProblemDetail handleNoHandlerFoundException(NoHandlerFoundException ex) {
+        return ProblemDetail.forStatus(404);
     }
 }
