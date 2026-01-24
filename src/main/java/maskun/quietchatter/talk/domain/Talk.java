@@ -1,7 +1,5 @@
 package maskun.quietchatter.talk.domain;
 
-import jakarta.persistence.AttributeOverride;
-import jakarta.persistence.AttributeOverrides;
 import jakarta.persistence.Column;
 import jakarta.persistence.Embedded;
 import jakarta.persistence.Entity;
@@ -12,6 +10,7 @@ import java.time.LocalDate;
 import java.time.ZoneId;
 import java.util.UUID;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import maskun.quietchatter.shared.persistence.BaseEntity;
 
 @Getter
@@ -22,6 +21,7 @@ import maskun.quietchatter.shared.persistence.BaseEntity;
         @Index(columnList = "created_at", name = "idx_talk_created_at"),
         @Index(columnList = "date_to_hidden, is_hidden", name = "idx_talk_date_to_hidden_is_hidden")
 })
+@NoArgsConstructor(access = lombok.AccessLevel.PROTECTED)
 public class Talk extends BaseEntity {
 
     @Column(name = "book_id")
@@ -39,16 +39,11 @@ public class Talk extends BaseEntity {
     @Column(name = "is_hidden")
     private boolean isHidden;
 
-    @Embedded
-    @AttributeOverrides(
-            value = {@AttributeOverride(name = "like", column = @Column(name = "like_count", updatable = false)),
-                    @AttributeOverride(name = "support", column = @Column(name = "support_count", updatable = false))}
-    )
-    private ReactionCount reactionCount;
+    @Column(name = "like_count", updatable = false)
+    private long likeCount;
 
-    protected Talk() {
-        // JPA용
-    }
+    @Column(name = "support_count", updatable = false)
+    private long supportCount;
 
     public Talk(UUID bookId, UUID memberId, Content content) {
         this(bookId, memberId, content, LocalDate.now().plusMonths(12));
@@ -60,19 +55,8 @@ public class Talk extends BaseEntity {
         this.content = content;
         this.dateToHidden = dateToHidden;
         this.isHidden = false;
-        this.reactionCount = ReactionCount.zero();
-    }
-
-    public void updateBookId(UUID bookId) {
-        this.bookId = bookId;
-    }
-
-    public void updateMemberId(UUID memberId) {
-        this.memberId = memberId;
-    }
-
-    public void update(Content content) {
-        this.content = content;
+        this.likeCount = 0;
+        this.supportCount = 0;
     }
 
     @Override
@@ -84,6 +68,8 @@ public class Talk extends BaseEntity {
                 "content = " + getContent() + ", " +
                 "dateToHidden = " + getDateToHidden() + ", " +
                 "isHidden = " + isHidden() + ", " +
+                "likeCount = " + getLikeCount() + ", " +
+                "supportCount = " + getSupportCount() + ", " +
                 "createdAt = " + getCreatedAt() + ")";
     }
 

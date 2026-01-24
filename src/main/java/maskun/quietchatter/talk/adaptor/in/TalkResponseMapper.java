@@ -48,9 +48,9 @@ public class TalkResponseMapper {
                 talk.getCreatedAt(),
                 talk.getHiddenTimeAsInstant(),
                 talk.getContent().value(),
-                talk.getReactionCount().like(),
+                talk.getLikeCount(),
                 false,
-                talk.getReactionCount().support(),
+                talk.getSupportCount(),
                 false
         );
     }
