@@ -67,7 +67,7 @@ class AuthTokenService {
 
     public void putAccessToken(HttpServletResponse response, String accessToken) {
         Cookie cookie = new Cookie(ACCESS_TOKEN_COOKIE_NAME, accessToken);
-        cookie.setMaxAge((int) ACCESS_TOKEN_LIFE_TIME.getSeconds());
+        cookie.setMaxAge((int) REFRESH_TOKEN_LIFETIME.getSeconds());
         cookie.setHttpOnly(true);
         cookie.setPath("/");
         response.addCookie(cookie);
