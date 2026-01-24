@@ -14,7 +14,7 @@ record TalkResponse(
         UUID bookId,
         UUID memberId,
         Instant createdAt,
-        Instant timeToHidden,
+        Instant dateToHidden,
         String content,
         long likeCount,
         Boolean didILike,
@@ -32,5 +32,3 @@ record TalkResponse(
         return supportCount;
     }
 }
-
-

@@ -28,11 +28,12 @@ class TalkCreateService implements TalkCreatable {
         bookRepository.require(request.bookId());
         memberRepository.require(request.memberId());
 
-        Talk talk = new Talk();
-        talk.updateBookId(request.bookId());
-        talk.updateMemberId(request.memberId());
-        talk.update(request.content());
-        talk.update(request.time());
+        Talk talk;
+        if (request.dateToHidden() != null) {
+            talk = new Talk(request.bookId(), request.memberId(), request.content(), request.dateToHidden());
+        } else {
+            talk = new Talk(request.bookId(), request.memberId(), request.content());
+        }
 
         return talkRepository.save(talk);
     }

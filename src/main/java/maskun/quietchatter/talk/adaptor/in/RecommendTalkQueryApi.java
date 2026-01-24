@@ -1,11 +1,9 @@
 package maskun.quietchatter.talk.adaptor.in;
 
 import java.util.List;
-import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import maskun.quietchatter.talk.application.in.RecommendTalkQueryable;
 import maskun.quietchatter.talk.domain.Talk;
-import maskun.quietchatter.talk.domain.Time;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -25,7 +23,7 @@ class RecommendTalkQueryApi {
                 talk.getBookId(),
                 talk.getMemberId(),
                 talk.getCreatedAt(),
-                Optional.ofNullable(talk.getTime()).map(Time::hidden).orElse(null),
+                talk.getHiddenTimeAsInstant(),
                 talk.getContent().value(),
                 talk.getReactionCount().like(),
                 false,

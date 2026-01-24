@@ -1,5 +1,7 @@
 package maskun.quietchatter.talk.adaptor.in;
 
+import java.time.LocalDate;
+import java.time.ZoneId;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import maskun.quietchatter.security.AuthMember;
@@ -8,7 +10,6 @@ import maskun.quietchatter.talk.application.in.TalkCreatable;
 import maskun.quietchatter.talk.application.in.TalkCreateRequest;
 import maskun.quietchatter.talk.domain.Content;
 import maskun.quietchatter.talk.domain.Talk;
-import maskun.quietchatter.talk.domain.Time;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -32,11 +33,16 @@ class TalkCommandApi {
     }
 
     private TalkCreateRequest convert(TalkCreateWebRequest request, UUID memberId) {
+        LocalDate dateToHidden = null;
+        if (request.hidden() != null) {
+            dateToHidden = LocalDate.ofInstant(request.hidden(), ZoneId.systemDefault());
+        }
+        
         return new TalkCreateRequest(
                 request.bookId(),
                 memberId,
                 new Content(request.content()),
-                new Time(request.hidden())
+                dateToHidden
         );
     }
 }
