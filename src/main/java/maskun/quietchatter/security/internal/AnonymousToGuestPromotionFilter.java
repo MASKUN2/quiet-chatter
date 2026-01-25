@@ -30,6 +30,7 @@ class AnonymousToGuestPromotionFilter extends OncePerRequestFilter {
         Builder builder = PathPatternRequestMatcher.withDefaults();
         requestMatchers = List.of(
                 builder.matcher(HttpMethod.POST, "/api/talks"),
+                builder.matcher(HttpMethod.GET, "/api/talks"),
                 builder.matcher(HttpMethod.POST, "/api/reactions"),
                 builder.matcher(HttpMethod.DELETE, "/api/reactions")
         );
