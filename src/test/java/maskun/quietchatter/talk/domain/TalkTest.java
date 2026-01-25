@@ -1,7 +1,6 @@
 package maskun.quietchatter.talk.domain;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.assertj.core.api.Assertions.*;
 
 import java.time.LocalDate;
 import java.util.UUID;
@@ -10,6 +9,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.NullAndEmptySource;
 import org.junit.jupiter.params.provider.ValueSource;
+import org.springframework.test.util.ReflectionTestUtils;
 
 class TalkTest {
 
@@ -27,6 +27,7 @@ class TalkTest {
         // then
         assertThat(talk.getDateToHidden()).isEqualTo(LocalDate.now().plusMonths(12));
         assertThat(talk.isHidden()).isFalse();
+        assertThat(talk.isModified()).isFalse();
     }
 
     @DisplayName("톡 생성 시 숨김 날짜를 지정하면 해당 날짜로 설정된다")
@@ -44,6 +45,7 @@ class TalkTest {
         // then
         assertThat(talk.getDateToHidden()).isEqualTo(dateToHidden);
         assertThat(talk.isHidden()).isFalse();
+        assertThat(talk.isModified()).isFalse();
     }
 
     @DisplayName("내용이 비어있거나 공백이면 예외가 발생한다")
@@ -73,5 +75,47 @@ class TalkTest {
         assertThatThrownBy(() -> new Talk(bookId, memberId, longContent))
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessageContaining("초과할 수 없습니다");
+    }
+
+    @DisplayName("톡 내용을 수정하면 내용이 변경되고 숨김 날짜가 12개월 후로 갱신된다")
+    @Test
+    void updateContent() {
+        // given
+        Talk talk = new Talk(UUID.randomUUID(), UUID.randomUUID(), "old content", LocalDate.now().plusDays(1));
+        String newContent = "new content";
+
+        // when
+        talk.updateContent(newContent);
+
+        // then
+        assertThat(talk.getContent()).isEqualTo(newContent);
+        assertThat(talk.getDateToHidden()).isEqualTo(LocalDate.now().plusMonths(12));
+    }
+
+    @DisplayName("lastModifiedAt이 있으면 isModified는 true를 반환한다")
+    @Test
+    void isModified() {
+        // given
+        Talk talk = new Talk(UUID.randomUUID(), UUID.randomUUID(), "content");
+        assertThat(talk.isModified()).isFalse();
+
+        // when
+        ReflectionTestUtils.setField(talk, "lastModifiedAt", java.time.LocalDateTime.now());
+
+        // then
+        assertThat(talk.isModified()).isTrue();
+    }
+
+    @DisplayName("톡을 숨기면 isHidden 속성이 true가 된다")
+    @Test
+    void hide() {
+        // given
+        Talk talk = new Talk(UUID.randomUUID(), UUID.randomUUID(), "content");
+
+        // when
+        talk.hide();
+
+        // then
+        assertThat(talk.isHidden()).isTrue();
     }
 }

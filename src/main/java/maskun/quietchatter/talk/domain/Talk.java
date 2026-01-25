@@ -68,6 +68,20 @@ public class Talk extends BaseEntity {
         }
     }
 
+    public void updateContent(String content) {
+        validateContent(content);
+        this.content = content;
+        this.dateToHidden = LocalDate.now().plusMonths(12);
+    }
+
+    public void hide() {
+        this.isHidden = true;
+    }
+
+    public boolean isModified() {
+        return lastModifiedAt != null;
+    }
+
     @Override
     public String toString() {
         return getClass().getSimpleName() + "(" +

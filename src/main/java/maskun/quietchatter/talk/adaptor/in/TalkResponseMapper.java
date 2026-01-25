@@ -51,7 +51,8 @@ public class TalkResponseMapper {
                 talk.getLikeCount(),
                 false,
                 talk.getSupportCount(),
-                false
+                false,
+                talk.isModified()
         );
     }
 
@@ -81,7 +82,8 @@ public class TalkResponseMapper {
                 resp.like_count(),
                 didILike,
                 resp.support_count(),
-                didISupport
+                didISupport,
+                resp.isModified()
         );
     }
 }

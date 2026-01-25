@@ -20,7 +20,8 @@ record TalkResponse(
         long likeCount,
         Boolean didILike,
         long supportCount,
-        Boolean didISupport
+        Boolean didISupport,
+        boolean isModified
 ) implements Serializable {
 
     @JsonProperty("like_count")
@@ -31,5 +32,10 @@ record TalkResponse(
     @JsonProperty("support_count")
     public long support_count() {
         return supportCount;
+    }
+
+    @JsonProperty("is_modified")
+    public boolean is_modified() {
+        return isModified;
     }
 }

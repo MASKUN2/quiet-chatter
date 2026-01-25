@@ -28,7 +28,8 @@ class RecommendTalkQueryApi {
                 talk.getLikeCount(),
                 false,
                 talk.getSupportCount(),
-                false
+                false,
+                talk.isModified()
         )).toList();
         return ResponseEntity.ok(responses);
     }
