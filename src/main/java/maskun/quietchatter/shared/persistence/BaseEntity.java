@@ -1,42 +1,43 @@
 package maskun.quietchatter.shared.persistence;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.EntityListeners;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.MappedSuperclass;
 import java.io.Serializable;
-import java.time.Instant;
+import java.time.LocalDateTime;
 import java.util.Objects;
 import java.util.UUID;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 import org.hibernate.proxy.HibernateProxy;
+import org.jspecify.annotations.Nullable;
 import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
-import org.springframework.lang.Nullable;
 
+@Getter
 @MappedSuperclass
 @EntityListeners(AuditingEntityListener.class)
+@NoArgsConstructor(access = lombok.AccessLevel.PROTECTED)
 public abstract class BaseEntity implements Serializable {
 
     @Id
+    @Nullable
     @GeneratedValue(strategy = GenerationType.UUID)
-    private UUID id;
+    protected UUID id;
 
+    @Nullable
     @CreatedDate
-    private Instant createdAt;
-
-    protected BaseEntity() {
-    }
+    @Column(name = "created_at")
+    protected LocalDateTime createdAt;
 
     @Nullable
-    public UUID getId() {
-        return id;
-    }
-
-    @Nullable
-    public Instant getCreatedAt() {
-        return createdAt;
-    }
+    @LastModifiedDate
+    @Column(name = "last_modified_at")
+    protected LocalDateTime lastModifiedAt;
 
     @Override
     public final boolean equals(Object o) {
@@ -70,7 +71,7 @@ public abstract class BaseEntity implements Serializable {
     public String toString() {
         return getClass().getSimpleName() + "(" +
                 "id = " + id + ", " +
-                "createdAt = " + createdAt + ")";
+                "createdAt = " + createdAt + ", " +
+                "lastModifiedAt = " + lastModifiedAt + ")";
     }
 }
-

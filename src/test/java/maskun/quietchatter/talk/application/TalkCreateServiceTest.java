@@ -12,7 +12,6 @@ import maskun.quietchatter.member.application.out.MemberRepository;
 import maskun.quietchatter.member.domain.Member;
 import maskun.quietchatter.talk.application.in.TalkCreateRequest;
 import maskun.quietchatter.talk.application.out.TalkRepository;
-import maskun.quietchatter.talk.domain.Content;
 import maskun.quietchatter.talk.domain.Talk;
 import org.instancio.Instancio;
 import org.jetbrains.annotations.NotNull;
@@ -42,7 +41,7 @@ class TalkCreateServiceTest {
     void create() {
         UUID bookId = UUID.randomUUID();
         UUID memberId = UUID.randomUUID();
-        Content content = Instancio.create(Content.class);
+        String content = "test content";
         TalkCreateRequest request = new TalkCreateRequest(bookId, memberId, content, LocalDate.now().plusMonths(1));
 
         when(bookRepository.require(any())).thenReturn(Instancio.create(Book.class));

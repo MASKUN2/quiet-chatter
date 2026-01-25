@@ -1,11 +1,15 @@
 package maskun.quietchatter.talk.domain;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import java.time.LocalDate;
 import java.util.UUID;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.NullAndEmptySource;
+import org.junit.jupiter.params.provider.ValueSource;
 
 class TalkTest {
 
@@ -15,7 +19,7 @@ class TalkTest {
         // given
         UUID bookId = UUID.randomUUID();
         UUID memberId = UUID.randomUUID();
-        Content content = new Content("content");
+        String content = "content";
 
         // when
         Talk talk = new Talk(bookId, memberId, content);
@@ -31,7 +35,7 @@ class TalkTest {
         // given
         UUID bookId = UUID.randomUUID();
         UUID memberId = UUID.randomUUID();
-        Content content = new Content("content");
+        String content = "content";
         LocalDate dateToHidden = LocalDate.now().plusDays(30);
 
         // when
@@ -40,5 +44,34 @@ class TalkTest {
         // then
         assertThat(talk.getDateToHidden()).isEqualTo(dateToHidden);
         assertThat(talk.isHidden()).isFalse();
+    }
+
+    @DisplayName("내용이 비어있거나 공백이면 예외가 발생한다")
+    @ParameterizedTest
+    @NullAndEmptySource
+    @ValueSource(strings = {" ", "  "})
+    void validateContentEmpty(String content) {
+        // given
+        UUID bookId = UUID.randomUUID();
+        UUID memberId = UUID.randomUUID();
+
+        // when & then
+        assertThatThrownBy(() -> new Talk(bookId, memberId, content))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessage("내용은 비어있을 수 없습니다.");
+    }
+
+    @DisplayName("내용이 최대 길이를 초과하면 예외가 발생한다")
+    @Test
+    void validateContentLength() {
+        // given
+        UUID bookId = UUID.randomUUID();
+        UUID memberId = UUID.randomUUID();
+        String longContent = "a".repeat(Talk.MAX_CONTENT_LENGTH + 1);
+
+        // when & then
+        assertThatThrownBy(() -> new Talk(bookId, memberId, longContent))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessageContaining("초과할 수 없습니다");
     }
 }

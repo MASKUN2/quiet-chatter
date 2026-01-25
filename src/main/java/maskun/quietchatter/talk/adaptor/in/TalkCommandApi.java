@@ -8,7 +8,6 @@ import maskun.quietchatter.security.AuthMember;
 import maskun.quietchatter.shared.web.IdResponse;
 import maskun.quietchatter.talk.application.in.TalkCreatable;
 import maskun.quietchatter.talk.application.in.TalkCreateRequest;
-import maskun.quietchatter.talk.domain.Content;
 import maskun.quietchatter.talk.domain.Talk;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -41,7 +40,7 @@ class TalkCommandApi {
         return new TalkCreateRequest(
                 request.bookId(),
                 memberId,
-                new Content(request.content()),
+                request.content(),
                 dateToHidden
         );
     }
