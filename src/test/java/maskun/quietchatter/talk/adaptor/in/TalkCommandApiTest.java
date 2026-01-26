@@ -12,8 +12,7 @@ import maskun.quietchatter.member.domain.Role;
 import maskun.quietchatter.security.AuthMember;
 import maskun.quietchatter.security.AuthMemberToken;
 import maskun.quietchatter.shared.web.WebConfig;
-import maskun.quietchatter.talk.application.in.TalkCreatable;
-import maskun.quietchatter.talk.application.in.TalkUpdatable;
+import maskun.quietchatter.talk.application.in.TalkCommandable;
 import maskun.quietchatter.talk.domain.Talk;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -33,10 +32,7 @@ import org.springframework.test.web.servlet.assertj.MvcTestResult;
 class TalkCommandApiTest {
 
     @MockitoBean
-    private TalkCreatable talkCreatable;
-
-    @MockitoBean
-    private TalkUpdatable talkUpdatable;
+    private TalkCommandable talkCommandable;
 
     @Autowired
     private MockMvcTester tester;
@@ -48,7 +44,7 @@ class TalkCommandApiTest {
     @DisplayName("북톡 등록 성공")
     void post() throws JsonProcessingException {
         TalkCreateWebRequest request = create(TalkCreateWebRequest.class);
-        when(talkCreatable.create(any())).thenReturn(create(Talk.class));
+        when(talkCommandable.create(any())).thenReturn(create(Talk.class));
 
         //when
         MvcTestResult result = tester.post().uri("/api/talks")

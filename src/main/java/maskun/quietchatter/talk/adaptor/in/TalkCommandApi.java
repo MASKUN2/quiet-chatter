@@ -6,9 +6,8 @@ import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import maskun.quietchatter.security.AuthMember;
 import maskun.quietchatter.shared.web.IdResponse;
-import maskun.quietchatter.talk.application.in.TalkCreatable;
+import maskun.quietchatter.talk.application.in.TalkCommandable;
 import maskun.quietchatter.talk.application.in.TalkCreateRequest;
-import maskun.quietchatter.talk.application.in.TalkUpdatable;
 import maskun.quietchatter.talk.domain.Talk;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -24,14 +23,13 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequiredArgsConstructor
 class TalkCommandApi {
-    private final TalkCreatable talkCreatable;
-    private final TalkUpdatable talkUpdatable;
+    private final TalkCommandable talkCommandable;
 
     @PostMapping
     ResponseEntity<IdResponse> post(@AuthenticationPrincipal AuthMember authMember,
                                     @RequestBody TalkCreateWebRequest webRequest) {
         TalkCreateRequest createRequest = convert(webRequest, authMember.id());
-        Talk posted = talkCreatable.create(createRequest);
+        Talk posted = talkCommandable.create(createRequest);
         IdResponse idResponse = new IdResponse(posted.getId());
         return ResponseEntity.ok(idResponse);
     }
@@ -40,14 +38,14 @@ class TalkCommandApi {
     ResponseEntity<Void> update(@AuthenticationPrincipal AuthMember authMember,
                                 @PathVariable UUID talkId,
                                 @RequestBody TalkUpdateWebRequest webRequest) {
-        talkUpdatable.update(talkId, authMember.id(), webRequest.content());
+        talkCommandable.update(talkId, authMember.id(), webRequest.content());
         return ResponseEntity.noContent().build();
     }
 
     @DeleteMapping("/{talkId}")
     ResponseEntity<Void> delete(@AuthenticationPrincipal AuthMember authMember,
                                 @PathVariable UUID talkId) {
-        talkUpdatable.hide(talkId, authMember.id());
+        talkCommandable.hide(talkId, authMember.id());
         return ResponseEntity.noContent().build();
     }
 

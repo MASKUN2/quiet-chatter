@@ -3,6 +3,7 @@ package maskun.quietchatter.talk.domain;
 import static org.assertj.core.api.Assertions.*;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.UUID;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -92,7 +93,7 @@ class TalkTest {
         assertThat(talk.getDateToHidden()).isEqualTo(LocalDate.now().plusMonths(12));
     }
 
-    @DisplayName("lastModifiedAt이 있으면 isModified는 true를 반환한다")
+    @DisplayName("lastModifiedAt이 createdAt보다 앞서 있으면있으면 isModified는 true를 반환한다")
     @Test
     void isModified() {
         // given
@@ -100,7 +101,8 @@ class TalkTest {
         assertThat(talk.isModified()).isFalse();
 
         // when
-        ReflectionTestUtils.setField(talk, "lastModifiedAt", java.time.LocalDateTime.now());
+        ReflectionTestUtils.setField(talk, "createdAt", LocalDateTime.now());
+        ReflectionTestUtils.setField(talk, "lastModifiedAt", LocalDateTime.now().plusMinutes(1));
 
         // then
         assertThat(talk.isModified()).isTrue();
