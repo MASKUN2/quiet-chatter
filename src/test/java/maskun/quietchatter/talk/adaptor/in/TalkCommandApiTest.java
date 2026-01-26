@@ -10,25 +10,25 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import java.util.UUID;
 import maskun.quietchatter.member.domain.Role;
 import maskun.quietchatter.security.AuthMember;
+import maskun.quietchatter.security.AuthMemberToken;
 import maskun.quietchatter.shared.web.WebConfig;
 import maskun.quietchatter.talk.application.in.TalkCreatable;
 import maskun.quietchatter.talk.application.in.TalkUpdatable;
 import maskun.quietchatter.talk.domain.Talk;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.security.servlet.SecurityAutoConfiguration;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.context.annotation.Import;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.assertj.MockMvcTester;
 import org.springframework.test.web.servlet.assertj.MvcTestResult;
 
-@WebMvcTest(controllers = TalkCommandApi.class)
+@WebMvcTest(controllers = TalkCommandApi.class, excludeAutoConfiguration = SecurityAutoConfiguration.class)
 @Import({WebConfig.class})
 class TalkCommandApiTest {
 
@@ -44,25 +44,18 @@ class TalkCommandApiTest {
     @Autowired
     private ObjectMapper objectMapper;
 
-    @BeforeEach
-    void setUp() {
-        when(talkCreatable.create(any())).thenReturn(create(Talk.class));
-
-        AuthMember authMember = new AuthMember(UUID.randomUUID(), Role.GUEST);
-        UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(
-                authMember, null, null);
-        SecurityContextHolder.getContext().setAuthentication(authentication);
-    }
-
     @Test
     @DisplayName("북톡 등록 성공")
     void post() throws JsonProcessingException {
         TalkCreateWebRequest request = create(TalkCreateWebRequest.class);
+        when(talkCreatable.create(any())).thenReturn(create(Talk.class));
 
         //when
         MvcTestResult result = tester.post().uri("/api/talks")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(request))
+                .with(SecurityMockMvcRequestPostProcessors.authentication(
+                        new AuthMemberToken(new AuthMember(UUID.randomUUID(), Role.GUEST))))
                 .exchange();
 
         //then
@@ -80,6 +73,8 @@ class TalkCommandApiTest {
         MvcTestResult result = tester.put().uri("/api/talks/{talkId}", UUID.randomUUID())
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(request))
+                .with(SecurityMockMvcRequestPostProcessors.authentication(
+                        new AuthMemberToken(new AuthMember(UUID.randomUUID(), Role.GUEST))))
                 .exchange();
 
         //then
@@ -91,6 +86,8 @@ class TalkCommandApiTest {
     void delete() {
         //when
         MvcTestResult result = tester.delete().uri("/api/talks/{talkId}", UUID.randomUUID())
+                .with(SecurityMockMvcRequestPostProcessors.authentication(
+                        new AuthMemberToken(new AuthMember(UUID.randomUUID(), Role.GUEST))))
                 .exchange();
 
         //then
