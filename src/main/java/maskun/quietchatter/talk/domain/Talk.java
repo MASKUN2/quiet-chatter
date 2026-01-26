@@ -79,7 +79,10 @@ public class Talk extends BaseEntity {
     }
 
     public boolean isModified() {
-        return lastModifiedAt != null;
+        if (createdAt == null || this.lastModifiedAt == null) {
+            return false;
+        }
+        return lastModifiedAt.isAfter(createdAt);
     }
 
     @Override
