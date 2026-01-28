@@ -1,8 +1,6 @@
 package maskun.quietchatter.book.domain;
 
-import jakarta.persistence.AttributeOverride;
 import jakarta.persistence.Column;
-import jakarta.persistence.Embedded;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Index;
 import jakarta.persistence.Table;
@@ -15,54 +13,48 @@ import maskun.quietchatter.shared.persistence.BaseEntity;
         , @Index(columnList = "title", name = "idx_book_title")})
 public class Book extends BaseEntity {
 
-    @Embedded
-    @AttributeOverride(name = "value", column = @Column(name = "title"))
-    private Title title;
+    @Column(name = "title")
+    private String title;
 
-    @Embedded
-    @AttributeOverride(name = "value", column = @Column(name = "isbn"))
-    private Isbn isbn;
+    @Column(name = "isbn")
+    private String isbn;
 
-    @Embedded
-    @AttributeOverride(name = "name", column = @Column(name = "author"))
-    private Author author;
+    @Column(name = "author")
+    private String author;
 
-    @Embedded
-    @AttributeOverride(name = "url", column = @Column(name = "thumbnail_image_url", columnDefinition = "TEXT"))
-    private ThumbnailImage thumbnailImage;
+    @Column(name = "thumbnail_image_url", columnDefinition = "TEXT")
+    private String thumbnailImage;
 
-    @Embedded
-    @AttributeOverride(name = "value", column = @Column(name = "description", columnDefinition = "TEXT"))
-    private Description description;
+    @Column(name = "description", columnDefinition = "TEXT")
+    private String description;
 
-    @Embedded
-    @AttributeOverride(name = "url", column = @Column(name = "external_link_url", columnDefinition = "TEXT"))
-    private ExternalLink externalLink;
+    @Column(name = "external_link_url", columnDefinition = "TEXT")
+    private String externalLink;
 
-    public static Book newOf(Title title, Isbn isbn) {
+    public static Book newOf(String title, String isbn) {
         Book book = new Book();
         book.title = title;
         book.isbn = isbn;
         return book;
     }
 
-    public void update(Title title) {
+    public void update(String title) {
         this.title = title;
     }
 
-    public void update(Author author) {
+    public void updateAuthor(String author) {
         this.author = author;
     }
 
-    public void update(ThumbnailImage thumbnailImage) {
+    public void updateThumbnailImage(String thumbnailImage) {
         this.thumbnailImage = thumbnailImage;
     }
 
-    public void update(Description description) {
+    public void updateDescription(String description) {
         this.description = description;
     }
 
-    public void update(ExternalLink externalLink) {
+    public void updateExternalLink(String externalLink) {
         this.externalLink = externalLink;
     }
 

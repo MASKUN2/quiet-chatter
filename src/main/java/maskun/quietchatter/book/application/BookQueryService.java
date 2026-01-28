@@ -13,8 +13,6 @@ import maskun.quietchatter.book.application.in.Keyword;
 import maskun.quietchatter.book.application.out.BookRepository;
 import maskun.quietchatter.book.application.out.ExternalBookSearcher;
 import maskun.quietchatter.book.domain.Book;
-import maskun.quietchatter.book.domain.Isbn;
-import maskun.quietchatter.book.domain.Title;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.util.Streamable;
@@ -51,18 +49,18 @@ class BookQueryService implements BookQueryable {
     }
 
     private Page<Book> mergeOrPersist(Page<Book> fetchedBooks) {
-        Set<Isbn> isbns = collectIsbn(fetchedBooks);
+        Set<String> isbns = collectIsbn(fetchedBooks);
         Map<TitleAndIsbn, Book> existsMap = mapExistsBy(isbns);
         return fetchedBooks.map(updateOrSave(existsMap));
     }
 
-    private static Set<Isbn> collectIsbn(Streamable<Book> fetchedBooks) {
+    private static Set<String> collectIsbn(Streamable<Book> fetchedBooks) {
         return fetchedBooks.stream()
                 .map(Book::getIsbn)
                 .collect(Collectors.toUnmodifiableSet());
     }
 
-    private Map<TitleAndIsbn, Book> mapExistsBy(Set<Isbn> isbns) {
+    private Map<TitleAndIsbn, Book> mapExistsBy(Set<String> isbns) {
         List<Book> isbnIn = bookRepository.findByIsbnIn(isbns);
 
         return isbnIn.stream()
@@ -72,8 +70,8 @@ class BookQueryService implements BookQueryable {
 
     private Function<Book, Book> updateOrSave(final Map<TitleAndIsbn, Book> exists) {
         return book -> {
-            Title title = book.getTitle();
-            Isbn isbn = book.getIsbn();
+            String title = book.getTitle();
+            String isbn = book.getIsbn();
             TitleAndIsbn key = new TitleAndIsbn(title, isbn);
 
             return Optional.ofNullable(exists.get(key))
@@ -85,10 +83,10 @@ class BookQueryService implements BookQueryable {
     private static Function<Book, Book> updateAndGet(Book fecthedBook) {
         return exist -> {
             exist.update(fecthedBook.getTitle());
-            exist.update(fecthedBook.getAuthor());
-            exist.update(fecthedBook.getThumbnailImage());
-            exist.update(fecthedBook.getDescription());
-            exist.update(fecthedBook.getExternalLink());
+            exist.updateAuthor(fecthedBook.getAuthor());
+            exist.updateThumbnailImage(fecthedBook.getThumbnailImage());
+            exist.updateDescription(fecthedBook.getDescription());
+            exist.updateExternalLink(fecthedBook.getExternalLink());
             return exist;
         };
     }
@@ -97,6 +95,6 @@ class BookQueryService implements BookQueryable {
         return () -> bookRepository.save(fecthedBook);
     }
 
-    private record TitleAndIsbn(Title title, Isbn isbn) {
+    private record TitleAndIsbn(String title, String isbn) {
     }
 }
