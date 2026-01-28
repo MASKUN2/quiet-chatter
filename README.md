@@ -16,7 +16,7 @@ URL: https://quiet-chatter.com
 > 아마도 '나는 이곳에 어울리지 않아' 같은 내적인 속삭임으로 대변될 수 있을 그 마음들을 생각하면서, 이 문제를 해결하기 위한 과제로써 이번 오픈 미션을 시작해보면 좋겠다고 생각했다. 그리고 그 미션의 결과물이 '너는 이곳에 어울려' 라는 메세지를 전달해줄 수 있길 원했다.
 >
 > 그래서 나는 수줍음이 많은 사람들을 위한 독서 SNS 프로젝트를 생각했다 ∙∙∙   
-> -[오픈미션 회고 중에서](/docs/old/2025년%20우테코%20지원%20오픈미션기록/오픈미션회고-정인호.pdf)-
+> -[오픈미션 회고 중에서](/docs/archived/2025년%20우테코%20지원%20오픈미션기록/오픈미션회고-정인호.pdf)-
 
 ### 주요 기능
 
@@ -27,70 +27,10 @@ URL: https://quiet-chatter.com
 
 ---
 
+### 문서
 
-### 인프라스트럭처 아키텍쳐
+- [요구사항명세서: requirements_specification.md](/docs/requirements_specification.md)
+- [프로젝트 히스토리: project_history.md](/docs/project_history.md)]
+- [현재 진행중인 작업: current_works.md](/docs/current_works.md)]
+- [AI 에이전트 작업지침: AGENTS.md](/docs/guide/ai_agent_guide.md)]
 
-```mermaid
-    C4Context
-    title Quiet Chatter : 인프라스트럭처 아키텍쳐
-    Person(user, "사용자")
-
-    Boundary(ststem, "클라우드 서버", "AWS Light Sail") {
-        Container(ws, "웹서버", "Nginx", "클라이언트 페이지 서빙 / 라우팅")
-        Container(api_server, "API 서버", "Spring boot")
-        Container(db, "관계형 데이터 베이스", "PostgreSQL")
-        Container(in_memory_db, "인 메모리 데이터 베이스", "Redis", "캐시/인증토큰관리")
-    }
-
-    Boundary(git, "VCS", "GitHub") {
-        Component(gitAction, "CI/CD", "Git Hub Action")
-        ComponentDb(repository, "프로젝트 저장소", "Git Hub Repository")
-        Person(developer, "개발자")
-    }
-    System(dockerhub, "이미지 저장소", "Docker Hub")
-    BiRel(user, ws, "")
-    Rel(gitAction, dockerhub, "Docker 이미지 푸시")
-    BiRel(ws, api_server, "")
-    BiRel(in_memory_db, api_server, "")
-    Rel(developer, repository, "Push to")
-    Rel(repository, gitAction, "Run Git Hub Action")
-    BiRel(api_server, db, "")
-
-```
-
-<br><br>
-
-### 애플리케이션 아키텍쳐 (Hexagonal Architecture)
-
-```mermaid
----
-config:
-  class:
-    hideEmptyMembersBox: true
----
-classDiagram
-    direction LR
-    namespace hexagon {
-        class domain {
-        }
-        class `application service` {
-        }
-        class `inbound port` {
-            <<interface>>
-        }
-        class `outbound port` {
-            <<interface>>
-        }
-    }
-    class `web adaptor` {
-    }
-    class `infra adaptor` {
-    }
-
-    `web adaptor` ..> `inbound port`
-    `inbound port` <|.. `application service`
-    `application service` ..> domain
-    `outbound port` <.. `application service`
-    `infra adaptor` ..|> `outbound port`
-
-```
