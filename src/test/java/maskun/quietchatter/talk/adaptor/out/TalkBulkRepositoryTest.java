@@ -1,11 +1,13 @@
 package maskun.quietchatter.talk.adaptor.out;
 
-import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.*;
 import static org.instancio.Select.field;
 import static org.instancio.Select.fields;
 
+import jakarta.persistence.EntityManager;
 import java.time.LocalDate;
 import java.util.List;
+import maskun.quietchatter.WithTestContainerDatabases;
 import maskun.quietchatter.shared.persistence.BaseEntity;
 import maskun.quietchatter.shared.persistence.JpaConfig;
 import maskun.quietchatter.talk.application.out.TalkBulkRepository;
@@ -16,18 +18,19 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.context.annotation.Import;
-import org.springframework.test.context.ActiveProfiles;
 
 @DataJpaTest
 @Import(JpaConfig.class)
-@ActiveProfiles("test")
-class TalkBulkRepositoryTest {
+class TalkBulkRepositoryTest implements WithTestContainerDatabases {
 
     @Autowired
     private TalkBulkRepository talkBulkRepository;
 
     @Autowired
     private TalkRepository talkRepository;
+
+    @Autowired
+    private EntityManager entityManager;
 
     @Test
     void hideExpiredTalks() {
@@ -66,6 +69,8 @@ class TalkBulkRepositoryTest {
 
         // When
         int updatedCount = talkBulkRepository.hideExpiredTalks(now);
+
+        entityManager.clear();
 
         // Then
         assertThat(updatedCount).isEqualTo(2);

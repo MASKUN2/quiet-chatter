@@ -1,10 +1,11 @@
 package maskun.quietchatter.reaction.adaptor.out;
 
-import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.*;
 
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
+import maskun.quietchatter.WithTestContainerDatabases;
 import maskun.quietchatter.reaction.domain.Reaction;
 import maskun.quietchatter.shared.persistence.JpaConfig;
 import org.junit.jupiter.api.BeforeEach;
@@ -14,13 +15,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.context.annotation.Import;
 import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.test.context.ActiveProfiles;
 
 @SuppressWarnings("SqlWithoutWhere")
 @DataJpaTest(properties = "logging.level.org.springframework.jdbc=TRACE")
 @Import({JpaConfig.class, ReactionBatchWorker.class})
-@ActiveProfiles("test")
-class ReactionBatchWorkerTest {
+class ReactionBatchWorkerTest implements WithTestContainerDatabases {
 
     @Autowired
     private ReactionBatchWorker worker;

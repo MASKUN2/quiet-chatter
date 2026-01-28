@@ -1,6 +1,6 @@
 package maskun.quietchatter.book.application;
 
-import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.*;
 import static org.instancio.Instancio.of;
 import static org.instancio.Instancio.ofObject;
 import static org.instancio.Select.field;
@@ -8,11 +8,10 @@ import static org.instancio.Select.fields;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anySet;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 import java.util.List;
+import maskun.quietchatter.WithTestContainerDatabases;
 import maskun.quietchatter.book.application.in.Keyword;
 import maskun.quietchatter.book.application.out.BookRepository;
 import maskun.quietchatter.book.application.out.ExternalBookSearcher;
@@ -29,12 +28,10 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
-import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 
 @SpringBootTest
-@ActiveProfiles("test")
-class BookQueryServiceTest {
+class BookQueryServiceTest implements WithTestContainerDatabases {
 
     @MockitoBean
     private ExternalBookSearcher externalBookSearcher;
