@@ -1,43 +1,52 @@
 package maskun.quietchatter.talk.adaptor.out;
 
-import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.*;
 import static org.instancio.Select.field;
 import static org.instancio.Select.fields;
 
 import java.util.List;
 import java.util.UUID;
+import maskun.quietchatter.WithTestContainerDatabases;
 import maskun.quietchatter.shared.persistence.BaseEntity;
 import maskun.quietchatter.shared.persistence.JpaConfig;
 import maskun.quietchatter.talk.application.out.TalkRepository;
 import maskun.quietchatter.talk.domain.Talk;
 import org.instancio.Instancio;
 import org.instancio.Model;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.context.annotation.Import;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.test.context.ActiveProfiles;
 
 @DataJpaTest
 @Import(JpaConfig.class)
-@ActiveProfiles("test")
-class TalkRepositoryTest {
+class TalkRepositoryTest implements WithTestContainerDatabases {
     @Autowired
     private TalkRepository repository;
 
+    @BeforeEach
+    void setUp() {
+        WithTestContainerDatabases.clearAll();
+    }
+
     @Test
     void save() {
-        final Talk talk = Instancio.of(Talk.class).ignore(fields().declaredIn(BaseEntity.class)).create();
+        Talk talk = new Talk(UUID.randomUUID(), UUID.randomUUID(), "content");
 
-        final Talk saved = repository.save(talk);
+        Talk saved = repository.save(talk);
 
         assertThat(saved.getId()).isNotNull();
         assertThat(saved.getBookId()).isNotNull();
         assertThat(saved.getMemberId()).isNotNull();
         assertThat(saved.getContent()).isNotNull();
         assertThat(saved.getCreatedAt()).isNotNull();
+        assertThat(saved.getLastModifiedAt()).isNotNull();
+        assertThat(saved.isHidden()).isFalse();
+        assertThat(saved.isModified()).isFalse();
+        assertThat(saved.getDateToHidden()).isNotNull();
     }
 
     @Test
