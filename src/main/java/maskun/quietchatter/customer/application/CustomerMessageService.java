@@ -4,7 +4,6 @@ import lombok.RequiredArgsConstructor;
 import maskun.quietchatter.customer.application.in.CustomerMessageCreatable;
 import maskun.quietchatter.customer.application.out.CustomerMessageRepository;
 import maskun.quietchatter.customer.domain.CustomerMessage;
-import maskun.quietchatter.customer.domain.Message;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -15,7 +14,7 @@ public class CustomerMessageService implements CustomerMessageCreatable {
 
     @Override
     @Transactional
-    public void create(Message message) {
+    public void create(String message) {
         CustomerMessage customerMessage = new CustomerMessage();
         customerMessage.update(message);
         customerMessageRepository.save(customerMessage);

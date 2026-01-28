@@ -2,7 +2,6 @@ package maskun.quietchatter.customer.adaptor.in;
 
 import lombok.RequiredArgsConstructor;
 import maskun.quietchatter.customer.application.in.CustomerMessageCreatable;
-import maskun.quietchatter.customer.domain.Message;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -16,8 +15,11 @@ class CustomerMessageApi {
     private final CustomerMessageCreatable customerMessageCreatable;
 
     @PostMapping
-    ResponseEntity<String> postMessage(@RequestBody Message message) {
-        customerMessageCreatable.create(message);
+    ResponseEntity<String> postMessage(@RequestBody CustomerMessageRequest request) {
+        customerMessageCreatable.create(request.content());
         return ResponseEntity.accepted().build();
+    }
+
+    record CustomerMessageRequest(String content) {
     }
 }

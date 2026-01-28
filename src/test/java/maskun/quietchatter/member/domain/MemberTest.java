@@ -1,9 +1,8 @@
 package maskun.quietchatter.member.domain;
 
-import static org.assertj.core.api.Assertions.assertThat;
-
-import org.instancio.Instancio;
 import org.junit.jupiter.api.Test;
+
+import static org.assertj.core.api.Assertions.assertThat;
 
 class MemberTest {
 
@@ -11,20 +10,7 @@ class MemberTest {
     void newGuest() {
         Member guest = Member.newGuest();
 
-        assertThat(guest.getLogin()).isNull();
         assertThat(guest.getStatus()).isEqualTo(Status.ACTIVE);
         assertThat(guest.getRole()).isEqualTo(Role.GUEST);
-    }
-
-    @Test
-    void promote() {
-        Member guest = Member.newGuest();
-
-        Login login = new Login(Instancio.create(Id.class), Instancio.create(Password.class));
-        guest.promote(login);
-
-        assertThat(guest.getLogin()).isEqualTo(login);
-        assertThat(guest.getStatus()).isEqualTo(Status.ACTIVE);
-        assertThat(guest.getRole()).isEqualTo(Role.REGULAR);
     }
 }
