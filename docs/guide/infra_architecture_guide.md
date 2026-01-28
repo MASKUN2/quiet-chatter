@@ -1,4 +1,4 @@
-### 인프라스트럭처 아키텍쳐
+# 인프라스트럭처 아키텍쳐
 
 ```mermaid
     C4Context
@@ -25,42 +25,5 @@
     Rel(developer, repository, "Push to")
     Rel(repository, gitAction, "Run Git Hub Action")
     BiRel(api_server, db, "")
-
-```
-
-<br><br>
-
-### 애플리케이션 아키텍쳐 (Hexagonal Architecture)
-
-```mermaid
----
-config:
-  class:
-    hideEmptyMembersBox: true
----
-classDiagram
-    direction LR
-    namespace hexagon {
-        class domain {
-        }
-        class `application service` {
-        }
-        class `inbound port` {
-            <<interface>>
-        }
-        class `outbound port` {
-            <<interface>>
-        }
-    }
-    class `web adaptor` {
-    }
-    class `infra adaptor` {
-    }
-
-    `web adaptor` ..> `inbound port`
-    `inbound port` <|.. `application service`
-    `application service` ..> domain
-    `outbound port` <.. `application service`
-    `infra adaptor` ..|> `outbound port`
 
 ```
