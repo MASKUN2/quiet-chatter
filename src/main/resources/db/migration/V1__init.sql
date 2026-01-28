@@ -5,12 +5,8 @@ CREATE TABLE IF NOT EXISTS member
     created_at       TIMESTAMP,
     last_modified_at TIMESTAMP,
     role             VARCHAR(255),
-    status           VARCHAR(255),
-    login_id         VARCHAR(50),
-    login_password   TEXT
+    status VARCHAR(255)
 );
-
-CREATE INDEX IF NOT EXISTS idx_member_login_id ON member (login_id);
 
 -- Book 테이블
 CREATE TABLE IF NOT EXISTS book
@@ -52,11 +48,12 @@ CREATE INDEX IF NOT EXISTS idx_talk_date_to_hidden_is_hidden ON talk (date_to_hi
 -- Reaction 테이블
 CREATE TABLE IF NOT EXISTS reaction
 (
-    id        BIGSERIAL PRIMARY KEY,
+    id               UUID PRIMARY KEY,
     talk_id   UUID,
     member_id UUID,
     type      VARCHAR(255),
     created_at TIMESTAMP,
+    last_modified_at TIMESTAMP,
     CONSTRAINT uq_reaction_talk_member_type UNIQUE (talk_id, member_id, type)
 );
 

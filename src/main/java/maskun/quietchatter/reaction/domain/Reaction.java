@@ -1,23 +1,12 @@
 package maskun.quietchatter.reaction.domain;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.EntityListeners;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.Index;
-import jakarta.persistence.Table;
-import jakarta.persistence.UniqueConstraint;
-import java.time.Instant;
-import java.util.Objects;
-import java.util.UUID;
+import jakarta.persistence.*;
+import lombok.AccessLevel;
 import lombok.Getter;
-import org.hibernate.proxy.HibernateProxy;
-import org.springframework.data.annotation.CreatedDate;
-import org.springframework.data.jpa.domain.support.AuditingEntityListener;
+import lombok.NoArgsConstructor;
+import maskun.quietchatter.shared.persistence.BaseEntity;
+
+import java.util.UUID;
 
 @Getter
 @Entity(name = "reaction")
@@ -26,12 +15,8 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
         @Index(columnList = "type", name = "idx_reaction_type")},
         uniqueConstraints = @UniqueConstraint(columnNames = {"talk_id", "member_id", "type"},
                 name = "uq_reaction_talk_member_type"))
-@EntityListeners(AuditingEntityListener.class)
-public class Reaction {
-
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
+public class Reaction extends BaseEntity {
 
     @Column(name = "talk_id")
     private UUID talkId;
@@ -43,36 +28,10 @@ public class Reaction {
     @Column(name = "type")
     private Type type;
 
-    @CreatedDate
-    @Column(name = "created_at")
-    private Instant createdAt;
-
-    @Override
-    public final boolean equals(Object o) {
-        if (this == o) {
-            return true;
-        }
-        if (o == null) {
-            return false;
-        }
-        Class<?> oEffectiveClass = o instanceof HibernateProxy
-                ? ((HibernateProxy) o).getHibernateLazyInitializer().getPersistentClass()
-                : o.getClass();
-        Class<?> thisEffectiveClass = this instanceof HibernateProxy
-                ? ((HibernateProxy) this).getHibernateLazyInitializer().getPersistentClass()
-                : this.getClass();
-        if (thisEffectiveClass != oEffectiveClass) {
-            return false;
-        }
-        Reaction reaction = (Reaction) o;
-        return getId() != null && Objects.equals(getId(), reaction.getId());
-    }
-
-    @Override
-    public final int hashCode() {
-        return this instanceof HibernateProxy ? ((HibernateProxy) this).getHibernateLazyInitializer()
-                .getPersistentClass()
-                .hashCode() : getClass().hashCode();
+    public Reaction(UUID talkId, UUID memberId, Type type) {
+        this.talkId = talkId;
+        this.memberId = memberId;
+        this.type = type;
     }
 
     @Override

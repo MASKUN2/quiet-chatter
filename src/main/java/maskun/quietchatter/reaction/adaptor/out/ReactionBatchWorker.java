@@ -1,13 +1,5 @@
 package maskun.quietchatter.reaction.adaptor.out;
 
-import java.util.EnumMap;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
-import java.util.UUID;
-import java.util.function.Function;
-import java.util.stream.IntStream;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import maskun.quietchatter.reaction.application.in.ReactionTarget;
@@ -15,6 +7,11 @@ import maskun.quietchatter.reaction.domain.Reaction.Type;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.*;
+import java.util.Map.Entry;
+import java.util.function.Function;
+import java.util.stream.IntStream;
 
 @Component
 @RequiredArgsConstructor
@@ -55,26 +52,20 @@ class ReactionBatchWorker {
     private int[] deleteBatch(List<ReactionTarget> requests) {
         String sql = "DELETE FROM reaction WHERE talk_id = ? and member_id = ? and type = ?";
 
-        List<Object[]> batchArgs = getObjects(requests);
+        List<Object[]> batchArgs = requests.stream()
+                .map(request -> new Object[]{request.talkId(), request.memberId(), request.type().name()})
+                .toList();
         return jdbcTemplate.batchUpdate(sql, batchArgs);
     }
 
     private int[] insertBatch(List<ReactionTarget> requests) {
-        String sql = "INSERT INTO reaction (talk_id, member_id, type, created_at) VALUES (?, ?, ?, now())"
+        String sql = "INSERT INTO reaction (id, talk_id, member_id, type, created_at, last_modified_at) VALUES (?, ?, ?, ?, now(), now())"
                 + " ON CONFLICT (talk_id, member_id, type) DO NOTHING";
 
-        List<Object[]> batchArgs = getObjects(requests);
-        return jdbcTemplate.batchUpdate(sql, batchArgs);
-    }
-
-    private static List<Object[]> getObjects(List<ReactionTarget> requests) {
-        return requests.stream()
-                .map(convertToObjectArray())
+        List<Object[]> batchArgs = requests.stream()
+                .map(request -> new Object[]{UUID.randomUUID(), request.talkId(), request.memberId(), request.type().name()})
                 .toList();
-    }
-
-    private static Function<ReactionTarget, Object[]> convertToObjectArray() {
-        return request -> new Object[]{request.talkId(), request.memberId(), request.type().name()};
+        return jdbcTemplate.batchUpdate(sql, batchArgs);
     }
 
     private static List<ReactionTarget> filterSuccess(List<ReactionTarget> requests, int[] affectedRows) {

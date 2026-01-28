@@ -1,24 +1,25 @@
 package maskun.quietchatter.talk.adaptor.in;
 
-import static org.assertj.core.api.Assertions.*;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.*;
-
-import java.util.List;
-import java.util.UUID;
 import maskun.quietchatter.member.domain.Role;
 import maskun.quietchatter.reaction.application.in.ReactionQueryable;
 import maskun.quietchatter.reaction.domain.Reaction;
 import maskun.quietchatter.reaction.domain.Reaction.Type;
 import maskun.quietchatter.security.AuthMember;
 import maskun.quietchatter.talk.domain.Talk;
-import org.instancio.Instancio;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
-import org.springframework.test.util.ReflectionTestUtils;
+
+import java.util.List;
+import java.util.UUID;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.instancio.Instancio.ofList;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 class TalkResponseMapperTest {
 
@@ -29,7 +30,7 @@ class TalkResponseMapperTest {
     @DisplayName("인증 정보가 없는 경우 모든 반응은 false")
     void mapToResponse_WithoutAuth() {
         // Given
-        List<Talk> talks = Instancio.ofList(Talk.class).size(3).create();
+        List<Talk> talks = ofList(Talk.class).size(3).create();
         Page<Talk> page = new PageImpl<>(talks);
 
         // When
@@ -48,16 +49,13 @@ class TalkResponseMapperTest {
     void mapToResponse_WithAuth() {
         // Given
         AuthMember authMember = new AuthMember(UUID.randomUUID(), Role.REGULAR);
-        List<Talk> talks = Instancio.ofList(Talk.class).size(2).create();
+        List<Talk> talks = ofList(Talk.class).size(2).create();
         Talk talk1 = talks.get(0);
         Talk talk2 = talks.get(1);
         Page<Talk> page = new PageImpl<>(talks);
 
         // talk1에 대해 LIKE 반응이 있다고 가정
-        Reaction reaction = new Reaction();
-        ReflectionTestUtils.setField(reaction, "memberId", authMember.id());
-        ReflectionTestUtils.setField(reaction, "talkId", talk1.getId());
-        ReflectionTestUtils.setField(reaction, "type", Type.LIKE);
+        Reaction reaction = new Reaction(talk1.getId(), authMember.id(), Type.LIKE);
 
         when(reactionQueryable.getAllBy(eq(authMember.id()), any()))
                 .thenReturn(List.of(reaction));
