@@ -6,6 +6,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import maskun.quietchatter.shared.persistence.BaseEntity;
 
+import java.util.Objects;
 import java.util.UUID;
 
 @Getter
@@ -29,9 +30,27 @@ public class Reaction extends BaseEntity {
     private Type type;
 
     public Reaction(UUID talkId, UUID memberId, Type type) {
-        this.talkId = talkId;
-        this.memberId = memberId;
-        this.type = type;
+        this.talkId = Objects.requireNonNull(talkId, "talkId must not be null");
+        this.memberId = Objects.requireNonNull(memberId, "memberId must not be null");
+        this.type = Objects.requireNonNull(type, "type must not be null");
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (!(o instanceof Reaction reaction)) {
+            return false;
+        }
+        return Objects.equals(getTalkId(), reaction.getTalkId()) &&
+                Objects.equals(getMemberId(), reaction.getMemberId()) &&
+                getType() == reaction.getType();
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(getTalkId(), getMemberId(), getType());
     }
 
     @Override
