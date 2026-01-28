@@ -7,7 +7,7 @@
 
     Boundary(ststem, "클라우드 서버", "AWS Light Sail") {
         Container(ws, "웹서버", "Nginx", "클라이언트 페이지 서빙 / 라우팅")
-        Container(api_server, "API 서버", "Spring boot")
+        Container(api_server, "API 서버", "Spring boot", "Flyway를 통한 DB 마이그레이션 포함")
         Container(db, "관계형 데이터 베이스", "PostgreSQL")
         Container(in_memory_db, "인 메모리 데이터 베이스", "Redis", "캐시/인증토큰관리")
     }

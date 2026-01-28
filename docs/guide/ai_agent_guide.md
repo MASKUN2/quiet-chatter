@@ -11,7 +11,7 @@
 ## 2. 기술 스택
 
 - **Backend**: Java 21, Spring Boot 3.5.*
-- **Database**: PostgreSQL (Main), Redis (Token/Cache)
+- **Database**: PostgreSQL (Main), Redis (Token/Cache), Flyway (Migration)
 - **Security**: Spring Security (JWT 기반)
 - **Infrastructure**: AWS LightSail, Docker, GitHub Actions
 
@@ -28,3 +28,5 @@
 
 ## 4. 에이전트 수행 지침
 - 테스트를 작성합니다.
+- 엔티티 변경 등 DB 스키마에 변화가 생길 경우, 반드시 Flyway 마이그레이션 스크립트(`src/main/resources/db/migration`)를 작성합니다.
+- 마이그레이션 스크립트 작성 시 `IF NOT EXISTS` 구문을 사용하여 기존 DB와의 충돌을 방지합니다.
