@@ -6,14 +6,17 @@ spring:
   jpa:
     show-sql: true
     hibernate:
-      ddl-auto: update
+      ddl-auto: validate
     properties:
       hibernate:
         default_batch_fetch_size: 100
+  flyway:
+    enabled: true
+    clean-disabled: false  # clean 기능을 활성화
 
 naver:
   api:
     client-id: hidden
     client-secret: hidden
 jwt:
-  secret-key: someveryverymuchlongtestsecretkey
+  secret-key: someveryverymuchlongtestsecretkeyforlocaldevelopment

@@ -10,10 +10,13 @@ spring:
     password: hidden
   jpa:
     hibernate:
-      ddl-auto: update
+      ddl-auto: validate
     properties:
       hibernate:
         default_batch_fetch_size: 100
+  flyway:
+    enabled: true
+    baseline-on-migrate: true
   threads:
     virtual:
       enabled: true

@@ -8,7 +8,6 @@ import java.util.List;
 import java.util.UUID;
 import maskun.quietchatter.WithTestContainerDatabases;
 import maskun.quietchatter.shared.persistence.BaseEntity;
-import maskun.quietchatter.shared.persistence.JpaConfig;
 import maskun.quietchatter.talk.application.out.TalkRepository;
 import maskun.quietchatter.talk.domain.Talk;
 import org.instancio.Instancio;
@@ -16,13 +15,11 @@ import org.instancio.Model;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
-import org.springframework.context.annotation.Import;
+import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 
-@DataJpaTest
-@Import(JpaConfig.class)
+@SpringBootTest
 class TalkRepositoryTest implements WithTestContainerDatabases {
     @Autowired
     private TalkRepository repository;

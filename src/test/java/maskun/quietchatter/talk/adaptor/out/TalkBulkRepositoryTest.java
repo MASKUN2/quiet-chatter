@@ -9,18 +9,17 @@ import java.time.LocalDate;
 import java.util.List;
 import maskun.quietchatter.WithTestContainerDatabases;
 import maskun.quietchatter.shared.persistence.BaseEntity;
-import maskun.quietchatter.shared.persistence.JpaConfig;
 import maskun.quietchatter.talk.application.out.TalkBulkRepository;
 import maskun.quietchatter.talk.application.out.TalkRepository;
 import maskun.quietchatter.talk.domain.Talk;
 import org.instancio.Instancio;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
-import org.springframework.context.annotation.Import;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.transaction.annotation.Transactional;
 
-@DataJpaTest
-@Import(JpaConfig.class)
+@SpringBootTest
+@Transactional
 class TalkBulkRepositoryTest implements WithTestContainerDatabases {
 
     @Autowired
