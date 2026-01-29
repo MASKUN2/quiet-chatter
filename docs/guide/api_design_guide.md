@@ -82,8 +82,12 @@
 ## 5. 인증 (Authentication)
 
 - JWT (JSON Web Token) 기반 인증을 사용한다.
-- `Authorization` 헤더에 Bearer 토큰을 담아 요청한다.
+- **액세스 토큰(Access Token)**은 다음 순서로 확인한다.
+  1. **Cookie**: `access_token` 쿠키
+  2. **Header**: `Authorization: Bearer <token>` 헤더
+- **리프레시 토큰(Refresh Token)**은 보안을 위해 **Cookie** (`refresh_token`)로만 전달한다 (HttpOnly).
 
 ```text
+# Header 예시
 Authorization: Bearer <access_token>
 ```
