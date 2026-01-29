@@ -14,8 +14,29 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 class MdcFilterTest {
+
+    @Test
+    void shouldSanitizeSensitiveQueryParameters() {
+        // given
+        MdcFilter mdcFilter = new MdcFilter();
+        HttpServletRequest request = mock(HttpServletRequest.class);
+        when(request.getRequestURI()).thenReturn("/api/test");
+        when(request.getQueryString()).thenReturn("id=1&password=1234&token=abcde&secret=xyz&key=999&other=value");
+
+        // when
+        String fullUri = mdcFilter.getFullUri(request);
+
+        // then
+        assertThat(fullUri).contains("id=1");
+        assertThat(fullUri).contains("password=****");
+        assertThat(fullUri).contains("token=****");
+        assertThat(fullUri).contains("secret=****");
+        assertThat(fullUri).contains("key=****");
+        assertThat(fullUri).contains("other=value");
+    }
 
     @Test
     void mdcIsSetAndCleared() throws ServletException, IOException {

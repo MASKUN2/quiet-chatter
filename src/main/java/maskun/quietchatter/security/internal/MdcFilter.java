@@ -53,7 +53,7 @@ class MdcFilter extends OncePerRequestFilter {
         }
     }
 
-    private String getFullUri(HttpServletRequest request) {
+    String getFullUri(HttpServletRequest request) {
         String uri = request.getRequestURI();
         String queryString = request.getQueryString();
 
@@ -61,7 +61,11 @@ class MdcFilter extends OncePerRequestFilter {
             return uri;
         }
 
-        return uri + "?" + queryString;
+        return uri + "?" + sanitizeQueryString(queryString);
+    }
+
+    private String sanitizeQueryString(String queryString) {
+        return queryString.replaceAll("(?i)(password|token|secret|key)=[^&]*", "$1=****");
     }
 
     private String getClientIp(HttpServletRequest request) {
