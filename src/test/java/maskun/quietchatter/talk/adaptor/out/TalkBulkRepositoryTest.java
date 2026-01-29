@@ -1,14 +1,8 @@
 package maskun.quietchatter.talk.adaptor.out;
 
-import static org.assertj.core.api.Assertions.*;
-import static org.instancio.Select.field;
-import static org.instancio.Select.fields;
-
 import jakarta.persistence.EntityManager;
-import java.time.LocalDate;
-import java.util.List;
 import maskun.quietchatter.WithTestContainerDatabases;
-import maskun.quietchatter.shared.persistence.BaseEntity;
+import maskun.quietchatter.persistence.BaseEntity;
 import maskun.quietchatter.talk.application.out.TalkBulkRepository;
 import maskun.quietchatter.talk.application.out.TalkRepository;
 import maskun.quietchatter.talk.domain.Talk;
@@ -17,6 +11,13 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.time.LocalDate;
+import java.util.List;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.instancio.Select.field;
+import static org.instancio.Select.fields;
 
 @SpringBootTest
 @Transactional

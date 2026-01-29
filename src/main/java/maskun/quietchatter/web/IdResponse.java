@@ -1,4 +1,4 @@
-package maskun.quietchatter.shared.web;
+package maskun.quietchatter.web;
 
 import java.util.UUID;
 

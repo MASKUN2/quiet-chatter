@@ -4,7 +4,7 @@ import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import maskun.quietchatter.shared.persistence.BaseEntity;
+import maskun.quietchatter.persistence.BaseEntity;
 
 import java.util.UUID;
 

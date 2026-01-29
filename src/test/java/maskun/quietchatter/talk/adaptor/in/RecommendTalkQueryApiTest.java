@@ -1,9 +1,9 @@
 package maskun.quietchatter.talk.adaptor.in;
 
-import maskun.quietchatter.shared.web.WebConfig;
 import maskun.quietchatter.talk.application.in.RecommendTalkQueryable;
 import maskun.quietchatter.talk.application.in.RecommendTalks;
 import maskun.quietchatter.talk.domain.Talk;
+import maskun.quietchatter.web.WebConfig;
 import org.instancio.Instancio;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;

@@ -1,4 +1,4 @@
-package maskun.quietchatter.shared.persistence;
+package maskun.quietchatter.persistence;
 
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.jpa.repository.config.EnableJpaAuditing;

@@ -5,7 +5,7 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.Index;
 import jakarta.persistence.Table;
 import lombok.Getter;
-import maskun.quietchatter.shared.persistence.BaseEntity;
+import maskun.quietchatter.persistence.BaseEntity;
 
 @Getter
 @Entity(name = "book")

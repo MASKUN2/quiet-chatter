@@ -4,11 +4,12 @@ import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Index;
 import jakarta.persistence.Table;
-import java.time.LocalDate;
-import java.util.UUID;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import maskun.quietchatter.shared.persistence.BaseEntity;
+import maskun.quietchatter.persistence.BaseEntity;
+
+import java.time.LocalDate;
+import java.util.UUID;
 
 @Getter
 @Entity(name = "talk")

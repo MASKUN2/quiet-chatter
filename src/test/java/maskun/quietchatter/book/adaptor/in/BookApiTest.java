@@ -2,7 +2,7 @@ package maskun.quietchatter.book.adaptor.in;
 
 import maskun.quietchatter.book.application.in.BookQueryable;
 import maskun.quietchatter.book.domain.Book;
-import maskun.quietchatter.shared.web.WebConfig;
+import maskun.quietchatter.web.WebConfig;
 import org.instancio.Instancio;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;

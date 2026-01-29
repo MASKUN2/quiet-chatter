@@ -2,10 +2,10 @@ package maskun.quietchatter.talk.adaptor.in;
 
 import lombok.RequiredArgsConstructor;
 import maskun.quietchatter.security.AuthMember;
-import maskun.quietchatter.shared.web.IdResponse;
 import maskun.quietchatter.talk.application.in.TalkCommandable;
 import maskun.quietchatter.talk.application.in.TalkCreateRequest;
 import maskun.quietchatter.talk.domain.Talk;
+import maskun.quietchatter.web.IdResponse;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;

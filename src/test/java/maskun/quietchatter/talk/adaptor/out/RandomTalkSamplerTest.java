@@ -1,11 +1,8 @@
 package maskun.quietchatter.talk.adaptor.out;
 
-import static org.instancio.Instancio.ofList;
-
 import jakarta.persistence.EntityManager;
-import java.util.List;
 import maskun.quietchatter.WithTestContainerDatabases;
-import maskun.quietchatter.shared.persistence.BaseEntity;
+import maskun.quietchatter.persistence.BaseEntity;
 import maskun.quietchatter.talk.application.out.TalkRepository;
 import maskun.quietchatter.talk.domain.Talk;
 import org.instancio.Select;
@@ -15,6 +12,10 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
+
+import static org.instancio.Instancio.ofList;
 
 @SpringBootTest(properties = "logging.level.org.springframework.jdbc=TRACE")
 @Transactional

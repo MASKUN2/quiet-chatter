@@ -1,8 +1,8 @@
 package maskun.quietchatter.reaction.adaptor.out;
 
 import maskun.quietchatter.WithTestContainerDatabases;
+import maskun.quietchatter.persistence.JpaConfig;
 import maskun.quietchatter.reaction.domain.Reaction;
-import maskun.quietchatter.shared.persistence.JpaConfig;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;

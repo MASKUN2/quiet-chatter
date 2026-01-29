@@ -1,4 +1,4 @@
-package maskun.quietchatter.shared.web;
+package maskun.quietchatter.web;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ProblemDetail;

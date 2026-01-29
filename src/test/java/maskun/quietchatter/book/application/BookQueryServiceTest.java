@@ -1,22 +1,11 @@
 package maskun.quietchatter.book.application;
 
-import static org.assertj.core.api.Assertions.*;
-import static org.instancio.Instancio.of;
-import static org.instancio.Instancio.ofObject;
-import static org.instancio.Select.field;
-import static org.instancio.Select.fields;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anySet;
-import static org.mockito.Mockito.*;
-
-import java.util.List;
 import maskun.quietchatter.WithTestContainerDatabases;
 import maskun.quietchatter.book.application.in.Keyword;
 import maskun.quietchatter.book.application.out.BookRepository;
 import maskun.quietchatter.book.application.out.ExternalBookSearcher;
 import maskun.quietchatter.book.domain.Book;
-import maskun.quietchatter.shared.persistence.BaseEntity;
+import maskun.quietchatter.persistence.BaseEntity;
 import org.instancio.Instancio;
 import org.instancio.Model;
 import org.junit.jupiter.api.AfterEach;
@@ -29,6 +18,18 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
+
+import java.util.List;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.instancio.Instancio.of;
+import static org.instancio.Instancio.ofObject;
+import static org.instancio.Select.field;
+import static org.instancio.Select.fields;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anySet;
+import static org.mockito.Mockito.*;
 
 @SpringBootTest
 class BookQueryServiceTest implements WithTestContainerDatabases {

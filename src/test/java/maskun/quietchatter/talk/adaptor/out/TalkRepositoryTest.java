@@ -1,13 +1,7 @@
 package maskun.quietchatter.talk.adaptor.out;
 
-import static org.assertj.core.api.Assertions.*;
-import static org.instancio.Select.field;
-import static org.instancio.Select.fields;
-
-import java.util.List;
-import java.util.UUID;
 import maskun.quietchatter.WithTestContainerDatabases;
-import maskun.quietchatter.shared.persistence.BaseEntity;
+import maskun.quietchatter.persistence.BaseEntity;
 import maskun.quietchatter.talk.application.out.TalkRepository;
 import maskun.quietchatter.talk.domain.Talk;
 import org.instancio.Instancio;
@@ -18,6 +12,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+
+import java.util.List;
+import java.util.UUID;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.instancio.Select.field;
+import static org.instancio.Select.fields;
 
 @SpringBootTest
 class TalkRepositoryTest implements WithTestContainerDatabases {

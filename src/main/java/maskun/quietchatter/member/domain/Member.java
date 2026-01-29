@@ -2,7 +2,7 @@ package maskun.quietchatter.member.domain;
 
 import jakarta.persistence.*;
 import lombok.Getter;
-import maskun.quietchatter.shared.persistence.BaseEntity;
+import maskun.quietchatter.persistence.BaseEntity;
 
 @Getter
 @Entity(name = "member")
