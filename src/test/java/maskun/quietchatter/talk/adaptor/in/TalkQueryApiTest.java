@@ -1,12 +1,5 @@
 package maskun.quietchatter.talk.adaptor.in;
 
-import static org.assertj.core.api.Assertions.*;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.*;
-import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.authentication;
-import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
-
-import java.util.UUID;
 import maskun.quietchatter.member.domain.Role;
 import maskun.quietchatter.security.AuthMember;
 import maskun.quietchatter.security.AuthMemberToken;
@@ -22,6 +15,14 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.assertj.MockMvcTester;
+
+import java.util.UUID;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.when;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.authentication;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 
 @WebMvcTest(controllers = TalkQueryApi.class)
 @Import(WebConfig.class)
@@ -45,7 +46,7 @@ class TalkQueryApiTest {
         when(mapper.mapToResponse(any(), any(AuthMember.class))).thenReturn(responsePage);
 
         // When & Then
-        tester.get().uri("/api/talks")
+        tester.get().uri("/api/v1/talks")
                 .queryParam("bookId", bookId.toString())
                 .queryParam("page", "0")
                 .queryParam("size", "10")

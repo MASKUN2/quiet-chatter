@@ -8,14 +8,14 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-@RequestMapping("/api/customer/messages")
+@RequestMapping("/api/v1/customer/messages")
 @RestController
 @RequiredArgsConstructor
 class CustomerMessageApi {
     private final CustomerMessageCreatable customerMessageCreatable;
 
     @PostMapping
-    ResponseEntity<String> postMessage(@RequestBody CustomerMessageRequest request) {
+    ResponseEntity<Void> postMessage(@RequestBody CustomerMessageRequest request) {
         customerMessageCreatable.create(request.content());
         return ResponseEntity.accepted().build();
     }

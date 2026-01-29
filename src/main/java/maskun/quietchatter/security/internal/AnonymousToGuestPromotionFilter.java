@@ -4,8 +4,6 @@ import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import java.io.IOException;
-import java.util.List;
 import lombok.extern.slf4j.Slf4j;
 import maskun.quietchatter.security.AuthMember;
 import maskun.quietchatter.security.AuthMemberToken;
@@ -19,6 +17,9 @@ import org.springframework.security.web.servlet.util.matcher.PathPatternRequestM
 import org.springframework.security.web.util.matcher.RequestMatcher;
 import org.springframework.web.filter.OncePerRequestFilter;
 
+import java.io.IOException;
+import java.util.List;
+
 @Slf4j
 @NullMarked
 class AnonymousToGuestPromotionFilter extends OncePerRequestFilter {
@@ -29,10 +30,10 @@ class AnonymousToGuestPromotionFilter extends OncePerRequestFilter {
     static {
         Builder builder = PathPatternRequestMatcher.withDefaults();
         requestMatchers = List.of(
-                builder.matcher(HttpMethod.POST, "/api/talks"),
-                builder.matcher(HttpMethod.GET, "/api/talks"),
-                builder.matcher(HttpMethod.POST, "/api/reactions"),
-                builder.matcher(HttpMethod.DELETE, "/api/reactions")
+                builder.matcher(HttpMethod.POST, "/api/v1/talks"),
+                builder.matcher(HttpMethod.GET, "/api/v1/talks"),
+                builder.matcher(HttpMethod.POST, "/api/v1/reactions"),
+                builder.matcher(HttpMethod.DELETE, "/api/v1/reactions")
         );
     }
 

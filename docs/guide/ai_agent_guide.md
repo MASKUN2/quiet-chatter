@@ -19,6 +19,7 @@
 
 작업시 다음 가이드 문서를 참고합니다.
 
+- [api_design_guide.md](/docs/guide/api_design_guide.md)
 - [requirements_specification.md](/docs/requirements_specification.md)
 - [application_architecture_guide.md](/docs/guide/application_architecture_guide.md)
 - [project_history.md](/docs/project_history.md)

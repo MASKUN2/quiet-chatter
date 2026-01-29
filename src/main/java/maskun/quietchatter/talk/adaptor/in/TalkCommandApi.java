@@ -1,8 +1,5 @@
 package maskun.quietchatter.talk.adaptor.in;
 
-import java.time.LocalDate;
-import java.time.ZoneId;
-import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import maskun.quietchatter.security.AuthMember;
 import maskun.quietchatter.shared.web.IdResponse;
@@ -11,15 +8,13 @@ import maskun.quietchatter.talk.application.in.TalkCreateRequest;
 import maskun.quietchatter.talk.domain.Talk;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
-@RequestMapping("/api/talks")
+import java.time.LocalDate;
+import java.time.ZoneId;
+import java.util.UUID;
+
+@RequestMapping("/api/v1/talks")
 @RestController
 @RequiredArgsConstructor
 class TalkCommandApi {

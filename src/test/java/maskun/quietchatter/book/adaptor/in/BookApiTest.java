@@ -1,10 +1,5 @@
 package maskun.quietchatter.book.adaptor.in;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.when;
-
-import java.util.List;
 import maskun.quietchatter.book.application.in.BookQueryable;
 import maskun.quietchatter.book.domain.Book;
 import maskun.quietchatter.shared.web.WebConfig;
@@ -20,6 +15,12 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.assertj.MockMvcTester;
 import org.springframework.test.web.servlet.assertj.MvcTestResult;
+
+import java.util.List;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.when;
 
 @WebMvcTest(controllers = BookApi.class,
         excludeAutoConfiguration = SecurityAutoConfiguration.class)
@@ -40,7 +41,7 @@ class BookApiTest {
         when(bookQueryable.findBy(any(), any()))
                 .thenReturn(new PageImpl<>(books, pageRequest, books.size()));
 
-        MvcTestResult result = tester.get().uri("/api/books?keyword={}&size={}&page={}", "test", 10, 0)
+        MvcTestResult result = tester.get().uri("/api/v1/books?keyword={}&size={}&page={}", "test", 10, 0)
                 .exchange();
 
         assertThat(result).hasStatusOk()
