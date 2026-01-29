@@ -16,7 +16,7 @@ public class Book extends BaseEntity {
     @Column(name = "title")
     private String title;
 
-    @Column(name = "isbn")
+    @Column(name = "isbn", nullable = false)
     private String isbn;
 
     @Column(name = "author")
@@ -32,6 +32,9 @@ public class Book extends BaseEntity {
     private String externalLink;
 
     public static Book newOf(String title, String isbn) {
+        if (isbn == null || isbn.isBlank()) {
+            throw new IllegalArgumentException("ISBN is required");
+        }
         Book book = new Book();
         book.title = title;
         book.isbn = isbn;

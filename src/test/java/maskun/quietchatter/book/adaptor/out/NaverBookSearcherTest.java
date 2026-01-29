@@ -1,20 +1,20 @@
 package maskun.quietchatter.book.adaptor.out;
 
-import static org.assertj.core.api.Assertions.*;
-import static org.springframework.test.web.client.response.MockRestResponseCreators.withSuccess;
-
 import maskun.quietchatter.book.application.in.Keyword;
-import maskun.quietchatter.book.domain.Book;
+import maskun.quietchatter.book.application.out.ExternalBook;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Slice;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.client.ExpectedCount;
 import org.springframework.test.web.client.MockRestServiceServer;
 import org.springframework.test.web.client.match.MockRestRequestMatchers;
 import org.springframework.web.client.RestClient;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.springframework.test.web.client.response.MockRestResponseCreators.withSuccess;
 
 class NaverBookSearcherTest {
 
@@ -51,11 +51,10 @@ class NaverBookSearcherTest {
         Keyword keyword = new Keyword("수레바퀴 아래서");
         PageRequest pageRequest = PageRequest.of(0, 10);
 
-        Page<Book> books = naverBookSearcher.findByKeyword(keyword, pageRequest);
+        Slice<ExternalBook> books = naverBookSearcher.findByKeyword(keyword, pageRequest);
 
-        assertThat(books.getTotalElements()).isEqualTo(1);
         assertThat(books.getContent()).isNotEmpty();
 
-        assertThat(books.getContent()).allSatisfy(book -> assertThat(book.getIsbn()).isNotNull());
+        assertThat(books.getContent()).allSatisfy(book -> assertThat(book.isbn()).isNotNull());
     }
 }

@@ -4,8 +4,8 @@ import lombok.RequiredArgsConstructor;
 import maskun.quietchatter.book.application.in.BookQueryable;
 import maskun.quietchatter.book.application.in.Keyword;
 import maskun.quietchatter.book.domain.Book;
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Slice;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -20,12 +20,12 @@ class BookApi {
     private final BookQueryable bookQueryable;
 
     @GetMapping(params = "keyword")
-    public ResponseEntity<Page<BookResponse>> search(@PageableDefault Pageable pageable,
+    public ResponseEntity<Slice<BookResponse>> search(@PageableDefault Pageable pageable,
                                                      @RequestParam(name = "keyword") String keywordValue) {
         Keyword keyword = new Keyword(keywordValue);
-        Page<BookResponse> page = bookQueryable.findBy(keyword, pageable)
+        Slice<BookResponse> slice = bookQueryable.findBy(keyword, pageable)
                 .map(BookResponse::from);
-        return ResponseEntity.ok(page);
+        return ResponseEntity.ok(slice);
     }
 
     @GetMapping(params = "id")

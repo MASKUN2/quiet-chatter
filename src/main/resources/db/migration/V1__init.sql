@@ -15,7 +15,7 @@ CREATE TABLE IF NOT EXISTS book
     created_at        TIMESTAMP,
     last_modified_at  TIMESTAMP,
     title             VARCHAR(255),
-    isbn              VARCHAR(255),
+    isbn VARCHAR(255) NOT NULL,
     author            VARCHAR(255),
     thumbnail_image_url TEXT,
     description       TEXT,

@@ -1,18 +1,19 @@
 package maskun.quietchatter.book.adaptor.out;
 
-import java.net.URI;
-import java.util.List;
-import java.util.function.Function;
 import maskun.quietchatter.book.application.in.Keyword;
+import maskun.quietchatter.book.application.out.ExternalBook;
 import maskun.quietchatter.book.application.out.ExternalBookSearcher;
-import maskun.quietchatter.book.domain.Book;
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Slice;
+import org.springframework.data.domain.SliceImpl;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestClient;
 import org.springframework.web.util.UriBuilder;
+
+import java.net.URI;
+import java.util.List;
+import java.util.function.Function;
 
 @Component
 class NaverBookSearcher implements ExternalBookSearcher {
@@ -22,11 +23,12 @@ class NaverBookSearcher implements ExternalBookSearcher {
         this.naverClient = naverClient;
     }
 
-    @Override
-    public Page<Book> findByKeyword(Keyword keyword, Pageable pageRequest) {
-        NaverBookSearchResponse response = fetch(keyword, pageRequest);
-        List<Book> books = map(response);
-        return new PageImpl<>(books, pageRequest, response.total());
+    private static List<ExternalBook> map(NaverBookSearchResponse response) {
+        List<NaverBookItem> items = response.items();
+        return items.stream()
+                .filter(item -> item.isbn() != null && !item.isbn().isBlank())
+                .map(NaverBookSearcher::mapToExternalBook)
+                .toList();
     }
 
     private NaverBookSearchResponse fetch(Keyword keyword, Pageable pageRequest) {
@@ -48,20 +50,23 @@ class NaverBookSearcher implements ExternalBookSearcher {
                 .build();
     }
 
-    private static List<Book> map(NaverBookSearchResponse response) {
-        List<NaverBookItem> items = response.items();
-        return items.stream()
-                .map(NaverBookSearcher::map)
-                .toList();
+    private static ExternalBook mapToExternalBook(NaverBookItem item) {
+        return new ExternalBook(
+                item.title(),
+                item.isbn(),
+                item.author(),
+                item.image(),
+                item.description(),
+                item.link()
+        );
     }
 
-    private static Book map(NaverBookItem item) {
-        Book book = Book.newOf(item.title(), item.isbn());
+    @Override
+    public Slice<ExternalBook> findByKeyword(Keyword keyword, Pageable pageRequest) {
+        NaverBookSearchResponse response = fetch(keyword, pageRequest);
+        List<ExternalBook> books = map(response);
 
-        book.updateAuthor(item.author());
-        book.updateThumbnailImage(item.image());
-        book.updateDescription(item.description());
-        book.updateExternalLink(item.link());
-        return book;
+        boolean hasNext = response.start() + response.display() <= response.total();
+        return new SliceImpl<>(books, pageRequest, hasNext);
     }
 }
