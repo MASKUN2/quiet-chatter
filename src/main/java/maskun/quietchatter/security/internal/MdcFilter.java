@@ -24,15 +24,23 @@ class MdcFilter extends OncePerRequestFilter {
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
             throws ServletException, IOException {
 
-        String traceId = UUID.randomUUID().toString();
+        // Nginx가 전달한 X-Request-ID가 있으면 사용, 없으면 새로 생성
+        String traceId = request.getHeader("X-Request-ID");
+        if (traceId == null || traceId.isEmpty()) {
+            traceId = UUID.randomUUID().toString();
+        }
+
         MDC.put(TRACE_ID, traceId);
 
         try {
             Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
             Object principal = (authentication != null) ? authentication.getPrincipal() : "anonymous";
 
-            log.info("Request Start - TraceID: {}, URI: {}, IP: {}, Principal: {}",
-                    traceId, request.getRequestURI(), request.getRemoteAddr(), principal);
+            // Nginx 등 프록시를 거칠 경우 실제 클라이언트 IP를 가져옴
+            String clientIp = getClientIp(request);
+
+            log.info("Request Start - TraceID: {}, Method: {}, URI: {}, IP: {}, Principal: {}",
+                    traceId, request.getMethod(), request.getRequestURI(), clientIp, principal);
 
             filterChain.doFilter(request, response);
         } catch (Exception e) {
@@ -41,5 +49,29 @@ class MdcFilter extends OncePerRequestFilter {
         } finally {
             MDC.clear();
         }
+    }
+
+    private String getClientIp(HttpServletRequest request) {
+        String ip = request.getHeader("X-Forwarded-For");
+        if (ip == null || ip.isEmpty() || "unknown".equalsIgnoreCase(ip)) {
+            ip = request.getHeader("Proxy-Client-IP");
+        }
+        if (ip == null || ip.isEmpty() || "unknown".equalsIgnoreCase(ip)) {
+            ip = request.getHeader("WL-Proxy-Client-IP");
+        }
+        if (ip == null || ip.isEmpty() || "unknown".equalsIgnoreCase(ip)) {
+            ip = request.getHeader("HTTP_CLIENT_IP");
+        }
+        if (ip == null || ip.isEmpty() || "unknown".equalsIgnoreCase(ip)) {
+            ip = request.getHeader("HTTP_X_FORWARDED_FOR");
+        }
+        if (ip == null || ip.isEmpty() || "unknown".equalsIgnoreCase(ip)) {
+            ip = request.getRemoteAddr();
+        }
+
+        if (ip != null && ip.contains(",")) {
+            return ip.split(",")[0].trim();
+        }
+        return ip;
     }
 }
