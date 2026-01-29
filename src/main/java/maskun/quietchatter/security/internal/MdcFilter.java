@@ -39,8 +39,10 @@ class MdcFilter extends OncePerRequestFilter {
             // Nginx 등 프록시를 거칠 경우 실제 클라이언트 IP를 가져옴
             String clientIp = getClientIp(request);
 
+            String fullUri = getFullUri(request);
+
             log.info("Request Start - TraceID: {}, Method: {}, URI: {}, IP: {}, Principal: {}",
-                    traceId, request.getMethod(), request.getRequestURI(), clientIp, principal);
+                    traceId, request.getMethod(), fullUri, clientIp, principal);
 
             filterChain.doFilter(request, response);
         } catch (Exception e) {
@@ -49,6 +51,17 @@ class MdcFilter extends OncePerRequestFilter {
         } finally {
             MDC.clear();
         }
+    }
+
+    private String getFullUri(HttpServletRequest request) {
+        String uri = request.getRequestURI();
+        String queryString = request.getQueryString();
+
+        if (queryString == null || queryString.isEmpty()) {
+            return uri;
+        }
+
+        return uri + "?" + queryString;
     }
 
     private String getClientIp(HttpServletRequest request) {
