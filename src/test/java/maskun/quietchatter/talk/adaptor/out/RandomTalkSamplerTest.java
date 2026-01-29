@@ -1,43 +1,48 @@
 package maskun.quietchatter.talk.adaptor.out;
 
-import java.util.List;
-import java.util.UUID;
-import maskun.quietchatter.shared.persistence.JpaConfig;
+import jakarta.persistence.EntityManager;
+import maskun.quietchatter.WithTestContainerDatabases;
+import maskun.quietchatter.persistence.BaseEntity;
+import maskun.quietchatter.talk.application.out.TalkRepository;
 import maskun.quietchatter.talk.domain.Talk;
-import org.instancio.Instancio;
+import org.instancio.Select;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
-import org.springframework.context.annotation.Import;
-import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.test.context.ActiveProfiles;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.transaction.annotation.Transactional;
 
-@DataJpaTest(properties = "logging.level.org.springframework.jdbc=TRACE")
-@Import({JpaConfig.class, RandomTalkSampler.class})
-@ActiveProfiles("test")
-class RandomTalkSamplerTest {
+import java.util.List;
+
+import static org.instancio.Instancio.ofList;
+
+@SpringBootTest(properties = "logging.level.org.springframework.jdbc=TRACE")
+@Transactional
+class RandomTalkSamplerTest implements WithTestContainerDatabases {
     @Autowired
     private RandomTalkSampler sampler;
 
     @Autowired
-    JdbcTemplate jdbcTemplate;
+    private TalkRepository talkRepository;
+
+    @Autowired
+    private EntityManager entityManager;
 
     @BeforeEach
     void setUp() {
-
-        jdbcTemplate.update("Truncate talk");
-        List<Object[]> args = Instancio.ofList(UUID.class).size(1000).create()
-                .stream().map(uuid -> new Object[]{uuid})
-                .toList();
-        jdbcTemplate.batchUpdate("INSERT INTO talk(id) values (?)", args);
+        List<Talk> talks = ofList(Talk.class).size(1000)
+                .ignore(Select.all(Select.fields().declaredIn(BaseEntity.class)))
+                .create();
+        talkRepository.saveAll(talks);
+        entityManager.flush();
+        entityManager.clear();
 
     }
 
     @AfterEach
     void tearDown() {
-        jdbcTemplate.update("Truncate talk");
+        entityManager.createQuery("DELETE FROM talk").executeUpdate();
     }
 
     @Test

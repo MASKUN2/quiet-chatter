@@ -46,12 +46,13 @@ public class TalkResponseMapper {
                 talk.getBookId(),
                 talk.getMemberId(),
                 talk.getCreatedAt(),
-                talk.getTime().hidden(),
-                talk.getContent().value(),
-                talk.getReactionCount().like(),
+                talk.getDateToHidden(),
+                talk.getContent(),
+                talk.getLikeCount(),
                 false,
-                talk.getReactionCount().support(),
-                false
+                talk.getSupportCount(),
+                false,
+                talk.isModified()
         );
     }
 
@@ -76,12 +77,13 @@ public class TalkResponseMapper {
                 resp.bookId(),
                 resp.memberId(),
                 resp.createdAt(),
-                resp.timeToHidden(),
+                resp.dateToHidden(),
                 resp.content(),
                 resp.like_count(),
                 didILike,
                 resp.support_count(),
-                didISupport
+                didISupport,
+                resp.isModified()
         );
     }
 }

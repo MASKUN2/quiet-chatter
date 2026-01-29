@@ -1,32 +1,32 @@
 package maskun.quietchatter.book.adaptor.out;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.springframework.test.web.client.response.MockRestResponseCreators.withSuccess;
-
 import maskun.quietchatter.book.application.in.Keyword;
-import maskun.quietchatter.book.domain.Book;
+import maskun.quietchatter.book.application.out.ExternalBook;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.client.RestClientTest;
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Slice;
 import org.springframework.http.MediaType;
-import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.client.ExpectedCount;
 import org.springframework.test.web.client.MockRestServiceServer;
 import org.springframework.test.web.client.match.MockRestRequestMatchers;
+import org.springframework.web.client.RestClient;
 
-@RestClientTest(NaverBookSearcher.class)
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.springframework.test.web.client.response.MockRestResponseCreators.withSuccess;
+
 class NaverBookSearcherTest {
-    @Autowired
+
     private NaverBookSearcher naverBookSearcher;
+    private MockRestServiceServer mockServer;
 
-    @Autowired
-    MockRestServiceServer mockServer;
-
-    @MockitoBean
-    private NaverApiEnvironment naverApiEnvironment;
+    @BeforeEach
+    void setUp() {
+        RestClient.Builder builder = RestClient.builder();
+        mockServer = MockRestServiceServer.bindTo(builder).build();
+        naverBookSearcher = new NaverBookSearcher(builder.build());
+    }
 
     @Test
     @DisplayName("API 모킹 단위 테스트")
@@ -51,11 +51,10 @@ class NaverBookSearcherTest {
         Keyword keyword = new Keyword("수레바퀴 아래서");
         PageRequest pageRequest = PageRequest.of(0, 10);
 
-        Page<Book> books = naverBookSearcher.findByKeyword(keyword, pageRequest);
+        Slice<ExternalBook> books = naverBookSearcher.findByKeyword(keyword, pageRequest);
 
-        assertThat(books.getTotalElements()).isEqualTo(1);
         assertThat(books.getContent()).isNotEmpty();
 
-        assertThat(books.getContent()).allSatisfy(book -> assertThat(book.getIsbn()).isNotNull());
+        assertThat(books.getContent()).allSatisfy(book -> assertThat(book.isbn()).isNotNull());
     }
 }

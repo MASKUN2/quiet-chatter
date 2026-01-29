@@ -1,22 +1,28 @@
 package maskun.quietchatter.talk.domain;
 
-import jakarta.persistence.AttributeOverride;
-import jakarta.persistence.AttributeOverrides;
 import jakarta.persistence.Column;
-import jakarta.persistence.Embedded;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Index;
 import jakarta.persistence.Table;
-import java.util.UUID;
 import lombok.Getter;
-import maskun.quietchatter.shared.persistence.BaseEntity;
+import lombok.NoArgsConstructor;
+import maskun.quietchatter.persistence.BaseEntity;
+
+import java.time.LocalDate;
+import java.util.UUID;
 
 @Getter
 @Entity(name = "talk")
-@Table(indexes = {@Index(columnList = "book_id", name = "idx_talk_book_id"),
+@Table(indexes = {
+        @Index(columnList = "book_id", name = "idx_talk_book_id"),
         @Index(columnList = "member_id", name = "idx_talk_member_id"),
-        @Index(columnList = "created_at", name = "idx_talk_created_at")})
+        @Index(columnList = "created_at", name = "idx_talk_created_at"),
+        @Index(columnList = "date_to_hidden, is_hidden", name = "idx_talk_date_to_hidden_is_hidden")
+})
+@NoArgsConstructor(access = lombok.AccessLevel.PROTECTED)
 public class Talk extends BaseEntity {
+
+    public static final int MAX_CONTENT_LENGTH = 250;
 
     @Column(name = "book_id")
     private UUID bookId;
@@ -24,39 +30,60 @@ public class Talk extends BaseEntity {
     @Column(name = "member_id")
     private UUID memberId;
 
-    @Embedded
-    private Content content;
+    @Column(name = "content", length = MAX_CONTENT_LENGTH)
+    private String content;
 
-    @Embedded
-    @AttributeOverride(name = "hidden", column = @Column(name = "time_to_hidden"))
-    private Time time;
+    @Column(name = "date_to_hidden")
+    private LocalDate dateToHidden;
 
-    @Embedded
-    @AttributeOverrides(
-            value = {@AttributeOverride(name = "like", column = @Column(name = "like_count", updatable = false)),
-                    @AttributeOverride(name = "support", column = @Column(name = "support_count", updatable = false))}
-    )
-    private ReactionCount reactionCount;
+    @Column(name = "is_hidden")
+    private boolean isHidden;
 
-    public Talk() {
-        reactionCount = ReactionCount.zero();
-        time = new Time(null);
+    @Column(name = "like_count", updatable = false)
+    private long likeCount;
+
+    @Column(name = "support_count", updatable = false)
+    private long supportCount;
+
+    public Talk(UUID bookId, UUID memberId, String content) {
+        this(bookId, memberId, content, LocalDate.now().plusMonths(12)); // default
     }
 
-    public void updateBookId(UUID bookId) {
+    public Talk(UUID bookId, UUID memberId, String content, LocalDate dateToHidden) {
+        validateContent(content);
         this.bookId = bookId;
-    }
-
-    public void updateMemberId(UUID memberId) {
         this.memberId = memberId;
-    }
-
-    public void update(Content content) {
         this.content = content;
+        this.dateToHidden = dateToHidden;
+        this.isHidden = false;
+        this.likeCount = 0;
+        this.supportCount = 0;
     }
 
-    public void update(Time time) {
-        this.time = time;
+    private void validateContent(String content) {
+        if (content == null || content.isBlank()) {
+            throw new IllegalArgumentException("내용은 비어있을 수 없습니다.");
+        }
+        if (content.length() > MAX_CONTENT_LENGTH) {
+            throw new IllegalArgumentException("내용은 %d 자를 초과할 수 없습니다.".formatted(MAX_CONTENT_LENGTH));
+        }
+    }
+
+    public void updateContent(String content) {
+        validateContent(content);
+        this.content = content;
+        this.dateToHidden = LocalDate.now().plusMonths(12);
+    }
+
+    public void hide() {
+        this.isHidden = true;
+    }
+
+    public boolean isModified() {
+        if (createdAt == null || this.lastModifiedAt == null) {
+            return false;
+        }
+        return lastModifiedAt.isAfter(createdAt);
     }
 
     @Override
@@ -66,7 +93,10 @@ public class Talk extends BaseEntity {
                 "bookId = " + getBookId() + ", " +
                 "memberId = " + getMemberId() + ", " +
                 "content = " + getContent() + ", " +
-                "time = " + getTime() + ", " +
+                "dateToHidden = " + getDateToHidden() + ", " +
+                "isHidden = " + isHidden() + ", " +
+                "likeCount = " + getLikeCount() + ", " +
+                "supportCount = " + getSupportCount() + ", " +
                 "createdAt = " + getCreatedAt() + ")";
     }
 }

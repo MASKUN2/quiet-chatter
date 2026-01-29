@@ -6,20 +6,16 @@ import maskun.quietchatter.reaction.application.in.ReactionTarget;
 import maskun.quietchatter.security.AuthMember;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
-@RequestMapping("/api/reactions")
+@RequestMapping("/api/v1/reactions")
 @RestController
 @RequiredArgsConstructor
 class ReactionCommandApi {
     private final ReactionModifiable reactionModifiable;
 
     @PostMapping
-    ResponseEntity<String> add(@AuthenticationPrincipal AuthMember authMember,
+    ResponseEntity<Void> add(@AuthenticationPrincipal AuthMember authMember,
                                @RequestBody ReactionWebRequest webRequest) {
 
         ReactionTarget target = new ReactionTarget(webRequest.talkId(), authMember.id(), webRequest.type());
@@ -28,7 +24,7 @@ class ReactionCommandApi {
     }
 
     @DeleteMapping
-    ResponseEntity<String> remove(@AuthenticationPrincipal AuthMember authMember,
+    ResponseEntity<Void> remove(@AuthenticationPrincipal AuthMember authMember,
                                   @RequestBody ReactionWebRequest webRequest) {
         ReactionTarget target = new ReactionTarget(webRequest.talkId(),authMember.id(), webRequest.type());
         reactionModifiable.remove(target);

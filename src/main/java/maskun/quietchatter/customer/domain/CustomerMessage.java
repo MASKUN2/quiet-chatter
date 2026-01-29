@@ -1,21 +1,18 @@
 package maskun.quietchatter.customer.domain;
 
-import jakarta.persistence.AttributeOverride;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import lombok.Getter;
-import maskun.quietchatter.shared.persistence.BaseEntity;
+import maskun.quietchatter.persistence.BaseEntity;
 
 @Getter
 @Entity(name = "customer_message")
 public class CustomerMessage extends BaseEntity {
 
-    @AttributeOverride(
-            name = "content", column = @Column(name = "message", columnDefinition = "TEXT")
-    )
-    private Message message;
+    @Column(name = "message", columnDefinition = "TEXT")
+    private String message;
 
-    public void update(Message message) {
+    public void update(String message) {
         this.message = message;
     }
 }

@@ -1,6 +1,5 @@
 package maskun.quietchatter.talk.adaptor.in;
 
-import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import maskun.quietchatter.security.AuthMember;
 import maskun.quietchatter.talk.application.in.TalkQueryRequest;
@@ -17,7 +16,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-@RequestMapping("/api/talks")
+import java.util.UUID;
+
+@RequestMapping("/api/v1/talks")
 @RestController
 @RequiredArgsConstructor
 class TalkQueryApi {

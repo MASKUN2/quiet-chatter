@@ -1,25 +1,20 @@
 package maskun.quietchatter.book.application;
 
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.Set;
-import java.util.UUID;
-import java.util.function.Function;
-import java.util.function.Supplier;
-import java.util.stream.Collectors;
 import maskun.quietchatter.book.application.in.BookQueryable;
 import maskun.quietchatter.book.application.in.Keyword;
 import maskun.quietchatter.book.application.out.BookRepository;
+import maskun.quietchatter.book.application.out.ExternalBook;
 import maskun.quietchatter.book.application.out.ExternalBookSearcher;
 import maskun.quietchatter.book.domain.Book;
-import maskun.quietchatter.book.domain.Isbn;
-import maskun.quietchatter.book.domain.Title;
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.util.Streamable;
+import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.*;
+import java.util.function.Function;
+import java.util.function.Supplier;
+import java.util.stream.Collectors;
 
 @Service
 class BookQueryService implements BookQueryable {
@@ -37,11 +32,10 @@ class BookQueryService implements BookQueryable {
         return bookRepository.require(bookId);
     }
 
-    @Override
-    @Transactional
-    public Page<Book> findBy(Keyword keyword, Pageable pageRequest) {
-        Page<Book> fetchedBooks = externalBookSearcher.findByKeyword(keyword, pageRequest);
-        return mergeOrPersist(fetchedBooks);
+    private static Set<String> collectIsbn(Slice<ExternalBook> fetchedBooks) {
+        return fetchedBooks.stream()
+                .map(ExternalBook::isbn)
+                .collect(Collectors.toUnmodifiableSet());
     }
 
     @Override
@@ -50,19 +44,25 @@ class BookQueryService implements BookQueryable {
         return bookRepository.findByIdIn(bookIds);
     }
 
-    private Page<Book> mergeOrPersist(Page<Book> fetchedBooks) {
-        Set<Isbn> isbns = collectIsbn(fetchedBooks);
-        Map<TitleAndIsbn, Book> existsMap = mapExistsBy(isbns);
-        return fetchedBooks.map(updateOrSave(existsMap));
+    private static Function<Book, Book> updateAndGet(ExternalBook fetchedBook) {
+        return exist -> {
+            exist.update(fetchedBook.title());
+            exist.updateAuthor(fetchedBook.author());
+            exist.updateThumbnailImage(fetchedBook.thumbnailImage());
+            exist.updateDescription(fetchedBook.description());
+            exist.updateExternalLink(fetchedBook.externalLink());
+            return exist;
+        };
     }
 
-    private static Set<Isbn> collectIsbn(Streamable<Book> fetchedBooks) {
-        return fetchedBooks.stream()
-                .map(Book::getIsbn)
-                .collect(Collectors.toUnmodifiableSet());
+    @Override
+    @Transactional
+    public Slice<Book> findBy(Keyword keyword, Pageable pageRequest) {
+        Slice<ExternalBook> fetchedBooks = externalBookSearcher.findByKeyword(keyword, pageRequest);
+        return mergeOrPersist(fetchedBooks);
     }
 
-    private Map<TitleAndIsbn, Book> mapExistsBy(Set<Isbn> isbns) {
+    private Map<TitleAndIsbn, Book> mapExistsBy(Set<String> isbns) {
         List<Book> isbnIn = bookRepository.findByIsbnIn(isbns);
 
         return isbnIn.stream()
@@ -70,33 +70,35 @@ class BookQueryService implements BookQueryable {
                         book -> book));
     }
 
-    private Function<Book, Book> updateOrSave(final Map<TitleAndIsbn, Book> exists) {
-        return book -> {
-            Title title = book.getTitle();
-            Isbn isbn = book.getIsbn();
+    private Slice<Book> mergeOrPersist(Slice<ExternalBook> fetchedBooks) {
+        Set<String> isbns = collectIsbn(fetchedBooks);
+        Map<TitleAndIsbn, Book> existsMap = mapExistsBy(isbns);
+        return fetchedBooks.map(updateOrSave(existsMap));
+    }
+
+    private Function<ExternalBook, Book> updateOrSave(final Map<TitleAndIsbn, Book> exists) {
+        return externalBook -> {
+            String title = externalBook.title();
+            String isbn = externalBook.isbn();
             TitleAndIsbn key = new TitleAndIsbn(title, isbn);
 
             return Optional.ofNullable(exists.get(key))
-                    .map(updateAndGet(book))
-                    .orElseGet(saveAndGet(book));
+                    .map(updateAndGet(externalBook))
+                    .orElseGet(saveAndGet(externalBook));
         };
     }
 
-    private static Function<Book, Book> updateAndGet(Book fecthedBook) {
-        return exist -> {
-            exist.update(fecthedBook.getTitle());
-            exist.update(fecthedBook.getAuthor());
-            exist.update(fecthedBook.getThumbnailImage());
-            exist.update(fecthedBook.getDescription());
-            exist.update(fecthedBook.getExternalLink());
-            return exist;
+    private Supplier<Book> saveAndGet(ExternalBook fetchedBook) {
+        return () -> {
+            Book book = Book.newOf(fetchedBook.title(), fetchedBook.isbn());
+            book.updateAuthor(fetchedBook.author());
+            book.updateThumbnailImage(fetchedBook.thumbnailImage());
+            book.updateDescription(fetchedBook.description());
+            book.updateExternalLink(fetchedBook.externalLink());
+            return bookRepository.save(book);
         };
     }
 
-    private Supplier<Book> saveAndGet(Book fecthedBook) {
-        return () -> bookRepository.save(fecthedBook);
-    }
-
-    private record TitleAndIsbn(Title title, Isbn isbn) {
+    private record TitleAndIsbn(String title, String isbn) {
     }
 }

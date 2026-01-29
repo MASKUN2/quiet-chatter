@@ -21,6 +21,7 @@ repositories {
 dependencies {
     implementation 'org.jspecify:jspecify:1.0.0'
     implementation 'io.jsonwebtoken:jjwt-api:0.12.5'
+    implementation 'org.flywaydb:flyway-database-postgresql'
     runtimeOnly 'io.jsonwebtoken:jjwt-impl:0.12.5'
     runtimeOnly 'io.jsonwebtoken:jjwt-jackson:0.12.5'
     implementation 'org.springframework.boot:spring-boot-starter-web'
@@ -61,10 +62,5 @@ tasks.register("testExternalApi", Test) {
         includeTags("external-api")
     }
 
-    def naverApiClientIdName = 'naver.api.client-id'
-    def naverApiClientSecretName = 'naver.api.client-secret'
-
-    systemProperty naverApiClientIdName, project.property(naverApiClientIdName)
-    systemProperty naverApiClientSecretName, project.property(naverApiClientSecretName)
     environment("TESTCONTAINERS_REUSE_ENABLE", "true")
 }

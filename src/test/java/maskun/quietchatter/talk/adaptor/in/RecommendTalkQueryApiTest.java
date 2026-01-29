@@ -1,13 +1,9 @@
 package maskun.quietchatter.talk.adaptor.in;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Mockito.when;
-
-import java.util.List;
-import maskun.quietchatter.shared.web.WebConfig;
 import maskun.quietchatter.talk.application.in.RecommendTalkQueryable;
 import maskun.quietchatter.talk.application.in.RecommendTalks;
 import maskun.quietchatter.talk.domain.Talk;
+import maskun.quietchatter.web.WebConfig;
 import org.instancio.Instancio;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -21,6 +17,11 @@ import org.springframework.http.MediaType;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.assertj.MockMvcTester;
 import org.springframework.test.web.servlet.assertj.MvcTestResult;
+
+import java.util.List;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.when;
 
 @SuppressWarnings("SameParameterValue")
 @WebMvcTest(controllers = RecommendTalkQueryApi.class,
@@ -48,7 +49,7 @@ class RecommendTalkQueryApiTest {
     @DisplayName("최근 조회")
     void getRecent() {
         MvcTestResult result = tester.get()
-                .uri("/api/talks/recommend")
+                .uri("/api/v1/talks/recommend")
                 .contentType(MediaType.APPLICATION_JSON)
                 .exchange();
 

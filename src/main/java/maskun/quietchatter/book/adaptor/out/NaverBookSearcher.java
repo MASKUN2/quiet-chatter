@@ -1,41 +1,34 @@
 package maskun.quietchatter.book.adaptor.out;
 
-import java.net.URI;
-import java.util.List;
-import java.util.function.Function;
 import maskun.quietchatter.book.application.in.Keyword;
+import maskun.quietchatter.book.application.out.ExternalBook;
 import maskun.quietchatter.book.application.out.ExternalBookSearcher;
-import maskun.quietchatter.book.domain.Author;
-import maskun.quietchatter.book.domain.Book;
-import maskun.quietchatter.book.domain.Description;
-import maskun.quietchatter.book.domain.ExternalLink;
-import maskun.quietchatter.book.domain.Isbn;
-import maskun.quietchatter.book.domain.ThumbnailImage;
-import maskun.quietchatter.book.domain.Title;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Slice;
+import org.springframework.data.domain.SliceImpl;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestClient;
 import org.springframework.web.util.UriBuilder;
+
+import java.net.URI;
+import java.util.List;
+import java.util.function.Function;
 
 @Component
 class NaverBookSearcher implements ExternalBookSearcher {
     private final RestClient naverClient;
 
-    NaverBookSearcher(RestClient.Builder applicationClientBuilder, NaverApiEnvironment naverApiEnvironment) {
-        this.naverClient = applicationClientBuilder
-                .baseUrl("https://openapi.naver.com/v1/search/book.json")
-                .defaultHeader("X-Naver-Client-Id", naverApiEnvironment.getClientId())
-                .defaultHeader("X-Naver-Client-Secret", naverApiEnvironment.getClientSecret())
-                .build();
+    NaverBookSearcher(@Qualifier("naverRestClient") RestClient naverClient) {
+        this.naverClient = naverClient;
     }
 
-    @Override
-    public Page<Book> findByKeyword(Keyword keyword, Pageable pageRequest) {
-        NaverBookSearchResponse response = fetch(keyword, pageRequest);
-        List<Book> books = map(response);
-        return new PageImpl<>(books, pageRequest, response.total());
+    private static List<ExternalBook> map(NaverBookSearchResponse response) {
+        List<NaverBookItem> items = response.items();
+        return items.stream()
+                .filter(item -> item.isbn() != null && !item.isbn().isBlank())
+                .map(NaverBookSearcher::mapToExternalBook)
+                .toList();
     }
 
     private NaverBookSearchResponse fetch(Keyword keyword, Pageable pageRequest) {
@@ -57,22 +50,23 @@ class NaverBookSearcher implements ExternalBookSearcher {
                 .build();
     }
 
-    private static List<Book> map(NaverBookSearchResponse response) {
-        List<NaverBookItem> items = response.items();
-        return items.stream()
-                .map(NaverBookSearcher::map)
-                .toList();
+    private static ExternalBook mapToExternalBook(NaverBookItem item) {
+        return new ExternalBook(
+                item.title(),
+                item.isbn(),
+                item.author(),
+                item.image(),
+                item.description(),
+                item.link()
+        );
     }
 
-    private static Book map(NaverBookItem item) {
-        Title title = new Title(item.title());
-        Isbn isbn = new Isbn(item.isbn());
-        Book book = Book.newOf(title, isbn);
+    @Override
+    public Slice<ExternalBook> findByKeyword(Keyword keyword, Pageable pageRequest) {
+        NaverBookSearchResponse response = fetch(keyword, pageRequest);
+        List<ExternalBook> books = map(response);
 
-        book.update(new Author(item.author()));
-        book.update(new ThumbnailImage(item.image()));
-        book.update(new Description(item.description()));
-        book.update(new ExternalLink(item.link()));
-        return book;
+        boolean hasNext = response.start() + response.display() <= response.total();
+        return new SliceImpl<>(books, pageRequest, hasNext);
     }
 }

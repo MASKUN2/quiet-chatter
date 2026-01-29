@@ -1,12 +1,8 @@
 package maskun.quietchatter.reaction.adaptor.out;
 
-import static org.assertj.core.api.Assertions.assertThat;
-
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
+import maskun.quietchatter.WithTestContainerDatabases;
+import maskun.quietchatter.persistence.JpaConfig;
 import maskun.quietchatter.reaction.domain.Reaction;
-import maskun.quietchatter.shared.persistence.JpaConfig;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -14,13 +10,17 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.context.annotation.Import;
 import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.test.context.ActiveProfiles;
+
+import java.util.List;
+import java.util.Map;
+import java.util.UUID;
+
+import static org.assertj.core.api.Assertions.assertThat;
 
 @SuppressWarnings("SqlWithoutWhere")
 @DataJpaTest(properties = "logging.level.org.springframework.jdbc=TRACE")
 @Import({JpaConfig.class, ReactionBatchWorker.class})
-@ActiveProfiles("test")
-class ReactionBatchWorkerTest {
+class ReactionBatchWorkerTest implements WithTestContainerDatabases {
 
     @Autowired
     private ReactionBatchWorker worker;
@@ -47,13 +47,13 @@ class ReactionBatchWorkerTest {
         UUID memberId3 = UUID.randomUUID();
 
         jdbcTemplate.update(
-                "INSERT INTO talk (id, member_id, content, like_count, support_count) VALUES (?, ?, ?, 0, 0)",
+                "INSERT INTO talk (id, member_id, content, like_count, support_count, created_at, last_modified_at) VALUES (?, ?, ?, 0, 0, now(), now())",
                 talkId1, UUID.randomUUID(), "Talk 1");
         jdbcTemplate.update(
-                "INSERT INTO talk (id, member_id, content, like_count, support_count) VALUES (?, ?, ?, 0, 0)",
+                "INSERT INTO talk (id, member_id, content, like_count, support_count, created_at, last_modified_at) VALUES (?, ?, ?, 0, 0, now(), now())",
                 talkId2, UUID.randomUUID(), "Talk 2");
         jdbcTemplate.update(
-                "INSERT INTO talk (id, member_id, content, like_count, support_count) VALUES (?, ?, ?, 0, 0)",
+                "INSERT INTO talk (id, member_id, content, like_count, support_count, created_at, last_modified_at) VALUES (?, ?, ?, 0, 0, now(), now())",
                 talkId3, UUID.randomUUID(), "Talk 3");
 
         // 2. insert와 delete를 혼합해서. 일부 겹치게 해서 넣어줘
@@ -85,7 +85,7 @@ class ReactionBatchWorkerTest {
         // then
         // 최종 reaction 레코드 개수 검증
         // talk_id=1 (3개), talk_id=2 (2개), talk_id=3 (0개) -> 총 5개
-        assertThat(getReactionCount()).isEqualTo(5);
+        assertThat(getReactionCount()).isEqualTo(5L);
 
         // 3. talk 별 like/support 카운트 검증
         Map<String, Object> talk1Counts = getTalkReactionCounts(talkId1);
@@ -102,11 +102,10 @@ class ReactionBatchWorkerTest {
     }
 
     private Long getReactionCount() {
-        return jdbcTemplate.queryForObject("SELECT count(id) FROM reaction", Long.class);
+        return jdbcTemplate.queryForObject("SELECT count(*) FROM reaction", Long.class);
     }
 
     private Map<String, Object> getTalkReactionCounts(UUID talkId) {
         return jdbcTemplate.queryForMap("SELECT like_count, support_count FROM talk WHERE id = ?", talkId);
     }
 }
-

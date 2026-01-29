@@ -6,7 +6,6 @@ import java.util.NoSuchElementException;
 import java.util.Optional;
 import java.util.UUID;
 import maskun.quietchatter.book.domain.Book;
-import maskun.quietchatter.book.domain.Isbn;
 import org.springframework.data.repository.Repository;
 
 public interface BookRepository extends Repository<Book, UUID> {
@@ -20,7 +19,7 @@ public interface BookRepository extends Repository<Book, UUID> {
 
     Book save(Book book);
 
-    List<Book> findByIsbnIn(Collection<Isbn> isbns);
+    List<Book> findByIsbnIn(Collection<String> isbns);
 
     List<Book> findByIdIn(Collection<UUID> ids);
 }

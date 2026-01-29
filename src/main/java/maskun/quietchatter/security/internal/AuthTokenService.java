@@ -1,22 +1,10 @@
 package maskun.quietchatter.security.internal;
 
-import io.jsonwebtoken.Claims;
-import io.jsonwebtoken.ExpiredJwtException;
-import io.jsonwebtoken.Jws;
-import io.jsonwebtoken.JwtException;
-import io.jsonwebtoken.JwtParser;
-import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.*;
 import io.jsonwebtoken.security.Keys;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import java.sql.Date;
-import java.time.Duration;
-import java.time.Instant;
-import java.util.NoSuchElementException;
-import java.util.Optional;
-import java.util.UUID;
-import javax.crypto.SecretKey;
 import maskun.quietchatter.security.AuthTokenException;
 import maskun.quietchatter.security.ExpiredAuthTokenException;
 import org.jspecify.annotations.NullMarked;
@@ -24,6 +12,14 @@ import org.jspecify.annotations.Nullable;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
+
+import javax.crypto.SecretKey;
+import java.sql.Date;
+import java.time.Duration;
+import java.time.Instant;
+import java.util.NoSuchElementException;
+import java.util.Optional;
+import java.util.UUID;
 
 @NullMarked
 @Service
@@ -50,7 +46,20 @@ class AuthTokenService {
     }
 
     public @Nullable String extractAccessToken(HttpServletRequest request) {
-        return findCookieValueOrNull(request, ACCESS_TOKEN_COOKIE_NAME);
+        String cookieValue = findCookieValueOrNull(request, ACCESS_TOKEN_COOKIE_NAME);
+        if (cookieValue != null) {
+            return cookieValue;
+        }
+
+        return extractBearerToken(request);
+    }
+
+    private @Nullable String extractBearerToken(HttpServletRequest request) {
+        String header = request.getHeader("Authorization");
+        if (header != null && header.startsWith("Bearer ")) {
+            return header.substring(7);
+        }
+        return null;
     }
 
     public @Nullable String extractRefreshToken(HttpServletRequest request) {
@@ -67,7 +76,7 @@ class AuthTokenService {
 
     public void putAccessToken(HttpServletResponse response, String accessToken) {
         Cookie cookie = new Cookie(ACCESS_TOKEN_COOKIE_NAME, accessToken);
-        cookie.setMaxAge((int) ACCESS_TOKEN_LIFE_TIME.getSeconds());
+        cookie.setMaxAge((int) REFRESH_TOKEN_LIFETIME.getSeconds());
         cookie.setHttpOnly(true);
         cookie.setPath("/");
         response.addCookie(cookie);

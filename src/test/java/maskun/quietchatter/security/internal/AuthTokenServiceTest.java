@@ -1,21 +1,9 @@
 package maskun.quietchatter.security.internal;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
-
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
-import java.sql.Date;
-import java.time.Instant;
-import java.time.temporal.ChronoUnit;
-import java.util.UUID;
-import javax.crypto.SecretKey;
 import maskun.quietchatter.security.AuthTokenException;
 import maskun.quietchatter.security.ExpiredAuthTokenException;
 import org.junit.jupiter.api.BeforeEach;
@@ -25,6 +13,19 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.ValueOperations;
+
+import javax.crypto.SecretKey;
+import java.sql.Date;
+import java.time.Instant;
+import java.time.temporal.ChronoUnit;
+import java.util.UUID;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 class AuthTokenServiceTest {
@@ -123,6 +124,31 @@ class AuthTokenServiceTest {
         String token = authTokenService.extractAccessToken(request);
 
         assertThat(token).isEqualTo("some-access-token");
+    }
+
+    @Test
+    void extractAccessToken_should_retrieve_from_header_when_cookie_missing() {
+        initService();
+        when(request.getCookies()).thenReturn(null);
+        when(request.getHeader("Authorization")).thenReturn("Bearer header-access-token");
+
+        String token = authTokenService.extractAccessToken(request);
+
+        assertThat(token).isEqualTo("header-access-token");
+    }
+
+    @Test
+    void extractAccessToken_should_prioritize_cookie_over_header() {
+        initService();
+        Cookie cookie = new Cookie("access_token", "cookie-access-token");
+        when(request.getCookies()).thenReturn(new Cookie[]{cookie});
+        // Header should be ignored if cookie is present
+        // Note: In a real scenario, we might not set up the mock for header if it's not called,
+        // but strict stubs might complain. However, the logic stops at cookie.
+
+        String token = authTokenService.extractAccessToken(request);
+
+        assertThat(token).isEqualTo("cookie-access-token");
     }
 
     @Test
