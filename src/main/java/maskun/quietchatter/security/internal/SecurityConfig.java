@@ -1,7 +1,5 @@
 package maskun.quietchatter.security.internal;
 
-import static org.springframework.security.config.http.SessionCreationPolicy.STATELESS;
-
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -11,6 +9,8 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.AnonymousAuthenticationFilter;
+
+import static org.springframework.security.config.http.SessionCreationPolicy.STATELESS;
 
 @Configuration
 @EnableWebSecurity
@@ -31,6 +31,10 @@ class SecurityConfig {
                 .addFilterAfter(
                         new AnonymousToGuestPromotionFilter(authTokenService, authMemberService),
                         AnonymousAuthenticationFilter.class
+                )
+                .addFilterAfter(
+                        new MdcFilter(),
+                        AnonymousToGuestPromotionFilter.class
                 )
                 .authorizeHttpRequests(authorize -> authorize.anyRequest().permitAll())
                 .formLogin(AbstractHttpConfigurer::disable)
