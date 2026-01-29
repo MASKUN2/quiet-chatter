@@ -1,37 +1,36 @@
 package maskun.quietchatter.security.internal;
 
-import java.time.Duration;
-import java.util.Objects;
-import java.util.Optional;
-import java.util.UUID;
 import maskun.quietchatter.member.application.in.MemberQueryable;
 import maskun.quietchatter.member.application.in.MemberRegistrable;
 import maskun.quietchatter.member.domain.Member;
 import maskun.quietchatter.security.AuthMember;
+import maskun.quietchatter.security.AuthMemberCache;
 import maskun.quietchatter.security.AuthMemberNotFoundException;
 import org.jspecify.annotations.NullMarked;
-import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
+
+import java.util.Objects;
+import java.util.Optional;
+import java.util.UUID;
 
 @NullMarked
 @Service
 class AuthMemberService {
-    private final RedisTemplate<String, AuthMember> redisTemplate;
+    private final AuthMemberCache authMemberCache;
     private final MemberQueryable memberQueryable;
     private final MemberRegistrable memberRegistrable;
-    private static final String KEY_PREFIX = "auth:member:";
 
     AuthMemberService(
-            RedisTemplate<String, AuthMember> redisTemplate,
+            AuthMemberCache authMemberCache,
             MemberQueryable memberQueryable,
             MemberRegistrable memberRegistrable) {
-        this.redisTemplate = redisTemplate;
+        this.authMemberCache = authMemberCache;
         this.memberQueryable = memberQueryable;
         this.memberRegistrable = memberRegistrable;
     }
 
     public Optional<AuthMember> findById(UUID id) {
-        Optional<AuthMember> cachedAuthMember = getCachedAuthMember(id);
+        Optional<AuthMember> cachedAuthMember = authMemberCache.findById(id);
         if (cachedAuthMember.isPresent()) {
             return cachedAuthMember;
         }
@@ -42,7 +41,7 @@ class AuthMemberService {
         }
 
         AuthMember authMember = getAuthMember(foundMember.get());
-        saveIntoCache(authMember);
+        authMemberCache.save(authMember);
         return Optional.of(authMember);
     }
 
@@ -53,23 +52,11 @@ class AuthMemberService {
     public AuthMember createNewGuest() {
         Member guest = memberRegistrable.createNewGuest();
         AuthMember authMember = getAuthMember(guest);
-        saveIntoCache(authMember);
+        authMemberCache.save(authMember);
         return authMember;
     }
 
     private AuthMember getAuthMember(Member member) {
         return new AuthMember(Objects.requireNonNull(member.getId()), member.getRole());
-    }
-
-    private Optional<AuthMember> getCachedAuthMember(UUID id) {
-        return Optional.ofNullable(redisTemplate.opsForValue().get(KEY_PREFIX + id));
-    }
-
-    public void saveIntoCache(AuthMember authMember) {
-        redisTemplate.opsForValue().set(
-                KEY_PREFIX + authMember.id(),
-                authMember,
-                Duration.ofHours(2)
-        );
     }
 }
