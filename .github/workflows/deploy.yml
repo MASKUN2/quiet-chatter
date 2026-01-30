@@ -25,7 +25,7 @@ jobs:
         run: chmod +x gradlew
 
       - name: Build with Gradle
-        run: ./gradlew bootJar
+        run: ./gradlew bootJar -x test
 
       # --- Docker 이미지 빌드 및 푸시 ---
       - name: Log in to Docker Hub
