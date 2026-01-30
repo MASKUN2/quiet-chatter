@@ -1,0 +1,57 @@
+package maskun.quietchatter.security.adaptor.in;
+
+import maskun.quietchatter.MockSecurityTestConfig;
+import maskun.quietchatter.member.domain.Role;
+import maskun.quietchatter.security.AuthMember;
+import maskun.quietchatter.security.AuthMemberToken;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.context.annotation.Import;
+import org.springframework.test.web.servlet.assertj.MockMvcTester;
+
+import java.util.UUID;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.anonymous;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.authentication;
+
+@WebMvcTest(controllers = AuthMeApi.class)
+@Import(MockSecurityTestConfig.class)
+class AuthMeApiTest {
+
+    @Autowired
+    private MockMvcTester tester;
+
+    @Test
+    @DisplayName("인증된 사용자 정보 조회")
+    void me_Authenticated() {
+        UUID memberId = UUID.randomUUID();
+        AuthMember authMember = new AuthMember(memberId, Role.REGULAR);
+
+        tester.get().uri("/api/v1/auth/me")
+                .with(authentication(new AuthMemberToken(authMember)))
+                .exchange()
+                .assertThat()
+                .hasStatusOk()
+                .bodyJson()
+                .hasPathSatisfying("$.isLoggedIn", v -> assertThat(v).isEqualTo(true))
+                .hasPathSatisfying("$.id", v -> assertThat(v).isEqualTo(memberId.toString()))
+                .hasPathSatisfying("$.role", v -> assertThat(v).isEqualTo("REGULAR"));
+    }
+
+    @Test
+    @DisplayName("인증되지 않은 사용자 정보 조회")
+    void me_Unauthenticated() {
+        tester.get().uri("/api/v1/auth/me")
+                .with(anonymous())
+                .exchange()
+                .assertThat()
+                .hasStatusOk()
+                .bodyJson()
+                .hasPathSatisfying("$.isLoggedIn", v -> assertThat(v).isEqualTo(false))
+                .hasPathSatisfying("$.id", v -> assertThat(v).isNull())
+                .hasPathSatisfying("$.role", v -> assertThat(v).isEqualTo("anonymous"));
+    }
+}
