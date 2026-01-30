@@ -1,23 +1,22 @@
 package maskun.quietchatter.talk.adaptor.in;
 
-import static java.util.stream.Collectors.groupingBy;
-import static java.util.stream.Collectors.mapping;
-import static java.util.stream.Collectors.toSet;
+import lombok.RequiredArgsConstructor;
+import maskun.quietchatter.reaction.application.in.ReactionQueryable;
+import maskun.quietchatter.reaction.domain.Reaction;
+import maskun.quietchatter.reaction.domain.Reaction.Type;
+import maskun.quietchatter.security.domain.AuthMember;
+import maskun.quietchatter.talk.domain.Talk;
+import org.jspecify.annotations.NullMarked;
+import org.springframework.data.domain.Page;
+import org.springframework.stereotype.Component;
 
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 import java.util.function.Function;
-import lombok.RequiredArgsConstructor;
-import maskun.quietchatter.reaction.application.in.ReactionQueryable;
-import maskun.quietchatter.reaction.domain.Reaction;
-import maskun.quietchatter.reaction.domain.Reaction.Type;
-import maskun.quietchatter.security.AuthMember;
-import maskun.quietchatter.talk.domain.Talk;
-import org.jspecify.annotations.NullMarked;
-import org.springframework.data.domain.Page;
-import org.springframework.stereotype.Component;
+
+import static java.util.stream.Collectors.*;
 
 @NullMarked
 @Component

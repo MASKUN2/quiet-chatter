@@ -1,19 +1,21 @@
-package maskun.quietchatter.security.internal;
-
-import static org.assertj.core.api.Assertions.*;
-import static org.mockito.Mockito.*;
+package maskun.quietchatter.security.adaptor;
 
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import java.io.IOException;
-import maskun.quietchatter.security.ExpiredAuthTokenException;
+import maskun.quietchatter.security.application.in.AuthMemberService;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
+
+import java.io.IOException;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.mockito.Mockito.*;
 
 class AuthFilterTest {
 

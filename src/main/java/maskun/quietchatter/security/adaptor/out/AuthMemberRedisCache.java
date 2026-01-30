@@ -1,8 +1,8 @@
-package maskun.quietchatter.security.internal;
+package maskun.quietchatter.security.adaptor.out;
 
 import lombok.RequiredArgsConstructor;
-import maskun.quietchatter.security.AuthMember;
-import maskun.quietchatter.security.AuthMemberCache;
+import maskun.quietchatter.security.application.out.AuthMemberCache;
+import maskun.quietchatter.security.domain.AuthMember;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Repository;
 

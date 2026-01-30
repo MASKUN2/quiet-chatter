@@ -1,6 +1,5 @@
-package maskun.quietchatter.shared.web;
+package maskun.quietchatter.web;
 
-import maskun.quietchatter.web.WebConfig;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.security.servlet.SecurityAutoConfiguration;

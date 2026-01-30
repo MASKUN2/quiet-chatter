@@ -1,11 +1,9 @@
-package maskun.quietchatter.security.internal;
+package maskun.quietchatter.security.adaptor;
 
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
-import maskun.quietchatter.security.AuthTokenException;
-import maskun.quietchatter.security.ExpiredAuthTokenException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;

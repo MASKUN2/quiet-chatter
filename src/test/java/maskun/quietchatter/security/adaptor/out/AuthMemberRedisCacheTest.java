@@ -1,8 +1,8 @@
-package maskun.quietchatter.security.internal;
+package maskun.quietchatter.security.adaptor.out;
 
 import maskun.quietchatter.WithTestContainerDatabases;
 import maskun.quietchatter.member.domain.Role;
-import maskun.quietchatter.security.AuthMember;
+import maskun.quietchatter.security.domain.AuthMember;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;

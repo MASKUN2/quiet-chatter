@@ -1,11 +1,11 @@
-package maskun.quietchatter.security.internal;
+package maskun.quietchatter.security.application;
 
 import maskun.quietchatter.member.application.in.MemberQueryable;
 import maskun.quietchatter.member.application.in.MemberRegistrable;
 import maskun.quietchatter.member.domain.Member;
 import maskun.quietchatter.member.domain.Role;
-import maskun.quietchatter.security.AuthMember;
-import maskun.quietchatter.security.AuthMemberCache;
+import maskun.quietchatter.security.application.out.AuthMemberCache;
+import maskun.quietchatter.security.domain.AuthMember;
 import org.instancio.Select;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -35,7 +35,7 @@ class AuthMemberServiceTest {
     private MemberRegistrable memberRegistrable;
 
     @InjectMocks
-    private AuthMemberService authMemberService;
+    private AuthMemberServiceImpl authMemberService;
 
     @Test
     void loadAuthMemberFromMainDB() {

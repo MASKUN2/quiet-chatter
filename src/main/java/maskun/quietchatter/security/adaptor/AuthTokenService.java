@@ -1,12 +1,10 @@
-package maskun.quietchatter.security.internal;
+package maskun.quietchatter.security.adaptor;
 
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.security.Keys;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import maskun.quietchatter.security.AuthTokenException;
-import maskun.quietchatter.security.ExpiredAuthTokenException;
 import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 import org.springframework.beans.factory.annotation.Value;
@@ -40,7 +38,7 @@ class AuthTokenService {
         this.jwtParser = Jwts.parser().verifyWith(this.secretKey).build();
     }
 
-    public String parseRefreshTokenAndGetTokenId(String refreshToken)throws AuthTokenException{
+    public String parseRefreshTokenAndGetTokenId(String refreshToken) throws AuthTokenException {
         Claims payload = parse(refreshToken).getPayload();
         return payload.getId();
     }

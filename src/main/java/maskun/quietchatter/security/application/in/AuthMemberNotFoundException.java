@@ -1,4 +1,4 @@
-package maskun.quietchatter.security;
+package maskun.quietchatter.security.application.in;
 
 import org.springframework.security.core.AuthenticationException;
 

@@ -1,8 +1,8 @@
 package maskun.quietchatter.talk.adaptor.in;
 
 import maskun.quietchatter.member.domain.Role;
-import maskun.quietchatter.security.AuthMember;
-import maskun.quietchatter.security.AuthMemberToken;
+import maskun.quietchatter.security.adaptor.AuthMemberToken;
+import maskun.quietchatter.security.domain.AuthMember;
 import maskun.quietchatter.talk.application.in.TalkQueryable;
 import maskun.quietchatter.web.WebConfig;
 import org.instancio.Instancio;

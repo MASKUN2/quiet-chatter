@@ -2,8 +2,8 @@ package maskun.quietchatter.security.adaptor.in;
 
 import maskun.quietchatter.MockSecurityTestConfig;
 import maskun.quietchatter.member.domain.Role;
-import maskun.quietchatter.security.AuthMember;
-import maskun.quietchatter.security.AuthMemberToken;
+import maskun.quietchatter.security.adaptor.AuthMemberToken;
+import maskun.quietchatter.security.domain.AuthMember;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;

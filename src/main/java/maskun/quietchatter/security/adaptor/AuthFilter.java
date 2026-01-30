@@ -1,20 +1,19 @@
-package maskun.quietchatter.security.internal;
+package maskun.quietchatter.security.adaptor;
 
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import java.io.IOException;
-import java.util.UUID;
-import maskun.quietchatter.security.AuthMember;
-import maskun.quietchatter.security.AuthMemberToken;
-import maskun.quietchatter.security.AuthTokenException;
-import maskun.quietchatter.security.ExpiredAuthTokenException;
+import maskun.quietchatter.security.application.in.AuthMemberService;
+import maskun.quietchatter.security.domain.AuthMember;
 import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.filter.OncePerRequestFilter;
+
+import java.io.IOException;
+import java.util.UUID;
 
 @NullMarked
 class AuthFilter extends OncePerRequestFilter {

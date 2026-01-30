@@ -1,12 +1,12 @@
-package maskun.quietchatter.security.internal;
+package maskun.quietchatter.security.adaptor;
 
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
-import maskun.quietchatter.security.AuthMember;
-import maskun.quietchatter.security.AuthMemberToken;
+import maskun.quietchatter.security.application.in.AuthMemberService;
+import maskun.quietchatter.security.domain.AuthMember;
 import org.jspecify.annotations.NullMarked;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AnonymousAuthenticationToken;

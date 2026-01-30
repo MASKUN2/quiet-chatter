@@ -1,6 +1,7 @@
-package maskun.quietchatter.security.internal;
+package maskun.quietchatter.security.adaptor;
 
 import lombok.RequiredArgsConstructor;
+import maskun.quietchatter.security.application.in.AuthMemberService;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.Customizer;

@@ -4,7 +4,7 @@ import maskun.quietchatter.member.domain.Role;
 import maskun.quietchatter.reaction.application.in.ReactionQueryable;
 import maskun.quietchatter.reaction.domain.Reaction;
 import maskun.quietchatter.reaction.domain.Reaction.Type;
-import maskun.quietchatter.security.AuthMember;
+import maskun.quietchatter.security.domain.AuthMember;
 import maskun.quietchatter.talk.domain.Talk;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;

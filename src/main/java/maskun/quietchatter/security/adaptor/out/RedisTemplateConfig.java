@@ -1,13 +1,14 @@
-package maskun.quietchatter.security.internal;
+package maskun.quietchatter.security.adaptor.out;
 
-import java.util.UUID;
-import maskun.quietchatter.security.AuthMember;
+import maskun.quietchatter.security.domain.AuthMember;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.redis.connection.RedisConnectionFactory;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.serializer.Jackson2JsonRedisSerializer;
 import org.springframework.data.redis.serializer.StringRedisSerializer;
+
+import java.util.UUID;
 
 @Configuration
 class RedisTemplateConfig {

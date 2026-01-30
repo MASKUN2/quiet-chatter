@@ -1,4 +1,4 @@
-package maskun.quietchatter.security.internal;
+package maskun.quietchatter.security.adaptor;
 
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;

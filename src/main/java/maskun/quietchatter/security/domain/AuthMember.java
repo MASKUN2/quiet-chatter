@@ -1,8 +1,9 @@
-package maskun.quietchatter.security;
+package maskun.quietchatter.security.domain;
 
-import java.util.UUID;
 import maskun.quietchatter.member.domain.Role;
 import org.jspecify.annotations.NullMarked;
+
+import java.util.UUID;
 
 @NullMarked
 public record AuthMember(

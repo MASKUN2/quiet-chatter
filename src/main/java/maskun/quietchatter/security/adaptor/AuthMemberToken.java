@@ -1,10 +1,12 @@
-package maskun.quietchatter.security;
+package maskun.quietchatter.security.adaptor;
 
-import java.util.List;
+import maskun.quietchatter.security.domain.AuthMember;
 import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 import org.springframework.security.authentication.AbstractAuthenticationToken;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
+
+import java.util.List;
 
 @NullMarked
 public class AuthMemberToken extends AbstractAuthenticationToken {

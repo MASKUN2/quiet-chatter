@@ -1,11 +1,12 @@
-package maskun.quietchatter.security.internal;
+package maskun.quietchatter.security.application;
 
 import maskun.quietchatter.member.application.in.MemberQueryable;
 import maskun.quietchatter.member.application.in.MemberRegistrable;
 import maskun.quietchatter.member.domain.Member;
-import maskun.quietchatter.security.AuthMember;
-import maskun.quietchatter.security.AuthMemberCache;
-import maskun.quietchatter.security.AuthMemberNotFoundException;
+import maskun.quietchatter.security.application.in.AuthMemberNotFoundException;
+import maskun.quietchatter.security.application.in.AuthMemberService;
+import maskun.quietchatter.security.application.out.AuthMemberCache;
+import maskun.quietchatter.security.domain.AuthMember;
 import org.jspecify.annotations.NullMarked;
 import org.springframework.stereotype.Service;
 
@@ -15,12 +16,12 @@ import java.util.UUID;
 
 @NullMarked
 @Service
-class AuthMemberService {
+class AuthMemberServiceImpl implements AuthMemberService {
     private final AuthMemberCache authMemberCache;
     private final MemberQueryable memberQueryable;
     private final MemberRegistrable memberRegistrable;
 
-    AuthMemberService(
+    AuthMemberServiceImpl(
             AuthMemberCache authMemberCache,
             MemberQueryable memberQueryable,
             MemberRegistrable memberRegistrable) {
@@ -29,6 +30,7 @@ class AuthMemberService {
         this.memberRegistrable = memberRegistrable;
     }
 
+    @Override
     public Optional<AuthMember> findById(UUID id) {
         Optional<AuthMember> cachedAuthMember = authMemberCache.findById(id);
         if (cachedAuthMember.isPresent()) {
@@ -45,10 +47,12 @@ class AuthMemberService {
         return Optional.of(authMember);
     }
 
-    public AuthMember findOrThrow(UUID id) {
+    @Override
+    public AuthMember findOrThrow(UUID id) throws AuthMemberNotFoundException {
         return findById(id).orElseThrow(() -> new AuthMemberNotFoundException("member not found for id: " + id));
     }
 
+    @Override
     public AuthMember createNewGuest() {
         Member guest = memberRegistrable.createNewGuest();
         AuthMember authMember = getAuthMember(guest);
