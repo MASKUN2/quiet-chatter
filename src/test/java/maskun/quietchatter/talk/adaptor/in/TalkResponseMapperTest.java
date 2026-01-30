@@ -41,7 +41,15 @@ class TalkResponseMapperTest {
                 .allSatisfy(response -> {
                     assertThat(response.didILike()).isFalse();
                     assertThat(response.didISupport()).isFalse();
+                    assertThat(response.nickname()).isNotNull();
                 });
+
+        // Verify mapping correctness (using first element as sample)
+        Talk sourceTalk = talks.get(0);
+        TalkResponse mappedResponse = result.getContent().stream()
+                .filter(r -> r.id().equals(sourceTalk.getId()))
+                .findFirst().orElseThrow();
+        assertThat(mappedResponse.nickname()).isEqualTo(sourceTalk.getNickname());
     }
 
     @Test

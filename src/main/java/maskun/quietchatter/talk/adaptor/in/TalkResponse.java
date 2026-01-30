@@ -1,11 +1,12 @@
 package maskun.quietchatter.talk.adaptor.in;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import maskun.quietchatter.talk.domain.Talk;
+
 import java.io.Serializable;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.UUID;
-import maskun.quietchatter.talk.domain.Talk;
 
 /**
  * DTO for {@link Talk}
@@ -14,6 +15,7 @@ record TalkResponse(
         UUID id,
         UUID bookId,
         UUID memberId,
+        String nickname,
         LocalDateTime createdAt,
         LocalDate dateToHidden,
         String content,

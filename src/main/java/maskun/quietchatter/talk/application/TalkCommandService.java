@@ -1,6 +1,5 @@
 package maskun.quietchatter.talk.application;
 
-import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import maskun.quietchatter.book.application.out.BookRepository;
 import maskun.quietchatter.member.application.out.MemberRepository;
@@ -10,6 +9,8 @@ import maskun.quietchatter.talk.application.out.TalkRepository;
 import maskun.quietchatter.talk.domain.Talk;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
@@ -22,13 +23,13 @@ class TalkCommandService implements TalkCommandable {
     @Transactional
     public Talk create(TalkCreateRequest request) {
         bookRepository.require(request.bookId());
-        memberRepository.require(request.memberId());
+        maskun.quietchatter.member.domain.Member member = memberRepository.require(request.memberId());
 
         Talk talk;
         if (request.dateToHidden() != null) {
-            talk = new Talk(request.bookId(), request.memberId(), request.content(), request.dateToHidden());
+            talk = new Talk(request.bookId(), request.memberId(), member.getNickname(), request.content(), request.dateToHidden());
         } else {
-            talk = new Talk(request.bookId(), request.memberId(), request.content());
+            talk = new Talk(request.bookId(), request.memberId(), member.getNickname(), request.content());
         }
 
         return talkRepository.save(talk);
