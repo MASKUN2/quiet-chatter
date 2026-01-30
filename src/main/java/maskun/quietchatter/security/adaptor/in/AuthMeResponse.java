@@ -10,6 +10,6 @@ record AuthMeResponse(
         boolean isLoggedIn,
         @Nullable UUID id,
         String role,
-        String nickName
+        String nickname
 ) {
 }
