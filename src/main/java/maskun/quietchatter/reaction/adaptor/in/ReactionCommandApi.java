@@ -3,7 +3,7 @@ package maskun.quietchatter.reaction.adaptor.in;
 import lombok.RequiredArgsConstructor;
 import maskun.quietchatter.reaction.application.in.ReactionModifiable;
 import maskun.quietchatter.reaction.application.in.ReactionTarget;
-import maskun.quietchatter.security.AuthMember;
+import maskun.quietchatter.security.domain.AuthMember;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;

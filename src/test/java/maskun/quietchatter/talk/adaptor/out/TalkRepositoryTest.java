@@ -32,7 +32,7 @@ class TalkRepositoryTest implements WithTestContainerDatabases {
 
     @Test
     void save() {
-        Talk talk = new Talk(UUID.randomUUID(), UUID.randomUUID(), "content");
+        Talk talk = new Talk(UUID.randomUUID(), UUID.randomUUID(), "nickname", "content");
 
         Talk saved = repository.save(talk);
 

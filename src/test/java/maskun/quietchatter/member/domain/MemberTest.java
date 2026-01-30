@@ -12,5 +12,16 @@ class MemberTest {
 
         assertThat(guest.getStatus()).isEqualTo(Status.ACTIVE);
         assertThat(guest.getRole()).isEqualTo(Role.GUEST);
+        assertThat(guest.getNickname()).isEqualTo("guest");
+    }
+
+    @Test
+    void newGuest_withNickname() {
+        String nickname = "FancyGuest";
+        Member guest = Member.newGuest(nickname);
+
+        assertThat(guest.getStatus()).isEqualTo(Status.ACTIVE);
+        assertThat(guest.getRole()).isEqualTo(Role.GUEST);
+        assertThat(guest.getNickname()).isEqualTo(nickname);
     }
 }

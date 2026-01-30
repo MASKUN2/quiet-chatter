@@ -2,6 +2,7 @@ plugins {
     id 'java'
     id 'org.springframework.boot' version '3.5.9'
     id 'io.spring.dependency-management' version '1.1.7'
+    id 'com.epages.restdocs-api-spec' version '0.19.4'
 }
 
 group = 'maskun'
@@ -37,6 +38,8 @@ dependencies {
     testImplementation 'org.testcontainers:postgresql'
     testImplementation 'com.redis:testcontainers-redis:2.2.4'
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
+    testImplementation 'org.springframework.restdocs:spring-restdocs-mockmvc'
+    testImplementation 'com.epages:restdocs-api-spec-mockmvc:0.19.4'
     testImplementation 'org.springframework.boot:spring-boot-testcontainers'
     testImplementation 'net.datafaker:datafaker:2.5.3'
     testImplementation 'org.instancio:instancio-junit:5.5.1'
@@ -63,4 +66,20 @@ tasks.register("testExternalApi", Test) {
     }
 
     environment("TESTCONTAINERS_REUSE_ENABLE", "true")
+}
+
+openapi3 {
+    server = 'http://localhost:8080'
+    title = 'Quiet Chatter API'
+    description = 'Quiet Chatter API documentation'
+    version = '0.0.1'
+    format = 'json'
+    outputDirectory = 'build/api-spec'
+}
+
+tasks.named('bootJar') {
+    dependsOn 'openapi3'
+    from('build/api-spec') {
+        into 'static/docs'
+    }
 }

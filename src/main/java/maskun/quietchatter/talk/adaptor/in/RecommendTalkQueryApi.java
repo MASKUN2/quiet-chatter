@@ -23,6 +23,7 @@ class RecommendTalkQueryApi {
                 talk.getId(),
                 talk.getBookId(),
                 talk.getMemberId(),
+                talk.getNickname(),
                 talk.getCreatedAt(),
                 talk.getDateToHidden(),
                 talk.getContent(),

@@ -4,7 +4,7 @@ import maskun.quietchatter.member.domain.Role;
 import maskun.quietchatter.reaction.application.in.ReactionQueryable;
 import maskun.quietchatter.reaction.domain.Reaction;
 import maskun.quietchatter.reaction.domain.Reaction.Type;
-import maskun.quietchatter.security.AuthMember;
+import maskun.quietchatter.security.domain.AuthMember;
 import maskun.quietchatter.talk.domain.Talk;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -41,7 +41,15 @@ class TalkResponseMapperTest {
                 .allSatisfy(response -> {
                     assertThat(response.didILike()).isFalse();
                     assertThat(response.didISupport()).isFalse();
+                    assertThat(response.nickname()).isNotNull();
                 });
+
+        // Verify mapping correctness (using first element as sample)
+        Talk sourceTalk = talks.get(0);
+        TalkResponse mappedResponse = result.getContent().stream()
+                .filter(r -> r.id().equals(sourceTalk.getId()))
+                .findFirst().orElseThrow();
+        assertThat(mappedResponse.nickname()).isEqualTo(sourceTalk.getNickname());
     }
 
     @Test

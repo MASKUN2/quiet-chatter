@@ -7,6 +7,7 @@ import jakarta.persistence.Table;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import maskun.quietchatter.persistence.BaseEntity;
+import org.hibernate.annotations.Comment;
 
 import java.time.LocalDate;
 import java.util.UUID;
@@ -27,6 +28,10 @@ public class Talk extends BaseEntity {
     @Column(name = "book_id")
     private UUID bookId;
 
+    @Comment("작성 당시의 닉네임을 둔다(중복허용)")
+    @Column(name = "nickname")
+    private String nickname;
+
     @Column(name = "member_id")
     private UUID memberId;
 
@@ -45,14 +50,15 @@ public class Talk extends BaseEntity {
     @Column(name = "support_count", updatable = false)
     private long supportCount;
 
-    public Talk(UUID bookId, UUID memberId, String content) {
-        this(bookId, memberId, content, LocalDate.now().plusMonths(12)); // default
+    public Talk(UUID bookId, UUID memberId, String nickname, String content) {
+        this(bookId, memberId, nickname, content, LocalDate.now().plusMonths(12)); // default
     }
 
-    public Talk(UUID bookId, UUID memberId, String content, LocalDate dateToHidden) {
+    public Talk(UUID bookId, UUID memberId, String nickname, String content, LocalDate dateToHidden) {
         validateContent(content);
         this.bookId = bookId;
         this.memberId = memberId;
+        this.nickname = nickname;
         this.content = content;
         this.dateToHidden = dateToHidden;
         this.isHidden = false;

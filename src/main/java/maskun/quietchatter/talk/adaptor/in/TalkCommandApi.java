@@ -1,7 +1,7 @@
 package maskun.quietchatter.talk.adaptor.in;
 
 import lombok.RequiredArgsConstructor;
-import maskun.quietchatter.security.AuthMember;
+import maskun.quietchatter.security.domain.AuthMember;
 import maskun.quietchatter.talk.application.in.TalkCommandable;
 import maskun.quietchatter.talk.application.in.TalkCreateRequest;
 import maskun.quietchatter.talk.domain.Talk;

@@ -1,12 +1,5 @@
 package maskun.quietchatter.talk.application;
 
-import static org.assertj.core.api.Assertions.*;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.BDDMockito.given;
-import static org.mockito.Mockito.*;
-
-import java.time.LocalDate;
-import java.util.UUID;
 import maskun.quietchatter.book.application.out.BookRepository;
 import maskun.quietchatter.book.domain.Book;
 import maskun.quietchatter.member.application.out.MemberRepository;
@@ -20,6 +13,16 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.stubbing.Answer;
+
+import java.time.LocalDate;
+import java.util.UUID;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 class TalkCommandServiceTest {
     private TalkRepository talkRepository;
@@ -41,10 +44,15 @@ class TalkCommandServiceTest {
         UUID bookId = UUID.randomUUID();
         UUID memberId = UUID.randomUUID();
         String content = "test content";
+        String nickname = "testUser";
         TalkCreateRequest request = new TalkCreateRequest(bookId, memberId, content, LocalDate.now().plusMonths(1));
 
         when(bookRepository.require(any())).thenReturn(Instancio.create(Book.class));
-        when(memberRepository.require(any())).thenReturn(Instancio.create(Member.class));
+
+        Member member = mock(Member.class);
+        given(member.getNickname()).willReturn(nickname);
+        when(memberRepository.require(any())).thenReturn(member);
+        
         when(talkRepository.save(any())).thenAnswer(populateTalk());
 
         //when
@@ -55,6 +63,7 @@ class TalkCommandServiceTest {
         assertThat(created.getBookId()).isNotNull();
         assertThat(created.getMemberId()).isNotNull();
         assertThat(created.getContent()).isEqualTo(content);
+        assertThat(created.getNickname()).isEqualTo(nickname);
         assertThat(created.getCreatedAt()).isNotNull();
     }
 
@@ -64,7 +73,7 @@ class TalkCommandServiceTest {
         // given
         UUID talkId = UUID.randomUUID();
         UUID memberId = UUID.randomUUID();
-        Talk talk = new Talk(UUID.randomUUID(), memberId, "old content");
+        Talk talk = new Talk(UUID.randomUUID(), memberId, "nick", "old content");
         given(talkRepository.require(talkId)).willReturn(talk);
 
         // when
@@ -81,7 +90,7 @@ class TalkCommandServiceTest {
         UUID talkId = UUID.randomUUID();
         UUID ownerId = UUID.randomUUID();
         UUID otherId = UUID.randomUUID();
-        Talk talk = new Talk(UUID.randomUUID(), ownerId, "content");
+        Talk talk = new Talk(UUID.randomUUID(), ownerId, "nick", "content");
         given(talkRepository.require(talkId)).willReturn(talk);
 
         // when & then
@@ -96,7 +105,7 @@ class TalkCommandServiceTest {
         // given
         UUID talkId = UUID.randomUUID();
         UUID memberId = UUID.randomUUID();
-        Talk talk = new Talk(UUID.randomUUID(), memberId, "content");
+        Talk talk = new Talk(UUID.randomUUID(), memberId, "nick", "content");
         given(talkRepository.require(talkId)).willReturn(talk);
 
         // when
