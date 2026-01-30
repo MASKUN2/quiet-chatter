@@ -92,9 +92,9 @@ class TalkQueryApiDocTest {
                                                 fieldWithPath("content[].dateToHidden").description("Date to be hidden"),
                                                 fieldWithPath("content[].content").description("Content"),
                                                 fieldWithPath("content[].likeCount").description("Like Count"),
-                                                fieldWithPath("content[].didILike").description("Did I Like (null if anonymous)").optional(),
+                                                fieldWithPath("content[].didILike").description("Did I Like"),
                                                 fieldWithPath("content[].supportCount").description("Support Count"),
-                                                fieldWithPath("content[].didISupport").description("Did I Support (null if anonymous)").optional(),
+                                                fieldWithPath("content[].didISupport").description("Did I Support"),
                                                 fieldWithPath("content[].isModified").description("Is Modified"),
                                                 // JsonProperty methods might add these fields, need to verify or document them if they appear
                                                 fieldWithPath("content[].like_count").description("Like Count (snake_case alias)").optional(),

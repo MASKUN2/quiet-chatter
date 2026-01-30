@@ -20,9 +20,9 @@ record TalkResponse(
         LocalDate dateToHidden,
         String content,
         long likeCount,
-        Boolean didILike,
+        boolean didILike,
         long supportCount,
-        Boolean didISupport,
+        boolean didISupport,
         boolean isModified
 ) implements Serializable {
 
