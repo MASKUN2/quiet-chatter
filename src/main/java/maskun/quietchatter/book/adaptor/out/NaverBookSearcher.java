@@ -1,6 +1,8 @@
 package maskun.quietchatter.book.adaptor.out;
 
+import lombok.extern.slf4j.Slf4j;
 import maskun.quietchatter.book.application.in.Keyword;
+import maskun.quietchatter.book.application.out.ExternalApiUnavailableException;
 import maskun.quietchatter.book.application.out.ExternalBook;
 import maskun.quietchatter.book.application.out.ExternalBookSearcher;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -9,12 +11,14 @@ import org.springframework.data.domain.Slice;
 import org.springframework.data.domain.SliceImpl;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestClient;
+import org.springframework.web.client.RestClientException;
 import org.springframework.web.util.UriBuilder;
 
 import java.net.URI;
 import java.util.List;
 import java.util.function.Function;
 
+@Slf4j
 @Component
 class NaverBookSearcher implements ExternalBookSearcher {
     private final RestClient naverClient;
@@ -36,10 +40,15 @@ class NaverBookSearcher implements ExternalBookSearcher {
         int pageSize = pageRequest.getPageSize();
         int start = (pageNumber * pageSize) + 1; // naver 는 1부터시작
 
-        return naverClient.get()
-                .uri(buildSearchUri(keyword, start, pageSize))
-                .retrieve()
-                .body(NaverBookSearchResponse.class);
+        try {
+            return naverClient.get()
+                    .uri(buildSearchUri(keyword, start, pageSize))
+                    .retrieve()
+                    .body(NaverBookSearchResponse.class);
+        } catch (RestClientException e) {
+            log.error("Naver API error: {}", e.getMessage(), e);
+            throw new ExternalApiUnavailableException("Naver API is unavailable", e);
+        }
     }
 
     private static Function<UriBuilder, URI> buildSearchUri(Keyword keyword, int start, int display) {
