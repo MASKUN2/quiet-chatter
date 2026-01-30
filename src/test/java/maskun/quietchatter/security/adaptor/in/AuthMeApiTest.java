@@ -10,6 +10,7 @@ import maskun.quietchatter.member.domain.Role;
 import maskun.quietchatter.security.adaptor.AuthMemberToken;
 import maskun.quietchatter.security.domain.AuthMember;
 import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.restdocs.AutoConfigureRestDocs;
@@ -35,6 +36,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @WebMvcTest(controllers = AuthMeApi.class)
 @Import(MockSecurityTestConfig.class)
 @AutoConfigureRestDocs
+@Tag("restdocs")
 class AuthMeApiTest {
 
     @Autowired

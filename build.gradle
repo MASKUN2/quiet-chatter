@@ -68,6 +68,18 @@ tasks.register("testExternalApi", Test) {
     environment("TESTCONTAINERS_REUSE_ENABLE", "true")
 }
 
+// --- API 문서화 및 테스트 설정 (API Documentation & Test Setup) ---
+
+// 1. 문서 생성 전용 테스트 태스크 등록: 'restdocs' 태그가 붙은 테스트만 골라서 실행
+tasks.register("testDocs", Test) {
+    group = "verification"
+    description = "API 문서 생성을 위한 테스트 실행"
+    useJUnitPlatform {
+        includeTags("restdocs")
+    }
+}
+
+// 2. OpenAPI 3.0 스펙 생성 설정 (restdocs-api-spec 플러그인)
 openapi3 {
     server = 'http://localhost:8080'
     title = 'Quiet Chatter API'
@@ -77,6 +89,12 @@ openapi3 {
     outputDirectory = 'build/api-spec'
 }
 
+// 3. 태스크 의존성 연결: openapi3가 실행되기 전에 반드시 testDocs가 먼저 실행되어 스니펫을 만들어야 함
+tasks.matching { it.name == 'openapi3' }.configureEach {
+    dependsOn 'testDocs'
+}
+
+// 4. 배포용 JAR 패키징 설정: 빌드 시 문서를 생성하고, JAR 파일 내 static/docs 경로에 포함시킴
 tasks.named('bootJar') {
     dependsOn 'openapi3'
     from('build/api-spec') {

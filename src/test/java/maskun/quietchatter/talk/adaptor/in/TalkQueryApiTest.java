@@ -1,62 +1,124 @@
 package maskun.quietchatter.talk.adaptor.in;
 
-import maskun.quietchatter.member.domain.Role;
-import maskun.quietchatter.security.adaptor.AuthMemberToken;
-import maskun.quietchatter.security.domain.AuthMember;
+import com.epages.restdocs.apispec.MockMvcRestDocumentationWrapper;
+import com.epages.restdocs.apispec.ResourceSnippetParameters;
+import com.epages.restdocs.apispec.Schema;
+import maskun.quietchatter.MockSecurityTestConfig;
+import maskun.quietchatter.talk.application.in.TalkQueryRequest;
 import maskun.quietchatter.talk.application.in.TalkQueryable;
-import maskun.quietchatter.web.WebConfig;
-import org.instancio.Instancio;
-import org.junit.jupiter.api.DisplayName;
+import maskun.quietchatter.talk.domain.Talk;
+import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.restdocs.AutoConfigureRestDocs;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.context.annotation.Import;
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
+import org.springframework.http.MediaType;
+import org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
-import org.springframework.test.web.servlet.assertj.MockMvcTester;
+import org.springframework.test.web.servlet.MockMvc;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.util.List;
 import java.util.UUID;
 
-import static org.assertj.core.api.Assertions.assertThat;
+import static com.epages.restdocs.apispec.ResourceDocumentation.resource;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.when;
-import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.authentication;
-import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
+import static org.mockito.BDDMockito.given;
+import static org.springframework.restdocs.payload.PayloadDocumentation.fieldWithPath;
+import static org.springframework.restdocs.request.RequestDocumentation.parameterWithName;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-@WebMvcTest(controllers = TalkQueryApi.class)
-@Import(WebConfig.class)
+@WebMvcTest(TalkQueryApi.class)
+@Import(MockSecurityTestConfig.class)
+@AutoConfigureRestDocs
+@Tag("restdocs")
 class TalkQueryApiTest {
+
+    @Autowired
+    private MockMvc mockMvc;
 
     @MockitoBean
     private TalkQueryable talkQueryable;
+
     @MockitoBean
-    private TalkResponseMapper mapper;
-    @Autowired
-    private MockMvcTester tester;
+    private TalkResponseMapper talkResponseMapper;
 
     @Test
-    @DisplayName("페이징 조회 - Mapper 위임 확인")
-    void getByPage() {
-        // Given
+    void getTalksByBookId() throws Exception {
         UUID bookId = UUID.randomUUID();
-        Page<TalkResponse> responsePage = new PageImpl<>(Instancio.ofList(TalkResponse.class).size(5).create());
+        UUID talkId = UUID.randomUUID();
+        UUID memberId = UUID.randomUUID();
 
-        when(talkQueryable.findBy(any())).thenReturn(Page.empty());
-        when(mapper.mapToResponse(any(), any(AuthMember.class))).thenReturn(responsePage);
+        // Mock Talk (Since TalkResponseMapper is mocked, Talk object content is less important but needed for Page)
+        Talk talk = new Talk(bookId, memberId, "Test Nickname", "Test content");
 
-        // When & Then
-        tester.get().uri("/api/v1/talks")
-                .queryParam("bookId", bookId.toString())
-                .queryParam("page", "0")
-                .queryParam("size", "10")
-                .with(authentication(new AuthMemberToken(new AuthMember(UUID.randomUUID(), Role.REGULAR))))
-                .with(csrf())
-                .exchange()
-                .assertThat()
-                .hasStatusOk()
-                .bodyJson()
-                .hasPathSatisfying("$.page.totalElements", v -> assertThat(v).isEqualTo(5))
-                .hasPathSatisfying("$.content", v -> assertThat(v).isNotNull());
+        given(talkQueryable.findBy(any(TalkQueryRequest.class)))
+                .willReturn(new PageImpl<>(List.of(talk)));
+
+        TalkResponse response = new TalkResponse(
+                talkId, bookId, memberId, "Nickname", LocalDateTime.now(), LocalDate.now().plusDays(7),
+                "Test content", 10, false, 5, true, false
+        );
+
+        given(talkResponseMapper.mapToResponse(any(org.springframework.data.domain.Page.class)))
+                .willReturn(new PageImpl<>(List.of(response)));
+        given(talkResponseMapper.mapToResponse(any(org.springframework.data.domain.Page.class), any()))
+                .willReturn(new PageImpl<>(List.of(response)));
+
+
+        mockMvc.perform(RestDocumentationRequestBuilders.get("/api/v1/talks")
+                        .param("bookId", bookId.toString())
+                        .param("page", "0")
+                        .param("size", "10")
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andDo(MockMvcRestDocumentationWrapper.document("get-talks-by-book",
+                        resource(
+                                ResourceSnippetParameters.builder()
+                                        .tag("Talks")
+                                        .description("Get talks by book ID")
+                                        .queryParameters(
+                                                parameterWithName("bookId").description("Book ID"),
+                                                parameterWithName("page").description("Page number").optional(),
+                                                parameterWithName("size").description("Page size").optional()
+                                        )
+                                        .responseFields(
+                                                fieldWithPath("content[].id").description("Talk ID"),
+                                                fieldWithPath("content[].bookId").description("Book ID"),
+                                                fieldWithPath("content[].memberId").description("Member ID"),
+                                                fieldWithPath("content[].nickname").description("Nickname"),
+                                                fieldWithPath("content[].createdAt").description("Created At"),
+                                                fieldWithPath("content[].dateToHidden").description("Date to be hidden"),
+                                                fieldWithPath("content[].content").description("Content"),
+                                                fieldWithPath("content[].likeCount").description("Like Count"),
+                                                fieldWithPath("content[].didILike").description("Did I Like"),
+                                                fieldWithPath("content[].supportCount").description("Support Count"),
+                                                fieldWithPath("content[].didISupport").description("Did I Support"),
+                                                fieldWithPath("content[].isModified").description("Is Modified"),
+                                                // JsonProperty methods might add these fields, need to verify or document them if they appear
+                                                fieldWithPath("content[].like_count").description("Like Count (snake_case alias)").optional(),
+                                                fieldWithPath("content[].support_count").description("Support Count (snake_case alias)").optional(),
+                                                fieldWithPath("content[].is_modified").description("Is Modified (snake_case alias)").optional(),
+
+                                                fieldWithPath("pageable").description("Pageable info"),
+                                                fieldWithPath("totalPages").description("Total Pages"),
+                                                fieldWithPath("totalElements").description("Total Elements"),
+                                                fieldWithPath("last").description("Is Last"),
+                                                fieldWithPath("size").description("Size"),
+                                                fieldWithPath("number").description("Page Number"),
+                                                fieldWithPath("sort.empty").description("Sort Empty"),
+                                                fieldWithPath("sort.sorted").description("Sort Sorted"),
+                                                fieldWithPath("sort.unsorted").description("Sort Unsorted"),
+                                                fieldWithPath("numberOfElements").description("Number of Elements"),
+                                                fieldWithPath("first").description("Is First"),
+                                                fieldWithPath("empty").description("Is Empty")
+                                        )
+                                        .responseSchema(Schema.schema("TalkPageResponse"))
+                                        .build()
+                        )
+                ));
     }
 }

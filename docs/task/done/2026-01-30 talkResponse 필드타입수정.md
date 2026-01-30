@@ -29,3 +29,20 @@ boolean 타입으로 변경되어야한다.
 
 4. **검증:**
     - `./gradlew test openapi3` 명령을 실행하여 모든 테스트가 통과하고 `openapi3.json` 파일이 정상적으로 생성됨을 확인하였습니다.
+
+## 에이전트 작업수행내용 : 2026-01-30 20:50 (테스트 리팩토링)
+
+1. **테스트 구조 통합:**
+    - 문서 생성 전용 테스트(`*DocTest`)를 기능 검증용 테스트(`*ApiTest`)로 승격 및 리팩토링하였습니다.
+    - 변경 내역:
+        - `BookApiDocTest` -> `BookApiTest`
+        - `TalkQueryApiDocTest` -> `TalkQueryApiTest`
+        - `TalkCommandApiDocTest` -> `TalkCommandApiTest`
+        - `RecommendTalkQueryApiDocTest` -> `RecommendTalkQueryApiTest`
+        - `ReactionCommandApiDocTest` -> `ReactionCommandApiTest`
+        - `CustomerMessageApiDocTest` -> `CustomerMessageApiTest`
+    - 각 테스트 클래스에 `@Tag("restdocs")`를 적용하여 CI 환경에서 문서 생성 시 실행되도록 구성하였습니다.
+
+2. **빌드 설정 개선:**
+    - `build.gradle`의 API 문서화 관련 설정을 그룹화하고 주석을 추가하여 가독성을 높였습니다.
+    - `afterEvaluate` 블록을 제거하고 `tasks.matching`을 사용하는 방식으로 의존성 설정을 최적화하였습니다.
