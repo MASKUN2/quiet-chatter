@@ -6,6 +6,7 @@ import com.epages.restdocs.apispec.Schema;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import maskun.quietchatter.MockSecurityTestConfig;
 import maskun.quietchatter.customer.application.in.CustomerMessageCreatable;
+import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.restdocs.AutoConfigureRestDocs;
@@ -25,7 +26,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @WebMvcTest(CustomerMessageApi.class)
 @Import(MockSecurityTestConfig.class)
 @AutoConfigureRestDocs
-class CustomerMessageApiDocTest {
+@Tag("restdocs")
+class CustomerMessageApiTest {
 
     @Autowired
     private MockMvc mockMvc;

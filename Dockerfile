@@ -10,6 +10,7 @@ COPY . .
 
 # Gradle을 사용하여 실행 가능한 JAR 파일을 빌드합니다.
 # --no-daemon 옵션은 CI 환경에서 불필요한 Gradle 데몬이 실행되는 것을 방지합니다.
+# -x test 로 테스트를 포함하지 않아도 restdoc 을 위한 테스트는 실행됨
 RUN gradle bootJar --no-daemon -x test
 
 # --- 2. 런타임(Runtime) 스테이지 ---
