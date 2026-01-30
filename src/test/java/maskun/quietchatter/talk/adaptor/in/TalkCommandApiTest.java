@@ -2,16 +2,15 @@ package maskun.quietchatter.talk.adaptor.in;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import maskun.quietchatter.MockSecurityTestConfig;
 import maskun.quietchatter.member.domain.Role;
 import maskun.quietchatter.security.AuthMember;
 import maskun.quietchatter.security.AuthMemberToken;
 import maskun.quietchatter.talk.application.in.TalkCommandable;
 import maskun.quietchatter.talk.domain.Talk;
-import maskun.quietchatter.web.WebConfig;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.security.servlet.SecurityAutoConfiguration;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.context.annotation.Import;
 import org.springframework.http.HttpStatus;
@@ -28,8 +27,8 @@ import static org.instancio.Instancio.create;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
-@WebMvcTest(controllers = TalkCommandApi.class, excludeAutoConfiguration = SecurityAutoConfiguration.class)
-@Import({WebConfig.class})
+@WebMvcTest(controllers = TalkCommandApi.class)
+@Import(MockSecurityTestConfig.class)
 class TalkCommandApiTest {
 
     @MockitoBean
