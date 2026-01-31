@@ -40,7 +40,7 @@ class AuthFilter extends OncePerRequestFilter {
     private @Nullable Authentication attempt(HttpServletRequest request, HttpServletResponse response) {
         String accessToken = authTokenService.extractAccessToken(request);
         if (accessToken == null) {
-            return null;
+            return tryWithRefreshToken(request, response);
         }
 
         try {
