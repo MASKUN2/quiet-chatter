@@ -4,13 +4,16 @@ import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.ValueOperations;
+import org.springframework.http.HttpHeaders;
 
 import javax.crypto.SecretKey;
 import java.sql.Date;
@@ -36,6 +39,8 @@ class AuthTokenServiceTest {
     private ValueOperations<String, UUID> valueOperations;
     @Mock
     private HttpServletRequest request;
+    @Mock
+    private HttpServletResponse response;
 
     private AuthTokenService authTokenService;
 
@@ -44,7 +49,33 @@ class AuthTokenServiceTest {
     }
 
     private void initService() {
-        authTokenService = new AuthTokenService(TEST_SECRET_KEY, redisTemplate);
+        authTokenService = new AuthTokenService(TEST_SECRET_KEY, new AppCookieProperties("localhost", false, "Lax"), redisTemplate);
+    }
+
+    @Test
+    void putAccessToken_should_add_cookie_with_configured_properties() {
+        // Given
+        AppCookieProperties properties = new AppCookieProperties("example.com", true, "None");
+        authTokenService = new AuthTokenService(TEST_SECRET_KEY, properties, redisTemplate);
+
+        String accessToken = "test-token";
+
+        // When
+        authTokenService.putAccessToken(response, accessToken);
+
+        // Then
+        ArgumentCaptor<String> headerNameCaptor = ArgumentCaptor.forClass(String.class);
+        ArgumentCaptor<String> headerValueCaptor = ArgumentCaptor.forClass(String.class);
+        verify(response).addHeader(headerNameCaptor.capture(), headerValueCaptor.capture());
+
+        assertThat(headerNameCaptor.getValue()).isEqualTo(HttpHeaders.SET_COOKIE);
+        String cookieValue = headerValueCaptor.getValue();
+        assertThat(cookieValue).contains("access_token=test-token");
+        assertThat(cookieValue).contains("Domain=example.com");
+        assertThat(cookieValue).contains("Secure");
+        assertThat(cookieValue).contains("SameSite=None");
+        assertThat(cookieValue).contains("HttpOnly");
+        assertThat(cookieValue).contains("Path=/");
     }
 
     @Test
