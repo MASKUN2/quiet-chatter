@@ -24,6 +24,9 @@ import java.util.UUID;
 public class Talk extends BaseEntity {
 
     public static final int MAX_CONTENT_LENGTH = 250;
+    public static final int DEFAULT_HIDDEN_PERIOD_MONTHS = 12;
+    static final String ERROR_CONTENT_EMPTY = "내용은 비어있을 수 없습니다.";
+    static final String ERROR_CONTENT_LENGTH = "내용은 %d 자를 초과할 수 없습니다.";
 
     @Column(name = "book_id")
     private UUID bookId;
@@ -51,7 +54,7 @@ public class Talk extends BaseEntity {
     private long supportCount;
 
     public Talk(UUID bookId, UUID memberId, String nickname, String content) {
-        this(bookId, memberId, nickname, content, LocalDate.now().plusMonths(12)); // default
+        this(bookId, memberId, nickname, content, LocalDate.now().plusMonths(DEFAULT_HIDDEN_PERIOD_MONTHS));
     }
 
     public Talk(UUID bookId, UUID memberId, String nickname, String content, LocalDate dateToHidden) {
@@ -68,17 +71,17 @@ public class Talk extends BaseEntity {
 
     private void validateContent(String content) {
         if (content == null || content.isBlank()) {
-            throw new IllegalArgumentException("내용은 비어있을 수 없습니다.");
+            throw new IllegalArgumentException(ERROR_CONTENT_EMPTY);
         }
         if (content.length() > MAX_CONTENT_LENGTH) {
-            throw new IllegalArgumentException("내용은 %d 자를 초과할 수 없습니다.".formatted(MAX_CONTENT_LENGTH));
+            throw new IllegalArgumentException(ERROR_CONTENT_LENGTH.formatted(MAX_CONTENT_LENGTH));
         }
     }
 
     public void updateContent(String content) {
         validateContent(content);
         this.content = content;
-        this.dateToHidden = LocalDate.now().plusMonths(12);
+        this.dateToHidden = LocalDate.now().plusMonths(DEFAULT_HIDDEN_PERIOD_MONTHS);
     }
 
     public void hide() {

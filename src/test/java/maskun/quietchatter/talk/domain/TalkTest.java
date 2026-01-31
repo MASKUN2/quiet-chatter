@@ -29,7 +29,7 @@ class TalkTest {
         Talk talk = new Talk(bookId, memberId, nickname, content);
 
         // then
-        assertThat(talk.getDateToHidden()).isEqualTo(LocalDate.now().plusMonths(12));
+        assertThat(talk.getDateToHidden()).isEqualTo(LocalDate.now().plusMonths(Talk.DEFAULT_HIDDEN_PERIOD_MONTHS));
         assertThat(talk.isHidden()).isFalse();
         assertThat(talk.isModified()).isFalse();
         assertThat(talk.getNickname()).isEqualTo(nickname);
@@ -68,7 +68,7 @@ class TalkTest {
         // when & then
         assertThatThrownBy(() -> new Talk(bookId, memberId, nickname, content))
                 .isInstanceOf(IllegalArgumentException.class)
-                .hasMessage("내용은 비어있을 수 없습니다.");
+                .hasMessage(Talk.ERROR_CONTENT_EMPTY);
     }
 
     @DisplayName("내용이 최대 길이를 초과하면 예외가 발생한다")
@@ -83,7 +83,7 @@ class TalkTest {
         // when & then
         assertThatThrownBy(() -> new Talk(bookId, memberId, nickname, longContent))
                 .isInstanceOf(IllegalArgumentException.class)
-                .hasMessageContaining("초과할 수 없습니다");
+                .hasMessage(Talk.ERROR_CONTENT_LENGTH.formatted(Talk.MAX_CONTENT_LENGTH));
     }
 
     @DisplayName("톡 내용을 수정하면 내용이 변경되고 숨김 날짜가 12개월 후로 갱신된다")
@@ -98,7 +98,7 @@ class TalkTest {
 
         // then
         assertThat(talk.getContent()).isEqualTo(newContent);
-        assertThat(talk.getDateToHidden()).isEqualTo(LocalDate.now().plusMonths(12));
+        assertThat(talk.getDateToHidden()).isEqualTo(LocalDate.now().plusMonths(Talk.DEFAULT_HIDDEN_PERIOD_MONTHS));
     }
 
     @DisplayName("lastModifiedAt이 createdAt보다 앞서 있으면있으면 isModified는 true를 반환한다")

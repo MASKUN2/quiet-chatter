@@ -8,9 +8,9 @@ import org.springframework.web.servlet.NoHandlerFoundException;
 
 import java.util.NoSuchElementException;
 
+import static org.springframework.http.HttpStatus.BAD_REQUEST;
+import static org.springframework.http.HttpStatus.INTERNAL_SERVER_ERROR;
 import static org.springframework.http.HttpStatus.NOT_FOUND;
-import static org.springframework.http.ResponseEntity.badRequest;
-import static org.springframework.http.ResponseEntity.internalServerError;
 
 @Slf4j
 @ControllerAdvice
@@ -19,7 +19,7 @@ class WebExceptionHandler {
 
     @ExceptionHandler(IllegalArgumentException.class)
     ProblemDetail handleException(IllegalArgumentException ex) {
-        return ProblemDetail.forStatusAndDetail(badRequest().build().getStatusCode(), ex.getMessage());
+        return ProblemDetail.forStatusAndDetail(BAD_REQUEST, ex.getMessage());
     }
 
     @ExceptionHandler(NoSuchElementException.class)
@@ -30,11 +30,11 @@ class WebExceptionHandler {
     @ExceptionHandler(Exception.class)
     ProblemDetail handleUncaught(Exception ex) {
         log.error("catch되지 않은 예외", ex);
-        return ProblemDetail.forStatusAndDetail(internalServerError().build().getStatusCode(), ERROR_UNCAUGHT);
+        return ProblemDetail.forStatusAndDetail(INTERNAL_SERVER_ERROR, ERROR_UNCAUGHT);
     }
 
     @ExceptionHandler(NoHandlerFoundException.class)
     ProblemDetail handleNoHandlerFoundException(NoHandlerFoundException ex) {
-        return ProblemDetail.forStatus(404);
+        return ProblemDetail.forStatus(NOT_FOUND);
     }
 }
