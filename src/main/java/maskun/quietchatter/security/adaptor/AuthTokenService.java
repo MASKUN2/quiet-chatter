@@ -31,11 +31,15 @@ class AuthTokenService {
     private final RedisTemplate<String, UUID> redisTemplate;
     private final JwtParser jwtParser;
     private final SecretKey secretKey;
+    private final AppCookieProperties appCookieProperties;
 
-    AuthTokenService(@Value("${jwt.secret-key}") String rawKey, RedisTemplate<String, UUID> redisTemplate) {
+    AuthTokenService(@Value("${jwt.secret-key}") String rawKey,
+                     AppCookieProperties appCookieProperties,
+                     RedisTemplate<String, UUID> redisTemplate) {
         this.secretKey = Keys.hmacShaKeyFor(rawKey.getBytes());
         this.redisTemplate = redisTemplate;
         this.jwtParser = Jwts.parser().verifyWith(this.secretKey).build();
+        this.appCookieProperties = appCookieProperties;
     }
 
     public String parseRefreshTokenAndGetTokenId(String refreshToken) throws AuthTokenException {
@@ -73,20 +77,23 @@ class AuthTokenService {
     }
 
     public void putAccessToken(HttpServletResponse response, String accessToken) {
-        Cookie cookie = new Cookie(ACCESS_TOKEN_COOKIE_NAME, accessToken);
-        cookie.setMaxAge((int) REFRESH_TOKEN_LIFETIME.getSeconds());
-        cookie.setHttpOnly(true);
-        cookie.setPath("/");
-        response.addCookie(cookie);
-
+        addCookie(response, ACCESS_TOKEN_COOKIE_NAME, accessToken, ACCESS_TOKEN_LIFE_TIME);
     }
 
     public void putRefreshToken(HttpServletResponse response, String newRefreshToken) {
-        Cookie cookie = new Cookie(REFRESH_TOKEN_COOKIE_NAME, newRefreshToken);
-        cookie.setMaxAge((int) REFRESH_TOKEN_LIFETIME.getSeconds());
-        cookie.setHttpOnly(true);
-        cookie.setPath("/");
-        response.addCookie(cookie);
+        addCookie(response, REFRESH_TOKEN_COOKIE_NAME, newRefreshToken, REFRESH_TOKEN_LIFETIME);
+    }
+
+    private void addCookie(HttpServletResponse response, String name, String value, Duration maxAge) {
+        org.springframework.http.ResponseCookie.ResponseCookieBuilder builder = org.springframework.http.ResponseCookie.from(name, value)
+                .path("/")
+                .httpOnly(true)
+                .maxAge(maxAge)
+                .secure(appCookieProperties.secure())
+                .sameSite(appCookieProperties.sameSite())
+                .domain(appCookieProperties.domain());
+
+        response.addHeader(org.springframework.http.HttpHeaders.SET_COOKIE, builder.build().toString());
     }
 
     public Optional<UUID> findById(String id) {

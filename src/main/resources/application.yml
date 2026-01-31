@@ -43,3 +43,9 @@ server:
 
 jwt:
   secret-key: veryveryveryveryLongSecretKeyForLocalDevelopment
+
+app:
+  cookie:
+    domain: "localhost"
+    secure: false
+    same-site: Lax
