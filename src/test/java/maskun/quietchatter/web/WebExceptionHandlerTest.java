@@ -1,12 +1,17 @@
 package maskun.quietchatter.web;
 
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotNull;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.security.servlet.SecurityAutoConfiguration;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.context.annotation.Import;
+import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.assertj.MockMvcTester;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.NoSuchElementException;
@@ -40,6 +45,26 @@ class WebExceptionHandlerTest {
                 .hasStatus(500);
     }
 
+    @Test
+    void testMethodArgumentNotValidException() {
+        tester.post().uri("/test/validation")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content("{\"name\":null}")
+                .assertThat()
+                .hasStatus(400)
+                .bodyText().contains("name: cannot be null");
+    }
+
+    @Test
+    void testHttpMessageNotReadableException() {
+        tester.post().uri("/test/validation")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content("invalid-json")
+                .assertThat()
+                .hasStatus(400)
+                .bodyText().contains("잘못된 요청 형식입니다.");
+    }
+
     @RestController
     public static class TestController {
 
@@ -57,5 +82,12 @@ class WebExceptionHandlerTest {
         public void throwUncaughtException() throws Exception {
             throw new Exception("catch되지 않은 예외 테스트");
         }
+
+        @PostMapping("/test/validation")
+        public void validate(@RequestBody @Valid TestDto dto) {
+        }
+    }
+
+    record TestDto(@NotNull(message = "cannot be null") String name) {
     }
 }

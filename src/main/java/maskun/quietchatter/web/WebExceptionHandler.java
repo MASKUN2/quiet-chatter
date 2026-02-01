@@ -2,11 +2,14 @@ package maskun.quietchatter.web;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ProblemDetail;
+import org.springframework.http.converter.HttpMessageNotReadableException;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.servlet.NoHandlerFoundException;
 
 import java.util.NoSuchElementException;
+import java.util.stream.Collectors;
 
 import static org.springframework.http.HttpStatus.NOT_FOUND;
 import static org.springframework.http.ResponseEntity.badRequest;
@@ -20,6 +23,19 @@ class WebExceptionHandler {
     @ExceptionHandler(IllegalArgumentException.class)
     ProblemDetail handleException(IllegalArgumentException ex) {
         return ProblemDetail.forStatusAndDetail(badRequest().build().getStatusCode(), ex.getMessage());
+    }
+
+    @ExceptionHandler(MethodArgumentNotValidException.class)
+    ProblemDetail handleException(MethodArgumentNotValidException ex) {
+        String errorMessage = ex.getBindingResult().getFieldErrors().stream()
+                .map(error -> error.getField() + ": " + error.getDefaultMessage())
+                .collect(Collectors.joining(", "));
+        return ProblemDetail.forStatusAndDetail(badRequest().build().getStatusCode(), errorMessage);
+    }
+
+    @ExceptionHandler(HttpMessageNotReadableException.class)
+    ProblemDetail handleException(HttpMessageNotReadableException ex) {
+        return ProblemDetail.forStatusAndDetail(badRequest().build().getStatusCode(), "잘못된 요청 형식입니다.");
     }
 
     @ExceptionHandler(NoSuchElementException.class)
