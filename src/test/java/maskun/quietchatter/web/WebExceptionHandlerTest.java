@@ -1,5 +1,6 @@
 package maskun.quietchatter.web;
 
+import maskun.quietchatter.talk.application.in.NotTalkOwnerException;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.security.servlet.SecurityAutoConfiguration;
@@ -40,6 +41,13 @@ class WebExceptionHandlerTest {
                 .hasStatus(500);
     }
 
+    @Test
+    void testNotTalkOwnerException() {
+        tester.get().uri("/test/not-talk-owner")
+                .assertThat()
+                .hasStatus(403);
+    }
+
     @RestController
     public static class TestController {
 
@@ -56,6 +64,11 @@ class WebExceptionHandlerTest {
         @GetMapping("/test/uncaught")
         public void throwUncaughtException() throws Exception {
             throw new Exception("catch되지 않은 예외 테스트");
+        }
+
+        @GetMapping("/test/not-talk-owner")
+        public void throwNotTalkOwnerException() {
+            throw new NotTalkOwnerException("본인의 톡만 수정/삭제할 수 있습니다.");
         }
     }
 }
