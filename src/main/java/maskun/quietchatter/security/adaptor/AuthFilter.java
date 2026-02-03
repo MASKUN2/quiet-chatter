@@ -60,16 +60,20 @@ class AuthFilter extends OncePerRequestFilter {
             return null;
         }
 
-        String tokenId = authTokenService.parseRefreshTokenAndGetTokenId(refreshToken);
-        UUID memberId = authTokenService.findMemberIdByRefreshTokenIdOrThrow(tokenId);
-        AuthMemberToken auth = new AuthMemberToken(authMemberService.findOrThrow(memberId));
+        try {
+            String tokenId = authTokenService.parseRefreshTokenAndGetTokenId(refreshToken);
+            UUID memberId = authTokenService.findMemberIdByRefreshTokenIdOrThrow(tokenId);
+            AuthMemberToken auth = new AuthMemberToken(authMemberService.findOrThrow(memberId));
 
-        String newAccessToken = authTokenService.createNewAccessToken(memberId);
-        String newRefreshToken = authTokenService.createAndSaveRefreshToken(memberId);
-        authTokenService.putAccessToken(response, newAccessToken);
-        authTokenService.putRefreshToken(response, newRefreshToken);
+            String newAccessToken = authTokenService.createNewAccessToken(memberId);
+            String newRefreshToken = authTokenService.createAndSaveRefreshToken(memberId);
+            authTokenService.putAccessToken(response, newAccessToken);
+            authTokenService.putRefreshToken(response, newRefreshToken);
 
-        authTokenService.deleteRefreshTokenById(tokenId); // delete old
-        return auth;
+            authTokenService.deleteRefreshTokenById(tokenId); // delete old
+            return auth;
+        } catch (AuthTokenException | java.util.NoSuchElementException e) {
+            return null;
+        }
     }
 }
