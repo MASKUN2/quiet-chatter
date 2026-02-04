@@ -14,10 +14,10 @@ public record AppCookieProperties(
 
     public AppCookieProperties {
         if (domain.isBlank()) {
-            throw new IllegalArgumentException("domain must not be or blank");
+            throw new IllegalArgumentException("domain must not be blank");
         }
         if (sameSite.isBlank()) {
-            throw new IllegalArgumentException("sameSite must not be or blank");
+            throw new IllegalArgumentException("sameSite must not be blank");
         }
     }
 }

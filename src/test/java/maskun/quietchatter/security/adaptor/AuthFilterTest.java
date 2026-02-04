@@ -66,7 +66,7 @@ class AuthFilterTest {
     }
 
     @Test
-    void ExpiredAccessTokenAndExpiredRefreshTokenThenThrow() {
+    void ExpiredAccessTokenAndExpiredRefreshTokenThenAnonymous() throws ServletException, IOException {
         AuthTokenService mockAuthTokenService = mock(AuthTokenService.class);
         when(mockAuthTokenService.extractAccessToken(any())).thenReturn("some expired token");
         when(mockAuthTokenService.parseAccessTokenAndGetMemberId(any())).thenThrow(
@@ -79,9 +79,27 @@ class AuthFilterTest {
 
         FilterChain mockfilterChain = mock(FilterChain.class);
 
-        assertThatThrownBy(() -> authFilter.doFilterInternal(
-                mock(HttpServletRequest.class), mock(HttpServletResponse.class), mockfilterChain)
-        ).isInstanceOf(ExpiredAuthTokenException.class);
+        authFilter.doFilterInternal(mock(HttpServletRequest.class), mock(HttpServletResponse.class), mockfilterChain);
+
+        assertThat(SecurityContextHolder.getContext().getAuthentication()).isNull();
+        verify(mockfilterChain).doFilter(any(), any());
+    }
+
+    @Test
+    void RefreshTokenNotFoundThenAnonymous() throws ServletException, IOException {
+        AuthTokenService mockAuthTokenService = mock(AuthTokenService.class);
+        when(mockAuthTokenService.extractAccessToken(any())).thenReturn(null);
+        when(mockAuthTokenService.extractRefreshToken(any())).thenReturn("valid_format_token");
+        when(mockAuthTokenService.parseRefreshTokenAndGetTokenId(any())).thenReturn("token_id");
+        when(mockAuthTokenService.findMemberIdByRefreshTokenIdOrThrow(any())).thenThrow(new java.util.NoSuchElementException("not found"));
+
+        AuthFilter authFilter = new AuthFilter(mockAuthTokenService, mock(AuthMemberService.class));
+        FilterChain mockfilterChain = mock(FilterChain.class);
+
+        authFilter.doFilterInternal(mock(HttpServletRequest.class), mock(HttpServletResponse.class), mockfilterChain);
+
+        assertThat(SecurityContextHolder.getContext().getAuthentication()).isNull();
+        verify(mockfilterChain).doFilter(any(), any());
     }
 
     @Test
