@@ -4,6 +4,7 @@ import maskun.quietchatter.book.application.out.BookRepository;
 import maskun.quietchatter.book.domain.Book;
 import maskun.quietchatter.member.application.out.MemberRepository;
 import maskun.quietchatter.member.domain.Member;
+import maskun.quietchatter.talk.application.in.NotTalkOwnerException;
 import maskun.quietchatter.talk.application.in.TalkCreateRequest;
 import maskun.quietchatter.talk.application.out.TalkRepository;
 import maskun.quietchatter.talk.domain.Talk;
@@ -95,7 +96,7 @@ class TalkCommandServiceTest {
 
         // when & then
         assertThatThrownBy(() -> talkCommandService.update(talkId, otherId, "new content"))
-                .isInstanceOf(IllegalArgumentException.class)
+                .isInstanceOf(NotTalkOwnerException.class)
                 .hasMessage("본인의 톡만 수정/삭제할 수 있습니다.");
     }
 

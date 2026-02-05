@@ -3,6 +3,7 @@ package maskun.quietchatter.talk.application;
 import lombok.RequiredArgsConstructor;
 import maskun.quietchatter.book.application.out.BookRepository;
 import maskun.quietchatter.member.application.out.MemberRepository;
+import maskun.quietchatter.talk.application.in.NotTalkOwnerException;
 import maskun.quietchatter.talk.application.in.TalkCommandable;
 import maskun.quietchatter.talk.application.in.TalkCreateRequest;
 import maskun.quietchatter.talk.application.out.TalkRepository;
@@ -53,7 +54,7 @@ class TalkCommandService implements TalkCommandable {
 
     private void validateOwner(Talk talk, UUID memberId) {
         if (!talk.getMemberId().equals(memberId)) {
-            throw new IllegalArgumentException("본인의 톡만 수정/삭제할 수 있습니다.");
+            throw new NotTalkOwnerException("본인의 톡만 수정/삭제할 수 있습니다.");
         }
     }
 }
