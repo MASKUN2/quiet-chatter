@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import maskun.quietchatter.security.domain.AuthMember;
 import maskun.quietchatter.talk.application.in.TalkCommandable;
 import maskun.quietchatter.talk.application.in.TalkCreateRequest;
+import jakarta.validation.Valid;
 import maskun.quietchatter.talk.domain.Talk;
 import maskun.quietchatter.web.IdResponse;
 import org.springframework.http.ResponseEntity;
@@ -22,7 +23,7 @@ class TalkCommandApi {
 
     @PostMapping
     ResponseEntity<IdResponse> post(@AuthenticationPrincipal AuthMember authMember,
-                                    @RequestBody TalkCreateWebRequest webRequest) {
+                                    @RequestBody @Valid TalkCreateWebRequest webRequest) {
         TalkCreateRequest createRequest = convert(webRequest, authMember.id());
         Talk posted = talkCommandable.create(createRequest);
         IdResponse idResponse = new IdResponse(posted.getId());

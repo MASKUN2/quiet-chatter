@@ -94,6 +94,21 @@ class TalkCommandApiTest {
     }
 
     @Test
+    void createTalk_validation_fail() throws Exception {
+        UUID memberId = UUID.randomUUID();
+        AuthMember authMember = new AuthMember(memberId, Role.REGULAR);
+
+        // Invalid request: empty content
+        TalkCreateWebRequest request = new TalkCreateWebRequest(UUID.randomUUID(), "", null);
+
+        mockMvc.perform(RestDocumentationRequestBuilders.post("/api/v1/talks")
+                        .with(authentication(new AuthMemberToken(authMember)))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(request)))
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
     void updateTalk() throws Exception {
         UUID memberId = UUID.randomUUID();
         UUID talkId = UUID.randomUUID();

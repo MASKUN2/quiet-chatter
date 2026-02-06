@@ -1,7 +1,9 @@
 package maskun.quietchatter.web;
 
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.support.DefaultMessageSourceResolvable;
 import org.springframework.http.ProblemDetail;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.servlet.NoHandlerFoundException;
@@ -36,5 +38,14 @@ class WebExceptionHandler {
     @ExceptionHandler(NoHandlerFoundException.class)
     ProblemDetail handleNoHandlerFoundException(NoHandlerFoundException ex) {
         return ProblemDetail.forStatus(404);
+    }
+
+    @ExceptionHandler(MethodArgumentNotValidException.class)
+    ProblemDetail handleException(MethodArgumentNotValidException ex) {
+        String message = ex.getBindingResult().getFieldErrors().stream()
+                .findFirst()
+                .map(DefaultMessageSourceResolvable::getDefaultMessage)
+                .orElse("잘못된 요청입니다.");
+        return ProblemDetail.forStatusAndDetail(badRequest().build().getStatusCode(), message);
     }
 }
