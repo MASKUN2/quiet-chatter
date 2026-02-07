@@ -128,4 +128,20 @@ class TalkTest {
         // then
         assertThat(talk.isHidden()).isTrue();
     }
+
+    @DisplayName("숨김 날짜를 null로 전달하면 12개월 후로 설정된다")
+    @Test
+    void createTalkWithNullHiddenDate() {
+        // given
+        UUID bookId = UUID.randomUUID();
+        UUID memberId = UUID.randomUUID();
+        String nickname = "tester";
+        String content = "content";
+
+        // when
+        Talk talk = new Talk(bookId, memberId, nickname, content, null);
+
+        // then
+        assertThat(talk.getDateToHidden()).isEqualTo(LocalDate.now().plusMonths(12));
+    }
 }

@@ -4,6 +4,7 @@ import maskun.quietchatter.book.application.out.BookRepository;
 import maskun.quietchatter.book.domain.Book;
 import maskun.quietchatter.member.application.out.MemberRepository;
 import maskun.quietchatter.member.domain.Member;
+import maskun.quietchatter.talk.application.in.NotTalkOwnerException;
 import maskun.quietchatter.talk.application.in.TalkCreateRequest;
 import maskun.quietchatter.talk.application.out.TalkRepository;
 import maskun.quietchatter.talk.domain.Talk;
@@ -95,7 +96,23 @@ class TalkCommandServiceTest {
 
         // when & then
         assertThatThrownBy(() -> talkCommandService.update(talkId, otherId, "new content"))
-                .isInstanceOf(IllegalArgumentException.class)
+                .isInstanceOf(NotTalkOwnerException.class)
+                .hasMessage("본인의 톡만 수정/삭제할 수 있습니다.");
+    }
+
+    @DisplayName("타인의 톡을 숨기려고 하면 예외가 발생한다")
+    @Test
+    void hideTalkByOtherMember() {
+        // given
+        UUID talkId = UUID.randomUUID();
+        UUID ownerId = UUID.randomUUID();
+        UUID otherId = UUID.randomUUID();
+        Talk talk = new Talk(UUID.randomUUID(), ownerId, "nick", "content");
+        given(talkRepository.require(talkId)).willReturn(talk);
+
+        // when & then
+        assertThatThrownBy(() -> talkCommandService.hide(talkId, otherId))
+                .isInstanceOf(NotTalkOwnerException.class)
                 .hasMessage("본인의 톡만 수정/삭제할 수 있습니다.");
     }
 

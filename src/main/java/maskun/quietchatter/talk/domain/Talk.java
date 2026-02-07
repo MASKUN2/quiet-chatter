@@ -60,7 +60,7 @@ public class Talk extends BaseEntity {
         this.memberId = memberId;
         this.nickname = nickname;
         this.content = content;
-        this.dateToHidden = dateToHidden;
+        this.dateToHidden = (dateToHidden != null) ? dateToHidden : LocalDate.now().plusMonths(12);
         this.isHidden = false;
         this.likeCount = 0;
         this.supportCount = 0;
