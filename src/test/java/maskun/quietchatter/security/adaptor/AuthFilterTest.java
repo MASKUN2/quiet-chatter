@@ -4,6 +4,7 @@ import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import maskun.quietchatter.security.application.in.AuthMemberNotFoundException;
 import maskun.quietchatter.security.application.in.AuthMemberService;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -12,6 +13,7 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.context.SecurityContextHolder;
 
 import java.io.IOException;
+import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -66,7 +68,7 @@ class AuthFilterTest {
     }
 
     @Test
-    void ExpiredAccessTokenAndExpiredRefreshTokenThenThrow() {
+    void ExpiredAccessTokenAndExpiredRefreshTokenThenAnonymous() throws ServletException, IOException {
         AuthTokenService mockAuthTokenService = mock(AuthTokenService.class);
         when(mockAuthTokenService.extractAccessToken(any())).thenReturn("some expired token");
         when(mockAuthTokenService.parseAccessTokenAndGetMemberId(any())).thenThrow(
@@ -79,9 +81,67 @@ class AuthFilterTest {
 
         FilterChain mockfilterChain = mock(FilterChain.class);
 
-        assertThatThrownBy(() -> authFilter.doFilterInternal(
-                mock(HttpServletRequest.class), mock(HttpServletResponse.class), mockfilterChain)
-        ).isInstanceOf(ExpiredAuthTokenException.class);
+        authFilter.doFilterInternal(mock(HttpServletRequest.class), mock(HttpServletResponse.class), mockfilterChain);
+
+        assertThat(SecurityContextHolder.getContext().getAuthentication()).isNull();
+        verify(mockfilterChain).doFilter(any(), any());
+    }
+
+    @Test
+    void AccessTokenValidButMemberNotFoundThenAnonymous() throws ServletException, IOException {
+        AuthTokenService mockAuthTokenService = mock(AuthTokenService.class);
+        AuthMemberService mockAuthMemberService = mock(AuthMemberService.class);
+
+        when(mockAuthTokenService.extractAccessToken(any())).thenReturn("valid_token");
+        when(mockAuthTokenService.parseAccessTokenAndGetMemberId(any())).thenReturn(UUID.randomUUID());
+        when(mockAuthMemberService.findOrThrow(any())).thenThrow(new AuthMemberNotFoundException("member not found"));
+
+        AuthFilter authFilter = new AuthFilter(mockAuthTokenService, mockAuthMemberService);
+        FilterChain mockfilterChain = mock(FilterChain.class);
+
+        authFilter.doFilterInternal(mock(HttpServletRequest.class), mock(HttpServletResponse.class), mockfilterChain);
+
+        assertThat(SecurityContextHolder.getContext().getAuthentication()).isNull();
+        verify(mockfilterChain).doFilter(any(), any());
+    }
+
+    @Test
+    void RefreshTokenValidButMemberNotFoundThenAnonymous() throws ServletException, IOException {
+        AuthTokenService mockAuthTokenService = mock(AuthTokenService.class);
+        AuthMemberService mockAuthMemberService = mock(AuthMemberService.class);
+
+        when(mockAuthTokenService.extractAccessToken(any())).thenReturn(null);
+        when(mockAuthTokenService.extractRefreshToken(any())).thenReturn("valid_refresh_token");
+        when(mockAuthTokenService.parseRefreshTokenAndGetTokenId(any())).thenReturn("token_id");
+        when(mockAuthTokenService.findMemberIdByRefreshTokenIdOrThrow(any())).thenReturn(UUID.randomUUID());
+        when(mockAuthMemberService.findOrThrow(any())).thenThrow(new AuthMemberNotFoundException("member not found"));
+
+        AuthFilter authFilter = new AuthFilter(mockAuthTokenService, mockAuthMemberService);
+        FilterChain mockfilterChain = mock(FilterChain.class);
+
+        authFilter.doFilterInternal(mock(HttpServletRequest.class), mock(HttpServletResponse.class), mockfilterChain);
+
+        assertThat(SecurityContextHolder.getContext().getAuthentication()).isNull();
+        verify(mockfilterChain).doFilter(any(), any());
+    }
+
+    @Test
+    void RefreshTokenIdNotFoundThenAnonymous() throws ServletException, IOException {
+        AuthTokenService mockAuthTokenService = mock(AuthTokenService.class);
+        AuthMemberService mockAuthMemberService = mock(AuthMemberService.class);
+
+        when(mockAuthTokenService.extractAccessToken(any())).thenReturn(null);
+        when(mockAuthTokenService.extractRefreshToken(any())).thenReturn("valid_refresh_token");
+        when(mockAuthTokenService.parseRefreshTokenAndGetTokenId(any())).thenReturn("token_id");
+        when(mockAuthTokenService.findMemberIdByRefreshTokenIdOrThrow(any())).thenThrow(new java.util.NoSuchElementException("not found"));
+
+        AuthFilter authFilter = new AuthFilter(mockAuthTokenService, mockAuthMemberService);
+        FilterChain mockfilterChain = mock(FilterChain.class);
+
+        authFilter.doFilterInternal(mock(HttpServletRequest.class), mock(HttpServletResponse.class), mockfilterChain);
+
+        assertThat(SecurityContextHolder.getContext().getAuthentication()).isNull();
+        verify(mockfilterChain).doFilter(any(), any());
     }
 
     @Test

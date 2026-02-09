@@ -4,6 +4,7 @@ import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import maskun.quietchatter.security.application.in.AuthMemberNotFoundException;
 import maskun.quietchatter.security.application.in.AuthMemberService;
 import maskun.quietchatter.security.domain.AuthMember;
 import org.jspecify.annotations.NullMarked;
@@ -49,7 +50,7 @@ class AuthFilter extends OncePerRequestFilter {
             return new AuthMemberToken(authMember);
         } catch (ExpiredAuthTokenException e) {
             return tryWithRefreshToken(request, response);
-        } catch (AuthTokenException e) {
+        } catch (AuthTokenException | AuthMemberNotFoundException e) {
             return null;
         }
     }
@@ -60,16 +61,20 @@ class AuthFilter extends OncePerRequestFilter {
             return null;
         }
 
-        String tokenId = authTokenService.parseRefreshTokenAndGetTokenId(refreshToken);
-        UUID memberId = authTokenService.findMemberIdByRefreshTokenIdOrThrow(tokenId);
-        AuthMemberToken auth = new AuthMemberToken(authMemberService.findOrThrow(memberId));
+        try {
+            String tokenId = authTokenService.parseRefreshTokenAndGetTokenId(refreshToken);
+            UUID memberId = authTokenService.findMemberIdByRefreshTokenIdOrThrow(tokenId);
+            AuthMemberToken auth = new AuthMemberToken(authMemberService.findOrThrow(memberId));
 
-        String newAccessToken = authTokenService.createNewAccessToken(memberId);
-        String newRefreshToken = authTokenService.createAndSaveRefreshToken(memberId);
-        authTokenService.putAccessToken(response, newAccessToken);
-        authTokenService.putRefreshToken(response, newRefreshToken);
+            String newAccessToken = authTokenService.createNewAccessToken(memberId);
+            String newRefreshToken = authTokenService.createAndSaveRefreshToken(memberId);
+            authTokenService.putAccessToken(response, newAccessToken);
+            authTokenService.putRefreshToken(response, newRefreshToken);
 
-        authTokenService.deleteRefreshTokenById(tokenId); // delete old
-        return auth;
+            authTokenService.deleteRefreshTokenById(tokenId); // delete old
+            return auth;
+        } catch (AuthTokenException | java.util.NoSuchElementException | AuthMemberNotFoundException e) {
+            return null;
+        }
     }
 }
