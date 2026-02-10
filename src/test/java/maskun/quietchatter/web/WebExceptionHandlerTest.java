@@ -6,6 +6,7 @@ import org.springframework.boot.autoconfigure.security.servlet.SecurityAutoConfi
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.context.annotation.Import;
 import org.springframework.test.web.servlet.assertj.MockMvcTester;
+import maskun.quietchatter.talk.domain.NotTalkOwnerException;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -34,6 +35,13 @@ class WebExceptionHandlerTest {
     }
 
     @Test
+    void testNotTalkOwnerException() {
+        tester.get().uri("/test/forbidden")
+                .assertThat()
+                .hasStatus(403);
+    }
+
+    @Test
     void testUncaughtException() {
         tester.get().uri("/test/uncaught")
                 .assertThat()
@@ -51,6 +59,11 @@ class WebExceptionHandlerTest {
         @GetMapping("/test/no-such-element")
         public void throwNoSuchElementException() {
             throw new NoSuchElementException("그러한 요소가 없음 테스트");
+        }
+
+        @GetMapping("/test/forbidden")
+        public void throwNotTalkOwnerException() {
+            throw new NotTalkOwnerException();
         }
 
         @GetMapping("/test/uncaught")

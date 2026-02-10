@@ -6,8 +6,11 @@ import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.servlet.NoHandlerFoundException;
 
+import maskun.quietchatter.talk.domain.NotTalkOwnerException;
+
 import java.util.NoSuchElementException;
 
+import static org.springframework.http.HttpStatus.FORBIDDEN;
 import static org.springframework.http.HttpStatus.NOT_FOUND;
 import static org.springframework.http.ResponseEntity.badRequest;
 import static org.springframework.http.ResponseEntity.internalServerError;
@@ -25,6 +28,11 @@ class WebExceptionHandler {
     @ExceptionHandler(NoSuchElementException.class)
     ProblemDetail handleException(NoSuchElementException ex) {
         return ProblemDetail.forStatusAndDetail(NOT_FOUND, ex.getMessage());
+    }
+
+    @ExceptionHandler(NotTalkOwnerException.class)
+    ProblemDetail handleException(NotTalkOwnerException ex) {
+        return ProblemDetail.forStatusAndDetail(FORBIDDEN, ex.getMessage());
     }
 
     @ExceptionHandler(Exception.class)

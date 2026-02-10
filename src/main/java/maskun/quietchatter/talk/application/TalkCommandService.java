@@ -25,12 +25,7 @@ class TalkCommandService implements TalkCommandable {
         bookRepository.require(request.bookId());
         maskun.quietchatter.member.domain.Member member = memberRepository.require(request.memberId());
 
-        Talk talk;
-        if (request.dateToHidden() != null) {
-            talk = new Talk(request.bookId(), request.memberId(), member.getNickname(), request.content(), request.dateToHidden());
-        } else {
-            talk = new Talk(request.bookId(), request.memberId(), member.getNickname(), request.content());
-        }
+        Talk talk = new Talk(request.bookId(), request.memberId(), member.getNickname(), request.content(), request.dateToHidden());
 
         return talkRepository.save(talk);
     }
@@ -39,7 +34,7 @@ class TalkCommandService implements TalkCommandable {
     @Transactional
     public void update(UUID talkId, UUID memberId, String content) {
         Talk talk = talkRepository.require(talkId);
-        validateOwner(talk, memberId);
+        talk.validateOwner(memberId);
         talk.updateContent(content);
     }
 
@@ -47,13 +42,7 @@ class TalkCommandService implements TalkCommandable {
     @Transactional
     public void hide(UUID talkId, UUID memberId) {
         Talk talk = talkRepository.require(talkId);
-        validateOwner(talk, memberId);
+        talk.validateOwner(memberId);
         talk.hide();
-    }
-
-    private void validateOwner(Talk talk, UUID memberId) {
-        if (!talk.getMemberId().equals(memberId)) {
-            throw new IllegalArgumentException("본인의 톡만 수정/삭제할 수 있습니다.");
-        }
     }
 }

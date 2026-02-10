@@ -6,6 +6,7 @@ import maskun.quietchatter.member.application.out.MemberRepository;
 import maskun.quietchatter.member.domain.Member;
 import maskun.quietchatter.talk.application.in.TalkCreateRequest;
 import maskun.quietchatter.talk.application.out.TalkRepository;
+import maskun.quietchatter.talk.domain.NotTalkOwnerException;
 import maskun.quietchatter.talk.domain.Talk;
 import org.instancio.Instancio;
 import org.jetbrains.annotations.NotNull;
@@ -95,8 +96,24 @@ class TalkCommandServiceTest {
 
         // when & then
         assertThatThrownBy(() -> talkCommandService.update(talkId, otherId, "new content"))
-                .isInstanceOf(IllegalArgumentException.class)
+                .isInstanceOf(NotTalkOwnerException.class)
                 .hasMessage("본인의 톡만 수정/삭제할 수 있습니다.");
+    }
+
+    @DisplayName("숨김 날짜를 지정하지 않으면 12개월 뒤로 설정된다")
+    @Test
+    void createWithDefaultDateToHidden() {
+        UUID bookId = UUID.randomUUID();
+        UUID memberId = UUID.randomUUID();
+        TalkCreateRequest request = new TalkCreateRequest(bookId, memberId, "content", null);
+
+        when(bookRepository.require(any())).thenReturn(Instancio.create(Book.class));
+        when(memberRepository.require(any())).thenReturn(Instancio.create(Member.class));
+        when(talkRepository.save(any())).thenAnswer(populateTalk());
+
+        Talk created = talkCommandService.create(request);
+
+        assertThat(created.getDateToHidden()).isEqualTo(LocalDate.now().plusMonths(12));
     }
 
     @DisplayName("본인의 톡을 숨길 수 있다")
