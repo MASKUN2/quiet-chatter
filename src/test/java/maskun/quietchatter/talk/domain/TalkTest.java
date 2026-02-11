@@ -29,7 +29,7 @@ class TalkTest {
         Talk talk = new Talk(bookId, memberId, nickname, content);
 
         // then
-        assertThat(talk.getDateToHidden()).isEqualTo(LocalDate.now().plusMonths(12));
+        assertThat(talk.getDateToHidden()).isEqualTo(LocalDate.now().plusMonths(Talk.DEFAULT_HIDDEN_MONTHS));
         assertThat(talk.isHidden()).isFalse();
         assertThat(talk.isModified()).isFalse();
         assertThat(talk.getNickname()).isEqualTo(nickname);
@@ -98,7 +98,7 @@ class TalkTest {
 
         // then
         assertThat(talk.getContent()).isEqualTo(newContent);
-        assertThat(talk.getDateToHidden()).isEqualTo(LocalDate.now().plusMonths(12));
+        assertThat(talk.getDateToHidden()).isEqualTo(LocalDate.now().plusMonths(Talk.DEFAULT_HIDDEN_MONTHS));
     }
 
     @DisplayName("lastModifiedAt이 createdAt보다 앞서 있으면있으면 isModified는 true를 반환한다")

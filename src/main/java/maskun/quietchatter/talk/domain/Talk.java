@@ -24,6 +24,7 @@ import java.util.UUID;
 public class Talk extends BaseEntity {
 
     public static final int MAX_CONTENT_LENGTH = 250;
+    public static final int DEFAULT_HIDDEN_MONTHS = 12;
 
     @Column(name = "book_id")
     private UUID bookId;
@@ -51,7 +52,7 @@ public class Talk extends BaseEntity {
     private long supportCount;
 
     public Talk(UUID bookId, UUID memberId, String nickname, String content) {
-        this(bookId, memberId, nickname, content, LocalDate.now().plusMonths(12)); // default
+        this(bookId, memberId, nickname, content, LocalDate.now().plusMonths(DEFAULT_HIDDEN_MONTHS)); // default
     }
 
     public Talk(UUID bookId, UUID memberId, String nickname, String content, LocalDate dateToHidden) {
@@ -78,7 +79,7 @@ public class Talk extends BaseEntity {
     public void updateContent(String content) {
         validateContent(content);
         this.content = content;
-        this.dateToHidden = LocalDate.now().plusMonths(12);
+        this.dateToHidden = LocalDate.now().plusMonths(DEFAULT_HIDDEN_MONTHS);
     }
 
     public void hide() {

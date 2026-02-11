@@ -8,8 +8,12 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.*;
+import java.util.EnumMap;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.Map.Entry;
+import java.util.UUID;
 import java.util.function.Function;
 import java.util.stream.IntStream;
 
@@ -76,6 +80,10 @@ class ReactionBatchWorker {
     }
 
     private void updateCount(Map<UUID, Map<Type, Long>> result) {
+        if (result.isEmpty()) {
+            return;
+        }
+
         String sql = "UPDATE talk SET like_count = like_count + ?, support_count = support_count + ? WHERE id = ?";
         List<Object[]> batchArgs = result.entrySet().stream()
                 .map(extractCounts()).toList();
