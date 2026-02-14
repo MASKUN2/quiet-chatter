@@ -30,7 +30,7 @@ URL: https://quiet-chatter.com
 ### 문서
 
 - [요구사항명세서: requirements_specification.md](/docs/requirements_specification.md)
-- [프로젝트 히스토리: project_history.md](/docs/project_history.md)]
-- [현재 진행중인 작업: current_works.md](/docs/current_works.md)]
-- [AI 에이전트 작업지침: AGENTS.md](/docs/guide/ai_agent_guide.md)]
+- [프로젝트 히스토리: project_history.md](/docs/project_history.md)
+- [현재 진행중인 작업: current_works.md](/docs/current_works.md)
+- [AI 에이전트 작업지침: AGENTS.md](/docs/guide/ai_agent_guide.md)
 
