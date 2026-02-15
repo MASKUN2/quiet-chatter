@@ -130,18 +130,22 @@ class JwtAuthenticateTest implements WithTestContainerDatabases {
     }
 
     @Test
-    void request_without_token_should_be_anonymous() throws Exception {
+    void request_without_token_should_be_promoted_to_guest() throws Exception {
         mockMvc.perform(get("/test/auth/me"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.principal").value("anonymousUser"));
+                .andExpect(jsonPath("$.principal.role").value("GUEST"))
+                .andExpect(cookie().exists("access_token"))
+                .andExpect(cookie().exists("refresh_token"));
     }
 
     @Test
-    void authenticate_with_invalid_token_should_be_anonymous() throws Exception {
+    void authenticate_with_invalid_token_should_be_promoted_to_guest() throws Exception {
         Cookie invalidCookie = new Cookie("access_token", "invalid.token.value");
 
         mockMvc.perform(get("/test/auth/me").cookie(invalidCookie))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.principal").value("anonymousUser"));
+                .andExpect(jsonPath("$.principal.role").value("GUEST"))
+                .andExpect(cookie().exists("access_token"))
+                .andExpect(cookie().exists("refresh_token"));
     }
 }
