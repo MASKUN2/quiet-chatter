@@ -21,7 +21,7 @@ class TalkQueryService implements TalkQueryable, RecommendTalkQueryable {
     @Override
     @Transactional(readOnly = true)
     public Page<Talk> findBy(TalkQueryRequest request) {
-        return talkRepository.findByBookIdOrderByCreatedAtDesc(request.bookId(), request.pageRequest());
+        return talkRepository.findByBookIdAndIsHiddenFalseOrderByCreatedAtDesc(request.bookId(), request.pageRequest());
     }
 
     @Override

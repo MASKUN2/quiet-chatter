@@ -15,7 +15,7 @@
 ### 1.2 버저닝 (Versioning)
 
 - API의 하위 호환성을 보장하기 위해 **URI Path Versioning** 전략을 사용한다.
-- `/api/v{version_number}/` 형태로 버전을 명시한다.
+- `/v{version_number}/` 형태로 버전을 명시한다.
 
 ## 2. HTTP 메서드 (HTTP Methods)
 
@@ -105,7 +105,7 @@ Authorization: Bearer <access_token>
 1. **테스트 작성**: 각 API 엔드포인트에 대해 `RestDocs`를 적용한 테스트 코드(`@AutoConfigureRestDocs`)를 작성한다.
 2. **문서 생성**: 빌드 시(`bootJar` 또는 `openapi3` 태스크) 자동으로 `openapi3.json` 파일이 생성된다.
 3. **문서 조회**:
-  - 배포 후: `GET /api/v1/spec` 엔드포인트를 통해 JSON 명세서를 조회할 수 있다.
+  - 배포 후: `GET /v1/spec` 엔드포인트를 통해 JSON 명세서를 조회할 수 있다.
   - 로컬 개발 시: `openapi3` 태스크 실행 후 동일한 엔드포인트에서 조회 가능하다.
 
 ### 6.3 필수 포함 정보

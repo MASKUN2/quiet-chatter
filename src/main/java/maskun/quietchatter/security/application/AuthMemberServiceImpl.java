@@ -3,12 +3,16 @@ package maskun.quietchatter.security.application;
 import maskun.quietchatter.member.application.in.MemberQueryable;
 import maskun.quietchatter.member.application.in.MemberRegistrable;
 import maskun.quietchatter.member.domain.Member;
+import maskun.quietchatter.security.adaptor.out.NaverClient;
+import maskun.quietchatter.security.adaptor.out.NaverProfileResponse;
+import maskun.quietchatter.security.adaptor.out.NaverTokenResponse;
 import maskun.quietchatter.security.application.in.AuthMemberNotFoundException;
 import maskun.quietchatter.security.application.in.AuthMemberService;
 import maskun.quietchatter.security.application.out.AuthMemberCache;
 import maskun.quietchatter.security.domain.AuthMember;
 import org.jspecify.annotations.NullMarked;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Objects;
 import java.util.Optional;
@@ -20,14 +24,17 @@ class AuthMemberServiceImpl implements AuthMemberService {
     private final AuthMemberCache authMemberCache;
     private final MemberQueryable memberQueryable;
     private final MemberRegistrable memberRegistrable;
+    private final NaverClient naverClient;
 
     AuthMemberServiceImpl(
             AuthMemberCache authMemberCache,
             MemberQueryable memberQueryable,
-            MemberRegistrable memberRegistrable) {
+            MemberRegistrable memberRegistrable,
+            NaverClient naverClient) {
         this.authMemberCache = authMemberCache;
         this.memberQueryable = memberQueryable;
         this.memberRegistrable = memberRegistrable;
+        this.naverClient = naverClient;
     }
 
     @Override
@@ -56,6 +63,30 @@ class AuthMemberServiceImpl implements AuthMemberService {
     public AuthMember createNewGuest() {
         Member guest = memberRegistrable.createNewGuest();
         AuthMember authMember = getAuthMember(guest);
+        authMemberCache.save(authMember);
+        return authMember;
+    }
+
+    @Override
+    @Transactional
+    public AuthMember loginWithNaver(String code, String state) {
+        NaverTokenResponse tokenResponse = naverClient.getAccessToken(code, state);
+        if (tokenResponse.accessToken() == null) {
+            throw new RuntimeException("Failed to get Naver access token: " + tokenResponse.errorDescription());
+        }
+
+        NaverProfileResponse profileResponse = naverClient.getProfile(tokenResponse.accessToken());
+        if (profileResponse.response() == null) {
+            throw new RuntimeException("Failed to get Naver profile: " + profileResponse.message());
+        }
+
+        String providerId = profileResponse.response().id();
+        String nickname = profileResponse.response().nickname();
+
+        Member member = memberQueryable.findByNaverId(providerId)
+                .orElseGet(() -> memberRegistrable.createNewNaverMember(providerId, nickname));
+
+        AuthMember authMember = getAuthMember(member);
         authMemberCache.save(authMember);
         return authMember;
     }

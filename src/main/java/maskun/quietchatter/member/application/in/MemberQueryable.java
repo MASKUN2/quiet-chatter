@@ -6,4 +6,5 @@ import maskun.quietchatter.member.domain.Member;
 
 public interface MemberQueryable {
     Optional<Member> findById(UUID id);
+    Optional<Member> findByNaverId(String providerId);
 }

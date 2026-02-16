@@ -20,3 +20,9 @@ naver:
     client-secret: hidden
 jwt:
   secret-key: someveryverymuchlongtestsecretkeyforlocaldevelopment
+
+app:
+  cookie:
+    domain: "localhost"
+    secure: false
+    same-site: Lax

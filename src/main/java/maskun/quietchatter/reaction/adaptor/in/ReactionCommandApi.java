@@ -8,7 +8,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
-@RequestMapping("/api/v1/reactions")
+@RequestMapping("/v1/reactions")
 @RestController
 @RequiredArgsConstructor
 class ReactionCommandApi {

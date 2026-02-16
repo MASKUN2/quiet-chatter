@@ -52,12 +52,13 @@ class TalkRepositoryTest implements WithTestContainerDatabases {
         UUID bookId = UUID.randomUUID();
         Model<Talk> talkModel = Instancio.of(Talk.class)
                 .ignore(fields().declaredIn(BaseEntity.class))
+                .set(field(Talk::isHidden), false)
                 .set(field(Talk::getBookId), bookId).toModel();
 
         List<Talk> talks = Instancio.ofList(talkModel).size(100).create();
         repository.saveAll(talks);
 
-        Page<Talk> result = repository.findByBookIdOrderByCreatedAtDesc(bookId, PageRequest.of(0, 10));
+        Page<Talk> result = repository.findByBookIdAndIsHiddenFalseOrderByCreatedAtDesc(bookId, PageRequest.of(0, 10));
 
         assertThat(result.getSize()).isEqualTo(10);
         assertThat(result.getTotalElements()).isEqualTo(100);

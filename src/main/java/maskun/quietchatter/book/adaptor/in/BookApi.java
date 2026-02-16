@@ -14,7 +14,7 @@ import java.util.List;
 import java.util.UUID;
 
 @RestController
-@RequestMapping("/api/v1/books")
+@RequestMapping("/v1/books")
 @RequiredArgsConstructor
 class BookApi {
     private final BookQueryable bookQueryable;
