@@ -57,7 +57,7 @@ class CustomerMessageApiTest {
 
         willDoNothing().given(customerMessageCreatable).create(eq(content));
 
-        mockMvc.perform(RestDocumentationRequestBuilders.post("/api/v1/customer/messages")
+        mockMvc.perform(RestDocumentationRequestBuilders.post("/v1/customer/messages")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(requestMap)))
                 .andExpect(status().isAccepted())

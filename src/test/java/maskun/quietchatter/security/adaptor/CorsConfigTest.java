@@ -42,7 +42,7 @@ class CorsConfigTest {
         };
 
         for (String origin : allowedOrigins) {
-            mockMvc.perform(options("/api/v1/any")
+            mockMvc.perform(options("/v1/any")
                             .header("Origin", origin)
                             .header("Access-Control-Request-Method", "GET"))
                     .andExpect(status().isOk())
@@ -54,7 +54,7 @@ class CorsConfigTest {
     @Test
     @DisplayName("허용되지 않은 오리진에서 OPTIONS 요청 시 CORS 헤더가 없거나 거부되어야 한다")
     void shouldRejectCorsFromUnallowedOrigins() throws Exception {
-        mockMvc.perform(options("/api/v1/any")
+        mockMvc.perform(options("/v1/any")
                         .header("Origin", "http://malicious-site.com")
                         .header("Access-Control-Request-Method", "GET"))
                 .andExpect(status().isForbidden());
@@ -62,7 +62,7 @@ class CorsConfigTest {
 
     @RestController
     static class DummyController {
-        @GetMapping("/api/v1/any")
+        @GetMapping("/v1/any")
         public String any() {
             return "ok";
         }

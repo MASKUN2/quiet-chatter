@@ -18,7 +18,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.util.UUID;
 
-@RequestMapping("/api/v1/talks")
+@RequestMapping("/v1/talks")
 @RestController
 @RequiredArgsConstructor
 class TalkQueryApi {

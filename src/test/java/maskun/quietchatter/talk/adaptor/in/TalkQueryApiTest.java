@@ -69,7 +69,7 @@ class TalkQueryApiTest {
                 .willReturn(new PageImpl<>(List.of(response)));
 
 
-        mockMvc.perform(RestDocumentationRequestBuilders.get("/api/v1/talks")
+        mockMvc.perform(RestDocumentationRequestBuilders.get("/v1/talks")
                         .param("bookId", bookId.toString())
                         .param("page", "0")
                         .param("size", "10")

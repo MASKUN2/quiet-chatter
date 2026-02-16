@@ -11,4 +11,6 @@ public interface AuthMemberService {
     AuthMember findOrThrow(UUID id) throws AuthMemberNotFoundException;
 
     AuthMember createNewGuest();
+
+    AuthMember loginWithNaver(String code, String state);
 }

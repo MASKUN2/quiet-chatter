@@ -55,7 +55,7 @@ class ReactionCommandApiTest {
 
         willDoNothing().given(reactionModifiable).add(any(ReactionTarget.class));
 
-        mockMvc.perform(RestDocumentationRequestBuilders.post("/api/v1/reactions")
+        mockMvc.perform(RestDocumentationRequestBuilders.post("/v1/reactions")
                         .with(authentication(new AuthMemberToken(authMember)))
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(request)))
@@ -84,7 +84,7 @@ class ReactionCommandApiTest {
 
         willDoNothing().given(reactionModifiable).remove(any(ReactionTarget.class));
 
-        mockMvc.perform(RestDocumentationRequestBuilders.delete("/api/v1/reactions")
+        mockMvc.perform(RestDocumentationRequestBuilders.delete("/v1/reactions")
                         .with(authentication(new AuthMemberToken(authMember)))
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(request)))

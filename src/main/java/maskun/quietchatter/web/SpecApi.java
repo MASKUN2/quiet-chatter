@@ -15,7 +15,7 @@ import java.nio.file.Paths;
 @RestController
 public class SpecApi {
 
-    @GetMapping("/api/v1/spec")
+    @GetMapping("/v1/spec")
     public ResponseEntity<String> getOpenApiSpec() {
         try {
             // 1. 배포 환경 (JAR 내부)

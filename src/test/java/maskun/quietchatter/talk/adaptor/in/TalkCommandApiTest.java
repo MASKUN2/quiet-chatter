@@ -68,7 +68,7 @@ class TalkCommandApiTest {
 
         given(talkCommandable.create(any(TalkCreateRequest.class))).willReturn(talk);
 
-        mockMvc.perform(RestDocumentationRequestBuilders.post("/api/v1/talks")
+        mockMvc.perform(RestDocumentationRequestBuilders.post("/v1/talks")
                         .with(authentication(new AuthMemberToken(authMember)))
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(request)))
@@ -103,7 +103,7 @@ class TalkCommandApiTest {
 
         willDoNothing().given(talkCommandable).update(eq(talkId), eq(memberId), eq("Updated content"));
 
-        mockMvc.perform(RestDocumentationRequestBuilders.put("/api/v1/talks/{talkId}", talkId)
+        mockMvc.perform(RestDocumentationRequestBuilders.put("/v1/talks/{talkId}", talkId)
                         .with(authentication(new AuthMemberToken(authMember)))
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(request)))
@@ -133,7 +133,7 @@ class TalkCommandApiTest {
 
         willDoNothing().given(talkCommandable).hide(talkId, memberId);
 
-        mockMvc.perform(RestDocumentationRequestBuilders.delete("/api/v1/talks/{talkId}", talkId)
+        mockMvc.perform(RestDocumentationRequestBuilders.delete("/v1/talks/{talkId}", talkId)
                         .with(authentication(new AuthMemberToken(authMember))))
                 .andExpect(status().isNoContent())
                 .andDo(MockMvcRestDocumentationWrapper.document("delete-talk",
