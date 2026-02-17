@@ -1,3 +1,9 @@
+spring:
+  data:
+    redis:
+      # 프로덕션은 Redis DB 0번 사용
+      url: redis://localhost:6379/0
+
 app:
   cookie:
     domain: quiet-chatter.com
