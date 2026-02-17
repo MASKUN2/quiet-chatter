@@ -42,7 +42,7 @@ class AuthMemberServiceTest {
         UUID myId = UUID.randomUUID();
         Member member = of(Member.class)
                 .set(Select.field(Member::getId), myId)
-                .set(Select.field(Member::getRole), Role.GUEST)
+                .set(Select.field(Member::getRole), Role.REGULAR)
                 .create();
 
         when(authMemberCache.findById(myId)).thenReturn(Optional.empty());
@@ -57,7 +57,7 @@ class AuthMemberServiceTest {
     @Test
     void cacheHit() {
         UUID myId = UUID.randomUUID();
-        AuthMember authMember = new AuthMember(myId, Role.GUEST);
+        AuthMember authMember = new AuthMember(myId, Role.REGULAR);
 
         when(authMemberCache.findById(myId)).thenReturn(Optional.of(authMember));
 

@@ -49,6 +49,9 @@ class JwtAuthenticateTest implements WithTestContainerDatabases {
     private AuthMemberService authMemberService;
 
     @Autowired
+    private maskun.quietchatter.member.application.out.MemberRepository memberRepository;
+
+    @Autowired
     private RedisTemplate<String, AuthMember> redisTemplate;
 
     @Autowired
@@ -90,7 +93,10 @@ class JwtAuthenticateTest implements WithTestContainerDatabases {
     @Test
     void authenticate_with_valid_access_token() throws Exception {
         // given
-        AuthMember member = authMemberService.createNewGuest();
+        maskun.quietchatter.member.domain.Member memberEntity = maskun.quietchatter.member.domain.Member.newNaverMember("naverId", "nickname");
+        memberRepository.save(memberEntity);
+        AuthMember member = new AuthMember(memberEntity.getId(), memberEntity.getRole());
+
         String accessToken = authTokenService.createNewAccessToken(member.id());
         Cookie accessCookie = new Cookie("access_token", accessToken);
 
@@ -104,7 +110,9 @@ class JwtAuthenticateTest implements WithTestContainerDatabases {
     @Test
     void authenticate_with_expired_access_token_and_valid_refresh_token_should_rotate_tokens() throws Exception {
         // given
-        AuthMember member = authMemberService.createNewGuest();
+        maskun.quietchatter.member.domain.Member memberEntity = maskun.quietchatter.member.domain.Member.newNaverMember("naverId", "nickname");
+        memberRepository.save(memberEntity);
+        AuthMember member = new AuthMember(memberEntity.getId(), memberEntity.getRole());
         
         // Create expired access token
         SecretKey key = Keys.hmacShaKeyFor(jwtSecretKey.getBytes());
@@ -130,22 +138,22 @@ class JwtAuthenticateTest implements WithTestContainerDatabases {
     }
 
     @Test
-    void request_without_token_should_be_promoted_to_guest() throws Exception {
+    void request_without_token_should_be_anonymous() throws Exception {
         mockMvc.perform(get("/test/auth/me"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.principal.role").value("GUEST"))
-                .andExpect(cookie().exists("access_token"))
-                .andExpect(cookie().exists("refresh_token"));
+                .andExpect(jsonPath("$.principal").value("anonymousUser"))
+                .andExpect(cookie().doesNotExist("access_token"))
+                .andExpect(cookie().doesNotExist("refresh_token"));
     }
 
     @Test
-    void authenticate_with_invalid_token_should_be_promoted_to_guest() throws Exception {
+    void authenticate_with_invalid_token_should_be_anonymous() throws Exception {
         Cookie invalidCookie = new Cookie("access_token", "invalid.token.value");
 
         mockMvc.perform(get("/test/auth/me").cookie(invalidCookie))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.principal.role").value("GUEST"))
-                .andExpect(cookie().exists("access_token"))
-                .andExpect(cookie().exists("refresh_token"));
+                .andExpect(jsonPath("$.principal").value("anonymousUser"))
+                .andExpect(cookie().doesNotExist("access_token"))
+                .andExpect(cookie().doesNotExist("refresh_token"));
     }
 }

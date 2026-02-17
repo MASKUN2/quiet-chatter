@@ -60,14 +60,6 @@ class AuthMemberServiceImpl implements AuthMemberService {
     }
 
     @Override
-    public AuthMember createNewGuest() {
-        Member guest = memberRegistrable.createNewGuest();
-        AuthMember authMember = getAuthMember(guest);
-        authMemberCache.save(authMember);
-        return authMember;
-    }
-
-    @Override
     @Transactional
     public AuthMember loginWithNaver(String code, String state) {
         NaverTokenResponse tokenResponse = naverClient.getAccessToken(code, state);
