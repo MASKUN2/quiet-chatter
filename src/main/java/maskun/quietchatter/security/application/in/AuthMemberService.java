@@ -10,5 +10,11 @@ public interface AuthMemberService {
 
     AuthMember findOrThrow(UUID id) throws AuthMemberNotFoundException;
 
-    AuthMember loginWithNaver(String code, String state);
+    NaverProfile loginWithNaver(String code, String state);
+
+    AuthMember getByNaverId(String providerId) throws AuthMemberNotFoundException;
+
+    AuthMember signupWithNaver(String providerId, String nickname);
+
+    record NaverProfile(String providerId, String nickname) {}
 }

@@ -26,6 +26,9 @@ public class AuthTokenService {
     private static final String REFRESH_TOKEN_COOKIE_NAME = "refresh_token";
     private static final Duration ACCESS_TOKEN_LIFE_TIME = Duration.ofMinutes(30);
     private static final Duration REFRESH_TOKEN_LIFETIME = Duration.ofDays(30);
+    private static final Duration REGISTER_TOKEN_LIFETIME = Duration.ofHours(2);
+    private static final String CLAIM_PURPOSE = "purpose";
+    private static final String PURPOSE_REGISTER = "register";
 
     private final RefreshTokenCache refreshTokenCache;
     private final JwtParser jwtParser;
@@ -39,6 +42,24 @@ public class AuthTokenService {
         this.refreshTokenCache = refreshTokenCache;
         this.jwtParser = Jwts.parser().verifyWith(this.secretKey).build();
         this.appCookieProperties = appCookieProperties;
+    }
+
+    public String createRegisterToken(String providerId) {
+        var exp = Date.from(Instant.now().plus(REGISTER_TOKEN_LIFETIME));
+        return Jwts.builder().signWith(secretKey)
+                .subject(providerId)
+                .claim(CLAIM_PURPOSE, PURPOSE_REGISTER)
+                .expiration(exp)
+                .compact();
+    }
+
+    public String parseRegisterToken(String registerToken) {
+        Claims payload = parse(registerToken).getPayload();
+        String purpose = payload.get(CLAIM_PURPOSE, String.class);
+        if (!PURPOSE_REGISTER.equals(purpose)) {
+            throw new AuthTokenException("invalid token purpose");
+        }
+        return payload.getSubject();
     }
 
     public String parseRefreshTokenAndGetTokenId(String refreshToken) throws AuthTokenException {

@@ -196,4 +196,27 @@ class AuthTokenServiceTest {
 
         assertThat(token).isNull();
     }
+
+    @Test
+    void createAndParseRegisterToken() {
+        initService();
+        String providerId = "naver123";
+
+        String registerToken = authTokenService.createRegisterToken(providerId);
+        String parsedProviderId = authTokenService.parseRegisterToken(registerToken);
+
+        assertThat(parsedProviderId).isEqualTo(providerId);
+    }
+
+    @Test
+    void parseRegisterToken_invalidPurpose() {
+        initService();
+        UUID memberId = UUID.randomUUID();
+        // Access Token을 Register Token으로 파싱 시도
+        String accessToken = authTokenService.createNewAccessToken(memberId);
+
+        assertThatThrownBy(() -> authTokenService.parseRegisterToken(accessToken))
+                .isInstanceOf(AuthTokenException.class)
+                .hasMessage("invalid token purpose");
+    }
 }
