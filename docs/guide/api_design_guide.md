@@ -81,14 +81,17 @@
 
 ## 5. 인증 (Authentication)
 
-- JWT (JSON Web Token) 기반 인증을 사용한다.
-- **액세스 토큰(Access Token)**은 다음 순서로 확인한다.
-  1. **Cookie**: `access_token` 쿠키
-  2. **Header**: `Authorization: Bearer <token>` 헤더
-- **리프레시 토큰(Refresh Token)**은 보안을 위해 **Cookie** (`refresh_token`)로만 전달한다 (HttpOnly).
+- **JWT (JSON Web Token)** 기반 인증을 사용합니다.
+- **인증 토큰 확인 순서**:
+  1. **Cookie**: `access_token` 쿠키 (우선)
+  2. **Header**: `Authorization: Bearer <token>` 헤더 (차순위, 테스트 등)
+- **Refresh Token**: 보안을 위해 `refresh_token` 쿠키(HttpOnly, Secure)로만 관리합니다.
+- **OAuth (Naver)**: 
+  - 로그인은 `/v1/auth/login/naver`를 통해 수행하며, 미가입 시 `200 OK`와 함께 `Register Token`을 반환합니다.
+  - 회원가입은 `/v1/auth/signup/naver`를 통해 수행하며, `Register Token` 검증 후 정식 토큰을 발급합니다.
 
 ```text
-# Header 예시
+# Header 예시 (쿠키 사용 불가 환경)
 Authorization: Bearer <access_token>
 ```
 
