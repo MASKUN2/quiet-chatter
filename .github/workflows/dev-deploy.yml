@@ -1,4 +1,4 @@
-name: Spring Boot Docker Deployment to Lightsail (Dev)
+name: Development Deployment
 
 on:
   push:
