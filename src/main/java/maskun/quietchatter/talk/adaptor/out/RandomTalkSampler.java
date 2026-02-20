@@ -15,7 +15,9 @@ class RandomTalkSampler {
     private final TalkRepository talkRepository;
 
     List<Talk> sample(int limit) {
-        List<UUID> ids = jdbcTemplate.queryForList("SELECT id FROM talk ORDER BY RANDOM() LIMIT ?;", UUID.class,
+        List<UUID> ids = jdbcTemplate.queryForList(
+                "SELECT id FROM talk WHERE is_hidden = false ORDER BY RANDOM() LIMIT ?;",
+                UUID.class,
                 limit);
 
         return talkRepository.findAllByIdIn(ids);
