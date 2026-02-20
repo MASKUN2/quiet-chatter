@@ -6,7 +6,7 @@ plugins {
 }
 
 group = 'maskun'
-version = '1.0.0'
+version = '1.1.0'
 description = 'quiet-chatter'
 
 java {
@@ -84,7 +84,7 @@ openapi3 {
     server = 'http://localhost:8080'
     title = 'Quiet Chatter API'
     description = 'Quiet Chatter API documentation'
-    version = '1.0.0'
+    version = '1.1.0'
     format = 'json'
     outputDirectory = 'build/api-spec'
 }
