@@ -29,18 +29,26 @@
 - **도메인 (API)**: `api.quiet-chatter.com`
 - **도메인 (Frontend)**: `quiet-chatter.com`
 - **Docker 이미지**: `maskun2/quiet-chatter:latest`
-- **데이터베이스**: PostgreSQL (`quiet_chatter`), Redis (DB 0)
-- **배포**: `main` 브랜치 푸시 시 GitHub Actions를 통해 자동 배포
+- **데이터베이스**: PostgreSQL, Redis (DB 0)
+- **배포 트리거**: `prod` 브랜치 푸시 시 자동 배포 (Watchtower 감지)
 
 ### Development (개발)
 - **도메인 (API)**: `dev-api.quiet-chatter.com`
 - **도메인 (Frontend)**: `dev.quiet-chatter.com`
 - **Docker 이미지**: `maskun2/quiet-chatter-dev:latest`
-- **데이터베이스**: PostgreSQL (`quiet_chatter_dev`), Redis (DB 1)
-- **배포**: `dev` 브랜치 푸시 시 GitHub Actions를 통해 자동 배포
+- **데이터베이스**: PostgreSQL, Redis (DB 1)
+- **배포 트리거**: `dev` 브랜치 푸시 시 자동 배포 (Watchtower 감지)
 
 ## 배포 파이프라인 (CI/CD)
-1. GitHub 푸시 감지 (`main` 또는 `dev`)
+
+### Development 환경
+1. `dev` 브랜치 푸시 감지
 2. Gradle 빌드 및 테스트 수행
-3. Docker 이미지 빌드 및 Docker Hub 푸시
-4. 서버(AWS Lightsail)의 Watchtower가 새 이미지를 감지하여 컨테이너 재시작
+3. `quiet-chatter-dev` Docker 이미지 빌드 및 Docker Hub 푸시
+4. **Watchtower**가 새 이미지를 감지하여 개발 서버 컨테이너 자동 재시작
+
+### Production 환경
+1. `prod` 브랜치 푸시 감지
+2. Gradle 빌드 (테스트 제외)
+3. `quiet-chatter` Docker 이미지 빌드 및 Docker Hub 푸시
+4. 운영서버에서 **Watchtower**가 새 이미지를 감지하여 최신 이미지 풀(pull) 및 컨테이너 재시작

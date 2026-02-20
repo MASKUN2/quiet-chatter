@@ -1,7 +1,6 @@
 package maskun.quietchatter.member.application;
 
 import maskun.quietchatter.member.application.out.MemberRepository;
-import maskun.quietchatter.member.application.out.RandomNickNameSupplier;
 import maskun.quietchatter.member.domain.Member;
 import maskun.quietchatter.member.domain.OauthProvider;
 import maskun.quietchatter.member.domain.Role;
@@ -24,9 +23,6 @@ class MemberServiceTest {
     @Mock
     private MemberRepository memberRepository;
 
-    @Mock
-    private RandomNickNameSupplier randomNickNameSupplier;
-
     @InjectMocks
     private MemberService memberService;
 
@@ -48,26 +44,6 @@ class MemberServiceTest {
         assertThat(newMember.getProvider()).isEqualTo(OauthProvider.NAVER);
         assertThat(newMember.getProviderId()).isEqualTo(providerId);
 
-        verify(memberRepository).save(any(Member.class));
-    }
-
-    @Test
-    @DisplayName("네이버 회원 생성 시 닉네임이 없으면 랜덤 닉네임을 사용한다")
-    void createNewNaverMemberWithRandomNickname() {
-        // given
-        String providerId = "naver123";
-        String expectedNickname = "RandomNickname123";
-        given(randomNickNameSupplier.get()).willReturn(expectedNickname);
-        given(memberRepository.save(any(Member.class))).willAnswer(invocation -> invocation.getArgument(0));
-
-        // when
-        Member newMember = memberService.createNewNaverMember(providerId, null);
-
-        // then
-        assertThat(newMember.getNickname()).isEqualTo(expectedNickname);
-        assertThat(newMember.getRole()).isEqualTo(Role.REGULAR);
-
-        verify(randomNickNameSupplier).get();
         verify(memberRepository).save(any(Member.class));
     }
 }

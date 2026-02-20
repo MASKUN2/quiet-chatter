@@ -1,6 +1,6 @@
 package maskun.quietchatter.member.adaptor;
 
-import maskun.quietchatter.member.application.out.RandomNickNameSupplier;
+import maskun.quietchatter.member.application.in.RandomNickNameSupplier;
 import org.jspecify.annotations.NullMarked;
 import org.springframework.stereotype.Component;
 

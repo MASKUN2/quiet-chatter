@@ -73,9 +73,8 @@ class AuthMemberServiceImpl implements AuthMemberService {
         }
 
         String providerId = profileResponse.response().id();
-        String nickname = profileResponse.response().nickname();
 
-        return new NaverProfile(providerId, nickname);
+        return new NaverProfile(providerId);
     }
 
     @Override
