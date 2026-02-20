@@ -34,3 +34,4 @@ URL: https://quiet-chatter.com
 - [현재 진행중인 작업: current_works.md](/docs/current_works.md)
 - [AI 에이전트 작업지침: AGENTS.md](/docs/guide/ai_agent_guide.md)
 
+<!-- Deployment test trigger -->
