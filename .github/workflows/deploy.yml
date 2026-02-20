@@ -2,9 +2,8 @@
 name: Spring Boot Docker Deployment to Lightsail
 
 on:
-  push:
-    branches:
-      - main # main 브랜치에 푸시될 때마다 실행
+  release:
+    types: [published]
 
 jobs:
   deploy:
@@ -25,7 +24,7 @@ jobs:
         run: chmod +x gradlew
 
       - name: Build with Gradle
-        run: ./gradlew bootJar -x test # restdoc 을 위한 테스트는 실행됨
+        run: ./gradlew bootJar -x test
 
       # --- Docker 이미지 빌드 및 푸시 ---
       - name: Log in to Docker Hub
@@ -39,5 +38,7 @@ jobs:
         with:
           context: .
           push: true
-          tags: ${{ secrets.DOCKER_USERNAME }}/quiet-chatter:latest
+          tags: |
+            ${{ secrets.DOCKER_USERNAME }}/quiet-chatter:latest
+            ${{ secrets.DOCKER_USERNAME }}/quiet-chatter:${{ github.event.release.tag_name }}
           # Dockerfile 경로가 프로젝트 루트에 있다고 가정
