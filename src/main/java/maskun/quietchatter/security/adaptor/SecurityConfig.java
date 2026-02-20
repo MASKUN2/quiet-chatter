@@ -44,7 +44,8 @@ class SecurityConfig {
                 )
                 .authorizeHttpRequests(authorize -> authorize
                         .requestMatchers(HttpMethod.GET, "/**").permitAll()
-                        .requestMatchers(HttpMethod.POST, "/v1/auth/login/**").permitAll()
+                        // Allow login and signup endpoints without authentication
+                        .requestMatchers(HttpMethod.POST, "/v1/auth/login/**", "/v1/auth/signup/**").permitAll()
                         .anyRequest().authenticated()
                 )
                 .formLogin(AbstractHttpConfigurer::disable)
