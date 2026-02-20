@@ -2,8 +2,9 @@
 name: Spring Boot Docker Deployment to Lightsail
 
 on:
-  release:
-    types: [published]
+  push:
+    tags:
+      - 'v*'
 
 jobs:
   deploy:
@@ -40,5 +41,5 @@ jobs:
           push: true
           tags: |
             ${{ secrets.DOCKER_USERNAME }}/quiet-chatter:latest
-            ${{ secrets.DOCKER_USERNAME }}/quiet-chatter:${{ github.event.release.tag_name }}
+            ${{ secrets.DOCKER_USERNAME }}/quiet-chatter:${{ github.ref_name }}
           # Dockerfile 경로가 프로젝트 루트에 있다고 가정
