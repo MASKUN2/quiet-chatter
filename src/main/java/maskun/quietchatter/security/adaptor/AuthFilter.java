@@ -39,19 +39,19 @@ class AuthFilter extends OncePerRequestFilter {
 
     private @Nullable Authentication attempt(HttpServletRequest request, HttpServletResponse response) {
         String accessToken = authTokenService.extractAccessToken(request);
-        if (accessToken == null) {
-            return tryWithRefreshToken(request, response);
+        if (accessToken != null) {
+            try {
+                UUID memberId = authTokenService.parseAccessTokenAndGetMemberId(accessToken);
+                AuthMember authMember = authMemberService.findOrThrow(memberId);
+                return new AuthMemberToken(authMember);
+            } catch (ExpiredAuthTokenException e) {
+                // Access token expired, try refresh token
+            } catch (AuthTokenException e) {
+                return null;
+            }
         }
 
-        try {
-            UUID memberId = authTokenService.parseAccessTokenAndGetMemberId(accessToken);
-            AuthMember authMember = authMemberService.findOrThrow(memberId);
-            return new AuthMemberToken(authMember);
-        } catch (ExpiredAuthTokenException e) {
-            return tryWithRefreshToken(request, response);
-        } catch (AuthTokenException e) {
-            return null;
-        }
+        return tryWithRefreshToken(request, response);
     }
 
     private @Nullable Authentication tryWithRefreshToken(HttpServletRequest request, HttpServletResponse response) {
@@ -60,16 +60,23 @@ class AuthFilter extends OncePerRequestFilter {
             return null;
         }
 
-        String tokenId = authTokenService.parseRefreshTokenAndGetTokenId(refreshToken);
-        UUID memberId = authTokenService.findMemberIdByRefreshTokenIdOrThrow(tokenId);
-        AuthMemberToken auth = new AuthMemberToken(authMemberService.findOrThrow(memberId));
+        try {
+            String tokenId = authTokenService.parseRefreshTokenAndGetTokenId(refreshToken);
+            UUID memberId = authTokenService.findMemberIdByRefreshTokenIdOrThrow(tokenId);
+            AuthMember authMember = authMemberService.findOrThrow(memberId);
+            AuthMemberToken auth = new AuthMemberToken(authMember);
 
-        String newAccessToken = authTokenService.createNewAccessToken(memberId);
-        String newRefreshToken = authTokenService.createAndSaveRefreshToken(memberId);
-        authTokenService.putAccessToken(response, newAccessToken);
-        authTokenService.putRefreshToken(response, newRefreshToken);
+            String newAccessToken = authTokenService.createNewAccessToken(memberId);
+            String newRefreshToken = authTokenService.createAndSaveRefreshToken(memberId);
 
-        authTokenService.deleteRefreshTokenById(tokenId); // delete old
-        return auth;
+            authTokenService.putAccessToken(response, newAccessToken);
+            authTokenService.putRefreshToken(response, newRefreshToken);
+
+            authTokenService.deleteRefreshTokenById(tokenId); // delete old
+            return auth;
+        } catch (Exception e) {
+            // If refresh token is invalid or expired, or member not found, return null
+            return null;
+        }
     }
 }

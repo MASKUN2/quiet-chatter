@@ -1,0 +1,19 @@
+spring:
+  data:
+    redis:
+      # dev 환경은 Redis DB 1번을 사용하도록 설정
+      url: redis://localhost:6379/1
+  datasource:
+    # dev DB 연결 정보
+    url: jdbc:postgresql://localhost:5432/quiet_chatter_dev
+
+app:
+  cors:
+    allowed-origins:
+      - "https://dev.quiet-chatter.com"
+      - "http://localhost:5173"
+      - "http://127.0.0.1:5173"
+  cookie:
+    domain: "dev-api.quiet-chatter.com"
+    secure: true
+    same-site: Lax

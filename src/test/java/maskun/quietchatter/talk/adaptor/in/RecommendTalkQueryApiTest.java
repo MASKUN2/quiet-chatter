@@ -50,7 +50,7 @@ class RecommendTalkQueryApiTest {
 
         given(recommendTalkQueryable.get()).willReturn(new RecommendTalks(List.of(talk)));
 
-        mockMvc.perform(RestDocumentationRequestBuilders.get("/api/v1/talks/recommend")
+        mockMvc.perform(RestDocumentationRequestBuilders.get("/v1/talks/recommend")
                         .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andDo(MockMvcRestDocumentationWrapper.document("get-recommend-talks",

@@ -14,7 +14,7 @@ import org.springframework.web.bind.annotation.RestController;
 @NullMarked
 @RequiredArgsConstructor
 @RestController
-@RequestMapping("/api/v1/auth")
+@RequestMapping("/v1/auth")
 class AuthMeApi {
     private final MemberQueryable memberQueryable;
 

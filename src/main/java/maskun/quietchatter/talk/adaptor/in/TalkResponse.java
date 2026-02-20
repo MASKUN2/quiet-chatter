@@ -40,4 +40,11 @@ record TalkResponse(
     public boolean is_modified() {
         return isModified;
     }
+
+    public TalkResponse withReactions(boolean didILike, boolean didISupport) {
+        return new TalkResponse(
+                id, bookId, memberId, nickname, createdAt, dateToHidden, content,
+                likeCount, didILike, supportCount, didISupport, isModified
+        );
+    }
 }

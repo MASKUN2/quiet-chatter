@@ -15,8 +15,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 import java.util.function.Function;
-
-import static java.util.stream.Collectors.*;
+import java.util.stream.Collectors;
 
 @NullMarked
 @Component
@@ -34,7 +33,7 @@ public class TalkResponseMapper {
         List<UUID> talkIds = talkResponses.getContent().stream().map(TalkResponse::id).toList();
 
         Map<UUID, Set<Type>> talkReactionsMap = reactionQueryable.getAllBy(authMember.id(), talkIds)
-                .stream().collect(groupingBy(Reaction::getTalkId, mapping(Reaction::getType, toSet())));
+                .stream().collect(Collectors.groupingBy(Reaction::getTalkId, Collectors.mapping(Reaction::getType, Collectors.toSet())));
 
         return talkResponses.map(updateReactionDid(talkReactionsMap));
     }
@@ -66,25 +65,7 @@ public class TalkResponseMapper {
             Set<Type> didReactions = talkReactionsMap.getOrDefault(talkId, Set.of());
             boolean didILike = didReactions.contains(Type.LIKE);
             boolean didISupport = didReactions.contains(Type.SUPPORT);
-            return buildTalkResponseWithLikesSupport(resp, didILike, didISupport);
+            return resp.withReactions(didILike, didISupport);
         };
-    }
-
-    private static TalkResponse buildTalkResponseWithLikesSupport(TalkResponse resp, boolean didILike,
-                                                                  boolean didISupport) {
-        return new TalkResponse(
-                resp.id(),
-                resp.bookId(),
-                resp.memberId(),
-                resp.nickname(),
-                resp.createdAt(),
-                resp.dateToHidden(),
-                resp.content(),
-                resp.like_count(),
-                didILike,
-                resp.support_count(),
-                didISupport,
-                resp.isModified()
-        );
     }
 }

@@ -1,10 +1,9 @@
-# .github/workflows/deploy.yml
-name: Spring Boot Docker Deployment to Lightsail
+name: Spring Boot Docker Deployment to Lightsail (Dev)
 
 on:
   push:
     branches:
-      - main # main 브랜치에 푸시될 때마다 실행
+      - dev # dev 브랜치에 푸시될 때마다 실행
 
 jobs:
   deploy:
@@ -39,5 +38,5 @@ jobs:
         with:
           context: .
           push: true
-          tags: ${{ secrets.DOCKER_USERNAME }}/quiet-chatter:latest
+          tags: ${{ secrets.DOCKER_USERNAME }}/quiet-chatter-dev:latest
           # Dockerfile 경로가 프로젝트 루트에 있다고 가정

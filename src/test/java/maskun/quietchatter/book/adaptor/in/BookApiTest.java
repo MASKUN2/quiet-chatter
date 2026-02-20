@@ -56,7 +56,7 @@ class BookApiTest {
         given(bookQueryable.findBy(any(UUID.class))).willReturn(book);
 
         // when & then
-        mockMvc.perform(RestDocumentationRequestBuilders.get("/api/v1/books/{bookId}", bookId)
+        mockMvc.perform(RestDocumentationRequestBuilders.get("/v1/books/{bookId}", bookId)
                         .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andDo(MockMvcRestDocumentationWrapper.document("get-book-detail",
@@ -100,7 +100,7 @@ class BookApiTest {
                 .willReturn(slice);
 
         // when & then
-        mockMvc.perform(RestDocumentationRequestBuilders.get("/api/v1/books")
+        mockMvc.perform(RestDocumentationRequestBuilders.get("/v1/books")
                         .param("keyword", keyword)
                         .param("page", "0")
                         .param("size", "10")
@@ -157,7 +157,7 @@ class BookApiTest {
         given(bookQueryable.findBy(any(java.util.List.class))).willReturn(java.util.List.of(book1, book2));
 
         // when & then
-        mockMvc.perform(RestDocumentationRequestBuilders.get("/api/v1/books")
+        mockMvc.perform(RestDocumentationRequestBuilders.get("/v1/books")
                         .param("id", bookId1.toString())
                         .param("id", bookId2.toString())
                         .accept(MediaType.APPLICATION_JSON))

@@ -14,7 +14,7 @@ import java.time.LocalDate;
 import java.time.ZoneId;
 import java.util.UUID;
 
-@RequestMapping("/api/v1/talks")
+@RequestMapping("/v1/talks")
 @RestController
 @RequiredArgsConstructor
 class TalkCommandApi {

@@ -1,10 +1,5 @@
 package maskun.quietchatter.talk.application;
 
-import static org.assertj.core.api.Assertions.*;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.*;
-
-import java.util.UUID;
 import maskun.quietchatter.talk.application.in.TalkQueryRequest;
 import maskun.quietchatter.talk.application.out.TalkRepository;
 import maskun.quietchatter.talk.domain.Talk;
@@ -16,6 +11,12 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 
+import java.util.UUID;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.when;
+
 @ExtendWith(MockitoExtension.class)
 class TalkQueryServiceTest {
     @Mock
@@ -24,7 +25,7 @@ class TalkQueryServiceTest {
     @Test
     @DisplayName("없는 책을 조회시 빈 페이지 반환")
     void findByNotExistingBook() {
-        when(talkRepository.findByBookIdOrderByCreatedAtDesc(any(), any())).thenReturn(Page.empty());
+        when(talkRepository.findByBookIdAndIsHiddenFalseOrderByCreatedAtDesc(any(), any())).thenReturn(Page.empty());
 
         TalkQueryService talkQueryService = new TalkQueryService(talkRepository, null);
         TalkQueryRequest request = new TalkQueryRequest(UUID.randomUUID(), PageRequest.of(0, 10));

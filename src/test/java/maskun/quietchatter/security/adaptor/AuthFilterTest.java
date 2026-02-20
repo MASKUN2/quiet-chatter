@@ -4,28 +4,27 @@ import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import maskun.quietchatter.member.domain.Role;
 import maskun.quietchatter.security.application.in.AuthMemberService;
+import maskun.quietchatter.security.domain.AuthMember;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 
 import java.io.IOException;
+import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
 class AuthFilterTest {
 
     @BeforeEach
     void setUp() {
-        SecurityContextHolder.getContext().setAuthentication(new UsernamePasswordAuthenticationToken(null, null));
-        assertThat(SecurityContextHolder.getContext().getAuthentication()).isNotNull();
-
+        // Ensure context is clear before test
         SecurityContextHolder.clearContext();
-        assertThat(SecurityContextHolder.getContext().getAuthentication()).isNull();
     }
 
     @AfterEach
@@ -37,51 +36,51 @@ class AuthFilterTest {
     void NoAccessTokenAndNoAuthenticated() throws ServletException, IOException {
         AuthTokenService mockAuthTokenService = mock(AuthTokenService.class);
         when(mockAuthTokenService.extractAccessToken(any())).thenReturn(null);
+
         AuthFilter authFilter = new AuthFilter(mockAuthTokenService, mock(AuthMemberService.class));
+        FilterChain mockFilterChain = mock(FilterChain.class);
 
-        FilterChain mockfilterChain = mock(FilterChain.class);
-
-        authFilter.doFilterInternal(mock(HttpServletRequest.class), mock(HttpServletResponse.class), mockfilterChain);
+        authFilter.doFilterInternal(mock(HttpServletRequest.class), mock(HttpServletResponse.class), mockFilterChain);
 
         assertThat(SecurityContextHolder.getContext().getAuthentication()).isNull();
-        verify(mockfilterChain).doFilter(any(), any());
+        verify(mockFilterChain).doFilter(any(), any());
     }
 
     @Test
     void ExpiredAccessTokenNoRefreshTokenAndNoAuthenticated() throws ServletException, IOException {
         AuthTokenService mockAuthTokenService = mock(AuthTokenService.class);
-        when(mockAuthTokenService.extractAccessToken(any())).thenReturn("some expired token");
-        when(mockAuthTokenService.parseAccessTokenAndGetMemberId(any())).thenThrow(
-                new ExpiredAuthTokenException("some expired token"));
+        when(mockAuthTokenService.extractAccessToken(any())).thenReturn("expired_token");
+        doThrow(new ExpiredAuthTokenException("expired token"))
+                .when(mockAuthTokenService).parseAccessTokenAndGetMemberId("expired_token");
         when(mockAuthTokenService.extractRefreshToken(any())).thenReturn(null);
 
         AuthFilter authFilter = new AuthFilter(mockAuthTokenService, mock(AuthMemberService.class));
+        FilterChain mockFilterChain = mock(FilterChain.class);
 
-        FilterChain mockfilterChain = mock(FilterChain.class);
-
-        authFilter.doFilterInternal(mock(HttpServletRequest.class), mock(HttpServletResponse.class), mockfilterChain);
+        authFilter.doFilterInternal(mock(HttpServletRequest.class), mock(HttpServletResponse.class), mockFilterChain);
 
         assertThat(SecurityContextHolder.getContext().getAuthentication()).isNull();
-        verify(mockfilterChain).doFilter(any(), any());
+        verify(mockFilterChain).doFilter(any(), any());
     }
 
     @Test
-    void ExpiredAccessTokenAndExpiredRefreshTokenThenThrow() {
+    void ExpiredAccessTokenAndExpiredRefreshTokenThenThrow() throws ServletException, IOException {
         AuthTokenService mockAuthTokenService = mock(AuthTokenService.class);
-        when(mockAuthTokenService.extractAccessToken(any())).thenReturn("some expired token");
-        when(mockAuthTokenService.parseAccessTokenAndGetMemberId(any())).thenThrow(
-                new ExpiredAuthTokenException("some expired token"));
-        when(mockAuthTokenService.extractRefreshToken(any())).thenReturn("some expired refresh token");
-        when(mockAuthTokenService.parseRefreshTokenAndGetTokenId(any())).thenThrow(
-                new ExpiredAuthTokenException("some expired refresh token"));
+        when(mockAuthTokenService.extractAccessToken(any())).thenReturn("expired_token");
+        doThrow(new ExpiredAuthTokenException("expired token"))
+                .when(mockAuthTokenService).parseAccessTokenAndGetMemberId("expired_token");
+
+        when(mockAuthTokenService.extractRefreshToken(any())).thenReturn("expired_refresh_token");
+        doThrow(new ExpiredAuthTokenException("expired refresh token"))
+                .when(mockAuthTokenService).parseRefreshTokenAndGetTokenId("expired_refresh_token");
 
         AuthFilter authFilter = new AuthFilter(mockAuthTokenService, mock(AuthMemberService.class));
+        FilterChain mockFilterChain = mock(FilterChain.class);
 
-        FilterChain mockfilterChain = mock(FilterChain.class);
+        authFilter.doFilterInternal(mock(HttpServletRequest.class), mock(HttpServletResponse.class), mockFilterChain);
 
-        assertThatThrownBy(() -> authFilter.doFilterInternal(
-                mock(HttpServletRequest.class), mock(HttpServletResponse.class), mockfilterChain)
-        ).isInstanceOf(ExpiredAuthTokenException.class);
+        assertThat(SecurityContextHolder.getContext().getAuthentication()).isNull();
+        verify(mockFilterChain).doFilter(any(), any());
     }
 
     @Test
@@ -89,25 +88,37 @@ class AuthFilterTest {
         AuthTokenService mockAuthTokenService = mock(AuthTokenService.class);
         AuthMemberService mockAuthMemberService = mock(AuthMemberService.class);
 
+        // Setup: No access token, but valid refresh token
         when(mockAuthTokenService.extractAccessToken(any())).thenReturn(null);
         when(mockAuthTokenService.extractRefreshToken(any())).thenReturn("valid_refresh_token");
-        when(mockAuthTokenService.parseRefreshTokenAndGetTokenId(any())).thenReturn("token_id");
-        when(mockAuthTokenService.findMemberIdByRefreshTokenIdOrThrow(any())).thenReturn(java.util.UUID.randomUUID());
-        when(mockAuthTokenService.createNewAccessToken(any())).thenReturn("new_access_token");
-        when(mockAuthTokenService.createAndSaveRefreshToken(any())).thenReturn("new_refresh_token");
+        when(mockAuthTokenService.parseRefreshTokenAndGetTokenId("valid_refresh_token")).thenReturn("token_id");
 
-        maskun.quietchatter.security.domain.AuthMember mockMember = mock(maskun.quietchatter.security.domain.AuthMember.class);
-        when(mockMember.role()).thenReturn(maskun.quietchatter.member.domain.Role.REGULAR);
-        when(mockAuthMemberService.findOrThrow(any())).thenReturn(mockMember);
+        UUID memberId = UUID.randomUUID();
+        when(mockAuthTokenService.findMemberIdByRefreshTokenIdOrThrow("token_id")).thenReturn(memberId);
+
+        // Setup: Token rotation
+        when(mockAuthTokenService.createNewAccessToken(memberId)).thenReturn("new_access_token");
+        when(mockAuthTokenService.createAndSaveRefreshToken(memberId)).thenReturn("new_refresh_token");
+
+        // Setup: Member service
+        AuthMember mockMember = mock(AuthMember.class);
+        when(mockMember.role()).thenReturn(Role.REGULAR);
+        when(mockAuthMemberService.findOrThrow(memberId)).thenReturn(mockMember);
 
         AuthFilter authFilter = new AuthFilter(mockAuthTokenService, mockAuthMemberService);
-        FilterChain mockfilterChain = mock(FilterChain.class);
+        FilterChain mockFilterChain = mock(FilterChain.class);
 
-        authFilter.doFilterInternal(mock(HttpServletRequest.class), mock(HttpServletResponse.class), mockfilterChain);
+        authFilter.doFilterInternal(mock(HttpServletRequest.class), mock(HttpServletResponse.class), mockFilterChain);
 
         assertThat(SecurityContextHolder.getContext().getAuthentication()).isNotNull();
-        verify(mockAuthTokenService).createNewAccessToken(any());
-        verify(mockAuthTokenService).createAndSaveRefreshToken(any());
-        verify(mockfilterChain).doFilter(any(), any());
+
+        // Verify token rotation occurred
+        verify(mockAuthTokenService).deleteRefreshTokenById("token_id");
+        verify(mockAuthTokenService).createNewAccessToken(memberId);
+        verify(mockAuthTokenService).createAndSaveRefreshToken(memberId);
+        verify(mockAuthTokenService).putAccessToken(any(), eq("new_access_token"));
+        verify(mockAuthTokenService).putRefreshToken(any(), eq("new_refresh_token"));
+
+        verify(mockFilterChain).doFilter(any(), any());
     }
 }

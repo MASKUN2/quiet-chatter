@@ -50,11 +50,11 @@ class AuthMeApiTest {
     void me_Authenticated() throws Exception {
         UUID memberId = UUID.randomUUID();
         AuthMember authMember = new AuthMember(memberId, Role.REGULAR);
-        Member member = Member.newGuest("testUser");
+        Member member = Member.newNaverMember("naverId", "testUser");
 
         given(memberQueryable.findById(any(UUID.class))).willReturn(Optional.of(member));
 
-        mockMvc.perform(RestDocumentationRequestBuilders.get("/api/v1/auth/me")
+        mockMvc.perform(RestDocumentationRequestBuilders.get("/v1/auth/me")
                         .with(authentication(new AuthMemberToken(authMember)))
                         .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
@@ -82,7 +82,7 @@ class AuthMeApiTest {
     @Test
     @DisplayName("인증되지 않은 사용자 정보 조회")
     void me_Unauthenticated() throws Exception {
-        mockMvc.perform(RestDocumentationRequestBuilders.get("/api/v1/auth/me")
+        mockMvc.perform(RestDocumentationRequestBuilders.get("/v1/auth/me")
                         .with(anonymous())
                         .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
