@@ -5,6 +5,7 @@ import com.epages.restdocs.apispec.ResourceSnippetParameters;
 import com.epages.restdocs.apispec.Schema;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import maskun.quietchatter.MockSecurityTestConfig;
+import maskun.quietchatter.member.application.in.RandomNickNameSupplier;
 import maskun.quietchatter.security.adaptor.AuthTokenService;
 import maskun.quietchatter.security.application.in.AuthMemberNotFoundException;
 import maskun.quietchatter.security.application.in.AuthMemberService;
@@ -48,21 +49,25 @@ class AuthLoginApiTest {
     @MockitoBean
     private AuthTokenService authTokenService;
 
+    @MockitoBean
+    private RandomNickNameSupplier randomNickNameSupplier;
+
     @Test
     @DisplayName("네이버 로그인 - 미가입 회원")
     void loginWithNaver_NotRegistered() throws Exception {
         String code = "testCode";
         String state = "testState";
         String providerId = "naver123";
-        String nickname = "NaverUser";
+        String nickname = "Random User";
         String registerToken = "registerToken123";
 
         NaverLoginRequest request = new NaverLoginRequest(code, state);
-        NaverProfile profile = new NaverProfile(providerId, nickname);
+        NaverProfile profile = new NaverProfile(providerId);
 
         given(authMemberService.loginWithNaver(code, state)).willReturn(profile);
         given(authMemberService.getByNaverId(providerId)).willThrow(new AuthMemberNotFoundException("Not found"));
         given(authTokenService.createRegisterToken(providerId)).willReturn(registerToken);
+        given(randomNickNameSupplier.get()).willReturn(nickname);
 
         mockMvc.perform(RestDocumentationRequestBuilders.post("/v1/auth/login/naver")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -78,7 +83,7 @@ class AuthLoginApiTest {
                                         .responseFields(
                                                 fieldWithPath("isRegistered").description("Is registered user"),
                                                 fieldWithPath("registerToken").description("Register token for signup").optional(),
-                                                fieldWithPath("tempNickname").description("Temporary nickname from provider").optional()
+                                                fieldWithPath("tempNickname").description("Randomly generated temporary nickname").optional()
                                         )
                                         .build()
                         )
@@ -91,11 +96,10 @@ class AuthLoginApiTest {
         String code = "testCode";
         String state = "testState";
         String providerId = "naver123";
-        String nickname = "NaverUser";
         UUID memberId = UUID.randomUUID();
 
         NaverLoginRequest request = new NaverLoginRequest(code, state);
-        NaverProfile profile = new NaverProfile(providerId, nickname);
+        NaverProfile profile = new NaverProfile(providerId);
         AuthMember authMember = new AuthMember(memberId, Role.REGULAR);
 
         given(authMemberService.loginWithNaver(code, state)).willReturn(profile);

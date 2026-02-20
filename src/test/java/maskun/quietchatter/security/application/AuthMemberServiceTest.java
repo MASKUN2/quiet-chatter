@@ -97,7 +97,6 @@ class AuthMemberServiceTest {
         NaverProfile result = authMemberService.loginWithNaver(code, state);
 
         assertThat(result.providerId()).isEqualTo(providerId);
-        assertThat(result.nickname()).isEqualTo(nickname);
     }
 
     @Test
