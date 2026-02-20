@@ -5,8 +5,10 @@ import java.util.Optional;
 import java.util.UUID;
 import maskun.quietchatter.member.domain.Member;
 import maskun.quietchatter.member.domain.OauthProvider;
+import org.jspecify.annotations.NullMarked;
 import org.springframework.data.repository.Repository;
 
+@NullMarked
 public interface MemberRepository extends Repository<Member, UUID> {
     Optional<Member> findById(UUID id);
 

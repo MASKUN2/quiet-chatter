@@ -1,4 +1,4 @@
-package maskun.quietchatter.member.application.out;
+package maskun.quietchatter.member.application.in;
 
 import org.jspecify.annotations.NullMarked;
 
