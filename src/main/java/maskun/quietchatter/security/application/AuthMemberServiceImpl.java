@@ -60,16 +60,8 @@ class AuthMemberServiceImpl implements AuthMemberService {
     }
 
     @Override
-    public AuthMember createNewGuest() {
-        Member guest = memberRegistrable.createNewGuest();
-        AuthMember authMember = getAuthMember(guest);
-        authMemberCache.save(authMember);
-        return authMember;
-    }
-
-    @Override
     @Transactional
-    public AuthMember loginWithNaver(String code, String state) {
+    public NaverProfile loginWithNaver(String code, String state) {
         NaverTokenResponse tokenResponse = naverClient.getAccessToken(code, state);
         if (tokenResponse.accessToken() == null) {
             throw new RuntimeException("Failed to get Naver access token: " + tokenResponse.errorDescription());
@@ -83,9 +75,26 @@ class AuthMemberServiceImpl implements AuthMemberService {
         String providerId = profileResponse.response().id();
         String nickname = profileResponse.response().nickname();
 
-        Member member = memberQueryable.findByNaverId(providerId)
-                .orElseGet(() -> memberRegistrable.createNewNaverMember(providerId, nickname));
+        return new NaverProfile(providerId, nickname);
+    }
 
+    @Override
+    public AuthMember getByNaverId(String providerId) throws AuthMemberNotFoundException {
+        Member member = memberQueryable.findByNaverId(providerId)
+                .orElseThrow(() -> new AuthMemberNotFoundException("member not found for naver id: " + providerId));
+        AuthMember authMember = getAuthMember(member);
+        authMemberCache.save(authMember);
+        return authMember;
+    }
+
+    @Override
+    @Transactional
+    public AuthMember signupWithNaver(String providerId, String nickname) {
+        if (memberQueryable.findByNaverId(providerId).isPresent()) {
+            throw new IllegalArgumentException("이미 가입된 회원입니다.");
+        }
+
+        Member member = memberRegistrable.createNewNaverMember(providerId, nickname);
         AuthMember authMember = getAuthMember(member);
         authMemberCache.save(authMember);
         return authMember;

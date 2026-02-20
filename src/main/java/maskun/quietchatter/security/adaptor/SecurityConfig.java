@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import maskun.quietchatter.security.application.in.AuthMemberService;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
@@ -23,6 +24,8 @@ import static org.springframework.security.config.http.SessionCreationPolicy.STA
 @RequiredArgsConstructor
 class SecurityConfig {
 
+    private final AppCorsProperties appCorsProperties;
+
     @Bean
     SecurityFilterChain securityFilterChain(HttpSecurity http, AuthTokenService authTokenService,
                                             AuthMemberService authMemberService) throws Exception {
@@ -36,14 +39,14 @@ class SecurityConfig {
                         AnonymousAuthenticationFilter.class
                 )
                 .addFilterAfter(
-                        new AnonymousToGuestPromotionFilter(authTokenService, authMemberService),
+                        new MdcFilter(),
                         AnonymousAuthenticationFilter.class
                 )
-                .addFilterAfter(
-                        new MdcFilter(),
-                        AnonymousToGuestPromotionFilter.class
+                .authorizeHttpRequests(authorize -> authorize
+                        .requestMatchers(HttpMethod.GET, "/**").permitAll()
+                        .requestMatchers(HttpMethod.POST, "/v1/auth/login/**").permitAll()
+                        .anyRequest().authenticated()
                 )
-                .authorizeHttpRequests(authorize -> authorize.anyRequest().permitAll())
                 .formLogin(AbstractHttpConfigurer::disable)
                 .httpBasic(AbstractHttpConfigurer::disable)
                 .csrf(AbstractHttpConfigurer::disable)
@@ -53,14 +56,7 @@ class SecurityConfig {
     @Bean
     CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
-        configuration.setAllowedOriginPatterns(List.of(
-                "http://localhost:*",
-                "http://127.0.0.1:*",
-                "https://quiet-chatter.com",
-                "http://quiet-chatter.com",
-                "https://*.quiet-chatter.com",
-                "http://*.quiet-chatter.com"
-        ));
+        configuration.setAllowedOrigins(appCorsProperties.allowedOrigins());
         configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"));
         configuration.setAllowedHeaders(List.of("*"));
         configuration.setAllowCredentials(true);

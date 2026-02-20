@@ -81,26 +81,39 @@
 
 ## 5. 인증 (Authentication)
 
-- JWT (JSON Web Token) 기반 인증을 사용한다.
-- **액세스 토큰(Access Token)**은 다음 순서로 확인한다.
-  1. **Cookie**: `access_token` 쿠키
-  2. **Header**: `Authorization: Bearer <token>` 헤더
-- **리프레시 토큰(Refresh Token)**은 보안을 위해 **Cookie** (`refresh_token`)로만 전달한다 (HttpOnly).
+- **JWT (JSON Web Token)** 기반 인증을 사용합니다.
+- **인증 토큰 확인 순서**:
+  1. **Cookie**: `access_token` 쿠키 (우선)
+  2. **Header**: `Authorization: Bearer <token>` 헤더 (차순위, 테스트 등)
+- **Refresh Token**: 보안을 위해 `refresh_token` 쿠키(HttpOnly, Secure)로만 관리합니다.
+- **OAuth (Naver)**: 
+  - 로그인은 `/v1/auth/login/naver`를 통해 수행하며, 미가입 시 `200 OK`와 함께 `Register Token`을 반환합니다.
+  - 회원가입은 `/v1/auth/signup/naver`를 통해 수행하며, `Register Token` 검증 후 정식 토큰을 발급합니다.
 
 ```text
-# Header 예시
+# Header 예시 (쿠키 사용 불가 환경)
 Authorization: Bearer <access_token>
 ```
 
-## 6. API 문서화 (API Documentation)
+## 6. CORS 정책 (CORS Policy)
 
-### 6.1 문서화 전략
+환경별로 허용된 Origin 리스트를 엄격하게 관리하여 보안을 강화합니다.
+
+- **기본 정책**: `AllowCredentials: true` 설정을 통해 쿠키 기반 인증을 지원합니다.
+- **환경별 허용 Origin**:
+    - **Production**: `https://quiet-chatter.com`
+    - **Development**: `https://dev.quiet-chatter.com`, `http://localhost:5173`
+    - **Local**: `http://localhost:5173`, `http://127.0.0.1:5173`
+
+## 7. API 문서화 (API Documentation)
+
+### 7.1 문서화 전략
 
 - **Spring Rest Docs**와 **restdocs-api-spec** 라이브러리를 사용하여 테스트 기반으로 문서를 자동 생성한다.
 - 테스트가 통과하지 않으면 문서가 생성되지 않으므로, 문서의 정확성(신뢰성)을 보장한다.
 - 최종 결과물은 **OpenAPI 3.0 (Swagger) JSON** 포맷으로 제공한다.
 
-### 6.2 문서 작성 및 확인
+### 7.2 문서 작성 및 확인
 
 1. **테스트 작성**: 각 API 엔드포인트에 대해 `RestDocs`를 적용한 테스트 코드(`@AutoConfigureRestDocs`)를 작성한다.
 2. **문서 생성**: 빌드 시(`bootJar` 또는 `openapi3` 태스크) 자동으로 `openapi3.json` 파일이 생성된다.
@@ -108,7 +121,7 @@ Authorization: Bearer <access_token>
   - 배포 후: `GET /v1/spec` 엔드포인트를 통해 JSON 명세서를 조회할 수 있다.
   - 로컬 개발 시: `openapi3` 태스크 실행 후 동일한 엔드포인트에서 조회 가능하다.
 
-### 6.3 필수 포함 정보
+### 7.3 필수 포함 정보
 
 테스트 코드 작성 시 다음 정보를 반드시 문서화해야 한다.
 

@@ -21,13 +21,6 @@ class MemberService implements MemberRegistrable, MemberQueryable {
 
     @Override
     @Transactional
-    public Member createNewGuest() {
-        Member member = Member.newGuest(randomNickNameSupplier.get());
-        return memberRepository.save(member);
-    }
-
-    @Override
-    @Transactional
     public Member createNewNaverMember(String providerId, String nickname) {
         String finalNickname = (nickname == null || nickname.isBlank()) ? randomNickNameSupplier.get() : nickname;
         Member member = Member.newNaverMember(providerId, finalNickname);

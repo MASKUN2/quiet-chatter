@@ -7,21 +7,15 @@ import static org.assertj.core.api.Assertions.assertThat;
 class MemberTest {
 
     @Test
-    void newGuest() {
-        Member guest = Member.newGuest();
+    void newNaverMember() {
+        String providerId = "naver123";
+        String nickname = "NaverUser";
+        Member member = Member.newNaverMember(providerId, nickname);
 
-        assertThat(guest.getStatus()).isEqualTo(Status.ACTIVE);
-        assertThat(guest.getRole()).isEqualTo(Role.GUEST);
-        assertThat(guest.getNickname()).isEqualTo("guest");
-    }
-
-    @Test
-    void newGuest_withNickname() {
-        String nickname = "FancyGuest";
-        Member guest = Member.newGuest(nickname);
-
-        assertThat(guest.getStatus()).isEqualTo(Status.ACTIVE);
-        assertThat(guest.getRole()).isEqualTo(Role.GUEST);
-        assertThat(guest.getNickname()).isEqualTo(nickname);
+        assertThat(member.getStatus()).isEqualTo(Status.ACTIVE);
+        assertThat(member.getRole()).isEqualTo(Role.REGULAR);
+        assertThat(member.getNickname()).isEqualTo(nickname);
+        assertThat(member.getProvider()).isEqualTo(OauthProvider.NAVER);
+        assertThat(member.getProviderId()).isEqualTo(providerId);
     }
 }

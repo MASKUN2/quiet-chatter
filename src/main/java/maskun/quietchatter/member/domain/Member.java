@@ -31,21 +31,6 @@ public class Member extends BaseEntity {
     @Column(name = "provider_id")
     private String providerId;
 
-    public static Member newGuest() {
-        Member member = new Member();
-        member.nickname = "guest";
-        member.role = Role.GUEST;
-        member.status = Status.ACTIVE;
-        member.provider = OauthProvider.NONE;
-        return member;
-    }
-
-    public static Member newGuest(String nickname) {
-        Member member = newGuest();
-        member.nickname = nickname;
-        return member;
-    }
-
     public static Member newNaverMember(String providerId, String nickname) {
         Member member = new Member();
         member.nickname = nickname;

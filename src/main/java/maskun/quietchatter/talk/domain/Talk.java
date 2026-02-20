@@ -10,6 +10,7 @@ import maskun.quietchatter.persistence.BaseEntity;
 import org.hibernate.annotations.Comment;
 
 import java.time.LocalDate;
+import java.time.temporal.ChronoUnit;
 import java.util.UUID;
 
 @Getter
@@ -89,7 +90,7 @@ public class Talk extends BaseEntity {
         if (createdAt == null || this.lastModifiedAt == null) {
             return false;
         }
-        return lastModifiedAt.isAfter(createdAt);
+        return ChronoUnit.SECONDS.between(createdAt, lastModifiedAt) > 0;
     }
 
     @Override

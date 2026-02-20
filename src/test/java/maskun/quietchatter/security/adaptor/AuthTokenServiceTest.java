@@ -5,20 +5,20 @@ import io.jsonwebtoken.security.Keys;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import maskun.quietchatter.security.application.out.RefreshTokenCache;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.data.redis.core.RedisTemplate;
-import org.springframework.data.redis.core.ValueOperations;
 import org.springframework.http.HttpHeaders;
 
 import javax.crypto.SecretKey;
 import java.sql.Date;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
+import java.util.Optional;
 import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -34,9 +34,7 @@ class AuthTokenServiceTest {
     private static final String TEST_SECRET_KEY = "12345678901234567890123456789012";
 
     @Mock
-    private RedisTemplate<String, UUID> redisTemplate;
-    @Mock
-    private ValueOperations<String, UUID> valueOperations;
+    private RefreshTokenCache refreshTokenCache;
     @Mock
     private HttpServletRequest request;
     @Mock
@@ -49,14 +47,14 @@ class AuthTokenServiceTest {
     }
 
     private void initService() {
-        authTokenService = new AuthTokenService(TEST_SECRET_KEY, new AppCookieProperties("localhost", false, "Lax"), redisTemplate);
+        authTokenService = new AuthTokenService(TEST_SECRET_KEY, new AppCookieProperties("localhost", false, "Lax"), refreshTokenCache);
     }
 
     @Test
     void putAccessToken_should_add_cookie_with_configured_properties() {
         // Given
         AppCookieProperties properties = new AppCookieProperties("example.com", true, "None");
-        authTokenService = new AuthTokenService(TEST_SECRET_KEY, properties, redisTemplate);
+        authTokenService = new AuthTokenService(TEST_SECRET_KEY, properties, refreshTokenCache);
 
         String accessToken = "test-token";
 
@@ -116,28 +114,26 @@ class AuthTokenServiceTest {
     }
 
     @Test
-    void createAndSaveRefreshToken_should_save_to_redis_and_return_token() {
-        when(redisTemplate.opsForValue()).thenReturn(valueOperations);
+    void createAndSaveRefreshToken_should_save_to_cache_and_return_token() {
         initService();
         UUID memberId = UUID.randomUUID();
 
         String refreshToken = authTokenService.createAndSaveRefreshToken(memberId);
 
         assertThat(refreshToken).isNotNull();
-        verify(valueOperations).set(any(String.class), eq(memberId), any(java.time.Duration.class));
+        verify(refreshTokenCache).save(any(String.class), eq(memberId), any(java.time.Duration.class));
         
         String tokenId = authTokenService.parseRefreshTokenAndGetTokenId(refreshToken);
         assertThat(tokenId).isNotEmpty();
     }
 
     @Test
-    void findById_should_delegate_to_redis() {
-        when(redisTemplate.opsForValue()).thenReturn(valueOperations);
+    void findById_should_delegate_to_cache() {
         initService();
         String tokenId = "some-token-id";
         UUID expectedMemberId = UUID.randomUUID();
 
-        when(valueOperations.get("auth:refresh-token:" + tokenId)).thenReturn(expectedMemberId);
+        when(refreshTokenCache.findMemberIdByRefreshTokenId(tokenId)).thenReturn(Optional.of(expectedMemberId));
 
         java.util.Optional<UUID> result = authTokenService.findById(tokenId);
 
@@ -199,5 +195,28 @@ class AuthTokenServiceTest {
         String token = authTokenService.extractAccessToken(request);
 
         assertThat(token).isNull();
+    }
+
+    @Test
+    void createAndParseRegisterToken() {
+        initService();
+        String providerId = "naver123";
+
+        String registerToken = authTokenService.createRegisterToken(providerId);
+        String parsedProviderId = authTokenService.parseRegisterToken(registerToken);
+
+        assertThat(parsedProviderId).isEqualTo(providerId);
+    }
+
+    @Test
+    void parseRegisterToken_invalidPurpose() {
+        initService();
+        UUID memberId = UUID.randomUUID();
+        // Access Token을 Register Token으로 파싱 시도
+        String accessToken = authTokenService.createNewAccessToken(memberId);
+
+        assertThatThrownBy(() -> authTokenService.parseRegisterToken(accessToken))
+                .isInstanceOf(AuthTokenException.class)
+                .hasMessage("invalid token purpose");
     }
 }

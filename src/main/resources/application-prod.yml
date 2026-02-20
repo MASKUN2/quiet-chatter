@@ -1,5 +1,14 @@
+spring:
+  data:
+    redis:
+      # 프로덕션은 Redis DB 0번 사용
+      url: redis://localhost:6379/0
+
 app:
+  cors:
+    allowed-origins:
+      - "https://quiet-chatter.com"
   cookie:
-    domain: quiet-chatter.com
+    domain: "api.quiet-chatter.com"
     secure: true
     same-site: Lax

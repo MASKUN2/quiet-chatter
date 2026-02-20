@@ -5,10 +5,10 @@ import io.jsonwebtoken.security.Keys;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import maskun.quietchatter.security.application.out.RefreshTokenCache;
 import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 
 import javax.crypto.SecretKey;
@@ -26,20 +26,40 @@ public class AuthTokenService {
     private static final String REFRESH_TOKEN_COOKIE_NAME = "refresh_token";
     private static final Duration ACCESS_TOKEN_LIFE_TIME = Duration.ofMinutes(30);
     private static final Duration REFRESH_TOKEN_LIFETIME = Duration.ofDays(30);
-    private static final String REDIS_REFRESH_TOKEN_PREFIX = "auth:refresh-token:";
+    private static final Duration REGISTER_TOKEN_LIFETIME = Duration.ofHours(2);
+    private static final String CLAIM_PURPOSE = "purpose";
+    private static final String PURPOSE_REGISTER = "register";
 
-    private final RedisTemplate<String, UUID> redisTemplate;
+    private final RefreshTokenCache refreshTokenCache;
     private final JwtParser jwtParser;
     private final SecretKey secretKey;
     private final AppCookieProperties appCookieProperties;
 
     AuthTokenService(@Value("${jwt.secret-key}") String rawKey,
                      AppCookieProperties appCookieProperties,
-                     RedisTemplate<String, UUID> redisTemplate) {
+                     RefreshTokenCache refreshTokenCache) {
         this.secretKey = Keys.hmacShaKeyFor(rawKey.getBytes());
-        this.redisTemplate = redisTemplate;
+        this.refreshTokenCache = refreshTokenCache;
         this.jwtParser = Jwts.parser().verifyWith(this.secretKey).build();
         this.appCookieProperties = appCookieProperties;
+    }
+
+    public String createRegisterToken(String providerId) {
+        var exp = Date.from(Instant.now().plus(REGISTER_TOKEN_LIFETIME));
+        return Jwts.builder().signWith(secretKey)
+                .subject(providerId)
+                .claim(CLAIM_PURPOSE, PURPOSE_REGISTER)
+                .expiration(exp)
+                .compact();
+    }
+
+    public String parseRegisterToken(String registerToken) {
+        Claims payload = parse(registerToken).getPayload();
+        String purpose = payload.get(CLAIM_PURPOSE, String.class);
+        if (!PURPOSE_REGISTER.equals(purpose)) {
+            throw new AuthTokenException("invalid token purpose");
+        }
+        return payload.getSubject();
     }
 
     public String parseRefreshTokenAndGetTokenId(String refreshToken) throws AuthTokenException {
@@ -84,6 +104,11 @@ public class AuthTokenService {
         addCookie(response, REFRESH_TOKEN_COOKIE_NAME, newRefreshToken, REFRESH_TOKEN_LIFETIME);
     }
 
+    public void expireTokenCookies(HttpServletResponse response) {
+        addCookie(response, ACCESS_TOKEN_COOKIE_NAME, "", Duration.ZERO);
+        addCookie(response, REFRESH_TOKEN_COOKIE_NAME, "", Duration.ZERO);
+    }
+
     private void addCookie(HttpServletResponse response, String name, String value, Duration maxAge) {
         org.springframework.http.ResponseCookie.ResponseCookieBuilder builder = org.springframework.http.ResponseCookie.from(name, value)
                 .path("/")
@@ -97,7 +122,7 @@ public class AuthTokenService {
     }
 
     public Optional<UUID> findById(String id) {
-        return Optional.ofNullable(redisTemplate.opsForValue().get(REDIS_REFRESH_TOKEN_PREFIX + id));
+        return refreshTokenCache.findMemberIdByRefreshTokenId(id);
     }
 
     public UUID findMemberIdByRefreshTokenIdOrThrow(String id) throws NoSuchElementException {
@@ -105,12 +130,12 @@ public class AuthTokenService {
     }
 
     public void deleteRefreshTokenById(String id) {
-        redisTemplate.delete(REDIS_REFRESH_TOKEN_PREFIX + id);
+        refreshTokenCache.deleteByRefreshTokenId(id);
     }
 
     public String createAndSaveRefreshToken(UUID memberId) {
         String refreshTokenId = UUID.randomUUID().toString();
-        redisTemplate.opsForValue().set(REDIS_REFRESH_TOKEN_PREFIX + refreshTokenId, memberId, REFRESH_TOKEN_LIFETIME);
+        refreshTokenCache.save(refreshTokenId, memberId, REFRESH_TOKEN_LIFETIME);
         var exp = Date.from(Instant.now().plus(REFRESH_TOKEN_LIFETIME));
         return Jwts.builder().signWith(secretKey)
                 .id(refreshTokenId)

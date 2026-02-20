@@ -50,7 +50,7 @@ class AuthMeApiTest {
     void me_Authenticated() throws Exception {
         UUID memberId = UUID.randomUUID();
         AuthMember authMember = new AuthMember(memberId, Role.REGULAR);
-        Member member = Member.newGuest("testUser");
+        Member member = Member.newNaverMember("naverId", "testUser");
 
         given(memberQueryable.findById(any(UUID.class))).willReturn(Optional.of(member));
 
