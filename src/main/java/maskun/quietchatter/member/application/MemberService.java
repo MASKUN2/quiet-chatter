@@ -4,26 +4,25 @@ import lombok.RequiredArgsConstructor;
 import maskun.quietchatter.member.application.in.MemberQueryable;
 import maskun.quietchatter.member.application.in.MemberRegistrable;
 import maskun.quietchatter.member.application.out.MemberRepository;
-import maskun.quietchatter.member.application.out.RandomNickNameSupplier;
 import maskun.quietchatter.member.domain.Member;
 import maskun.quietchatter.member.domain.OauthProvider;
+import org.jspecify.annotations.NullMarked;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Optional;
 import java.util.UUID;
 
+@NullMarked
 @Service
 @RequiredArgsConstructor
 class MemberService implements MemberRegistrable, MemberQueryable {
     private final MemberRepository memberRepository;
-    private final RandomNickNameSupplier randomNickNameSupplier;
 
     @Override
     @Transactional
     public Member createNewNaverMember(String providerId, String nickname) {
-        String finalNickname = (nickname == null || nickname.isBlank()) ? randomNickNameSupplier.get() : nickname;
-        Member member = Member.newNaverMember(providerId, finalNickname);
+        Member member = Member.newNaverMember(providerId, nickname);
         return memberRepository.save(member);
     }
 

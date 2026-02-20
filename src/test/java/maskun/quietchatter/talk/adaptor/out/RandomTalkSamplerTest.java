@@ -51,4 +51,24 @@ class RandomTalkSamplerTest implements WithTestContainerDatabases {
         assert talks.size() == 100;
 
     }
+
+    @Test
+    void sampleExcludesHiddenTalks() {
+        // Given: some talks are hidden
+        List<Talk> allTalks = talkRepository.findAllByIdIn(List.of()); // dummy to get all if needed, but we use saveAll
+        for (int i = 0; i < 50; i++) {
+            Talk talk = new Talk(java.util.UUID.randomUUID(), java.util.UUID.randomUUID(), "nick", "content");
+            talk.hide();
+            talkRepository.save(talk);
+        }
+        entityManager.flush();
+        entityManager.clear();
+
+        // When
+        List<Talk> sampled = sampler.sample(1000);
+
+        // Then
+        boolean containsHidden = sampled.stream().anyMatch(Talk::isHidden);
+        assert !containsHidden : "Sampled talks should not contain hidden talks";
+    }
 }

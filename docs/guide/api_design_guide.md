@@ -113,13 +113,20 @@ Authorization: Bearer <access_token>
 - 테스트가 통과하지 않으면 문서가 생성되지 않으므로, 문서의 정확성(신뢰성)을 보장한다.
 - 최종 결과물은 **OpenAPI 3.0 (Swagger) JSON** 포맷으로 제공한다.
 
-### 7.2 문서 작성 및 확인
+### 7.2 문서 생성 및 배포 흐름 (Automated Flow)
 
-1. **테스트 작성**: 각 API 엔드포인트에 대해 `RestDocs`를 적용한 테스트 코드(`@AutoConfigureRestDocs`)를 작성한다.
-2. **문서 생성**: 빌드 시(`bootJar` 또는 `openapi3` 태스크) 자동으로 `openapi3.json` 파일이 생성된다.
-3. **문서 조회**:
-  - 배포 후: `GET /v1/spec` 엔드포인트를 통해 JSON 명세서를 조회할 수 있다.
-  - 로컬 개발 시: `openapi3` 태스크 실행 후 동일한 엔드포인트에서 조회 가능하다.
+1. **테스트 작성**: 각 API 엔드포인트에 대해 `RestDocs`를 적용한 테스트 코드(`@Tag("restdocs")`)를 작성한다.
+2. **자동 생성 및 패키징**: 빌드 시(`bootJar` 태스크) 다음 과정이 자동으로 수행된다.
+    - `testDocs` 태스크 실행 (문서용 테스트만 선별 실행)
+    - `openapi3` 태스크 실행 (`build/api-spec/openapi3.json` 생성)
+    - 생성된 JSON 파일을 JAR 내부의 `static/docs/` 경로로 자동 포함
+3. **CI/CD 및 서버 배포**: GitHub Actions에서 빌드 시 API 명세서가 포함된 JAR를 도커 이미지로 만들어 배포하며, 서버의 `Watchtower`가 이를 감지하여 자동 갱신한다.
+4. **수동 커밋 금지**: `openapi3.json` 파일은 빌드 시점에 동적으로 생성되므로 **코드 저장소(Git)에 직접 커밋하지 않는다.** 개발자는 오직 **테스트 코드의 정확성**에만 집중한다.
+
+### 7.3 문서 조회 (Accessing Spec)
+
+- **배포 환경**: `GET /v1/spec` 엔드포인트를 통해 서버에 내장된 최신 JSON 명세서를 조회할 수 있다.
+- **로컬 개발 시**: `./gradlew openapi3` 실행 후 동일한 엔드포인트(`localhost:8080/v1/spec`)에서 `build` 디렉토리의 파일을 실시간으로 확인할 수 있다.
 
 ### 7.3 필수 포함 정보
 

@@ -1,3 +1,20 @@
+# [1.1.0](https://github.com/MASKUN2/quiet-chatter/compare/v1.0.0...v1.1.0) (2026-02-20)
+
+
+### Bug Fixes
+
+* **ci:** fix JSON syntax error in .releaserc.json ([15d255b](https://github.com/MASKUN2/quiet-chatter/commit/15d255b2ec18fe9ee5061929e04d188df5e9f3d7))
+* **ci:** remove npm cache to fix release workflow ([a32c929](https://github.com/MASKUN2/quiet-chatter/commit/a32c929171ecb1bd5c137ec967e6a4dc6ded5d36))
+* **ci:** use linux-compatible sed in .releaserc.json ([96cced0](https://github.com/MASKUN2/quiet-chatter/commit/96cced0eeed6a6270c755e00e89752d0d9528078))
+* exclude hidden talks from recommendation list ([145fa01](https://github.com/MASKUN2/quiet-chatter/commit/145fa01d08c539615c442f9272bb4960707965eb))
+* 릴리스 및 배포 전략 가이드 업데이트 및 워크플로우 최적화 ([65e253d](https://github.com/MASKUN2/quiet-chatter/commit/65e253de34311cdd5ac1c8038f84f8fb8b8c02c2))
+
+
+### Features
+
+* **auth:** 네이버 닉네임 수집 중단 및 서버 측 랜덤 닉네임 생성 로직 추가 ([c09d4a7](https://github.com/MASKUN2/quiet-chatter/commit/c09d4a729973d706e68e7011858caccd1a515210))
+* **ci:** release-please 제거 및 Semantic Release 도입 ([760e1fc](https://github.com/MASKUN2/quiet-chatter/commit/760e1fc137abb09e6abd75b33dd26a2fcbafae63))
+
 # Changelog
 
 ## 1.0.0 (2026-02-20)

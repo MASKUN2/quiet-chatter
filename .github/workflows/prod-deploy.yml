@@ -1,14 +1,14 @@
-name: Development Deployment
+name: Production Deployment
 
 on:
   push:
     branches:
-      - dev # dev 브랜치에 푸시될 때마다 실행
+      - prod
 
 jobs:
   deploy:
     runs-on: ubuntu-latest
-    
+
     steps:
       - name: Checkout Code
         uses: actions/checkout@v4
@@ -23,10 +23,16 @@ jobs:
       - name: Grant execute permission for gradlew
         run: chmod +x gradlew
 
-      - name: Build with Gradle
-        run: ./gradlew bootJar -x test # restdoc 을 위한 테스트는 실행됨
+      - name: Extract Version from build.gradle
+        id: get_version
+        run: |
+          VERSION=$(grep "^version =" build.gradle | awk -F"'" '{print $2}')
+          echo "Detected version: $VERSION"
+          echo "version=$VERSION" >> $GITHUB_OUTPUT
 
-      # --- Docker 이미지 빌드 및 푸시 ---
+      - name: Build with Gradle
+        run: ./gradlew bootJar -x test
+
       - name: Log in to Docker Hub
         uses: docker/login-action@v3
         with:
@@ -38,5 +44,6 @@ jobs:
         with:
           context: .
           push: true
-          tags: ${{ secrets.DOCKER_USERNAME }}/quiet-chatter-dev:latest
-          # Dockerfile 경로가 프로젝트 루트에 있다고 가정
+          tags: |
+            ${{ secrets.DOCKER_USERNAME }}/quiet-chatter:latest
+            ${{ secrets.DOCKER_USERNAME }}/quiet-chatter:${{ steps.get_version.outputs.version }}

@@ -1,10 +1,12 @@
 package maskun.quietchatter.security.application.in;
 
 import maskun.quietchatter.security.domain.AuthMember;
+import org.jspecify.annotations.NullMarked;
 
 import java.util.Optional;
 import java.util.UUID;
 
+@NullMarked
 public interface AuthMemberService {
     Optional<AuthMember> findById(UUID id);
 
@@ -16,5 +18,5 @@ public interface AuthMemberService {
 
     AuthMember signupWithNaver(String providerId, String nickname);
 
-    record NaverProfile(String providerId, String nickname) {}
+    record NaverProfile(String providerId) {}
 }

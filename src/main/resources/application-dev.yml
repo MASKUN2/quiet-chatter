@@ -1,11 +1,9 @@
 spring:
   data:
     redis:
-      # dev 환경은 Redis DB 1번을 사용하도록 설정
-      url: redis://localhost:6379/1
+      url: hidden
   datasource:
-    # dev DB 연결 정보
-    url: jdbc:postgresql://localhost:5432/quiet_chatter_dev
+    url: hidden
 
 app:
   cors:
