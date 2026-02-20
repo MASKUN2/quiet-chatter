@@ -24,6 +24,8 @@ import static org.springframework.security.config.http.SessionCreationPolicy.STA
 @RequiredArgsConstructor
 class SecurityConfig {
 
+    private final AppCorsProperties appCorsProperties;
+
     @Bean
     SecurityFilterChain securityFilterChain(HttpSecurity http, AuthTokenService authTokenService,
                                             AuthMemberService authMemberService) throws Exception {
@@ -54,14 +56,7 @@ class SecurityConfig {
     @Bean
     CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
-        configuration.setAllowedOriginPatterns(List.of(
-                "http://localhost:*",
-                "http://127.0.0.1:*",
-                "https://quiet-chatter.com",
-                "http://quiet-chatter.com",
-                "https://*.quiet-chatter.com",
-                "http://*.quiet-chatter.com"
-        ));
+        configuration.setAllowedOrigins(appCorsProperties.allowedOrigins());
         configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"));
         configuration.setAllowedHeaders(List.of("*"));
         configuration.setAllowCredentials(true);

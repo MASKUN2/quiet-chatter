@@ -6,6 +6,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Import;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
@@ -18,6 +19,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @WebMvcTest(CorsConfigTest.DummyController.class)
 @Import({SecurityConfig.class, WebConfig.class})
+@EnableConfigurationProperties({AppCorsProperties.class, AppCookieProperties.class})
 class CorsConfigTest {
 
     @Autowired
@@ -30,15 +32,11 @@ class CorsConfigTest {
     private AuthMemberService authMemberService;
 
     @Test
-    @DisplayName("허용된 오리진(서브도메인 포함)에서 OPTIONS 요청 시 CORS 헤더가 포함되어야 한다")
+    @DisplayName("허용된 오리진에서 OPTIONS 요청 시 CORS 헤더가 포함되어야 한다")
     void shouldAllowCorsFromAllowedOrigins() throws Exception {
         String[] allowedOrigins = {
-                "http://localhost:3000",
-                "http://127.0.0.1:5173",
-                "https://quiet-chatter.com",
-                "http://quiet-chatter.com",
-                "https://www.quiet-chatter.com",
-                "http://sub.quiet-chatter.com"
+                "http://localhost:5173",
+                "http://127.0.0.1:5173"
         };
 
         for (String origin : allowedOrigins) {
@@ -52,12 +50,20 @@ class CorsConfigTest {
     }
 
     @Test
-    @DisplayName("허용되지 않은 오리진에서 OPTIONS 요청 시 CORS 헤더가 없거나 거부되어야 한다")
+    @DisplayName("허용되지 않은 오리진(기존에 허용되었던 서브도메인 포함)에서 OPTIONS 요청 시 거부되어야 한다")
     void shouldRejectCorsFromUnallowedOrigins() throws Exception {
-        mockMvc.perform(options("/v1/any")
-                        .header("Origin", "http://malicious-site.com")
-                        .header("Access-Control-Request-Method", "GET"))
-                .andExpect(status().isForbidden());
+        String[] rejectedOrigins = {
+                "http://malicious-site.com",
+                "https://quiet-chatter.com",
+                "http://sub.quiet-chatter.com"
+        };
+
+        for (String origin : rejectedOrigins) {
+            mockMvc.perform(options("/v1/any")
+                            .header("Origin", origin)
+                            .header("Access-Control-Request-Method", "GET"))
+                    .andExpect(status().isForbidden());
+        }
     }
 
     @RestController

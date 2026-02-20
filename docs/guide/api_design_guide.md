@@ -95,15 +95,25 @@
 Authorization: Bearer <access_token>
 ```
 
-## 6. API 문서화 (API Documentation)
+## 6. CORS 정책 (CORS Policy)
 
-### 6.1 문서화 전략
+환경별로 허용된 Origin 리스트를 엄격하게 관리하여 보안을 강화합니다.
+
+- **기본 정책**: `AllowCredentials: true` 설정을 통해 쿠키 기반 인증을 지원합니다.
+- **환경별 허용 Origin**:
+    - **Production**: `https://quiet-chatter.com`
+    - **Development**: `https://dev.quiet-chatter.com`, `http://localhost:5173`
+    - **Local**: `http://localhost:5173`, `http://127.0.0.1:5173`
+
+## 7. API 문서화 (API Documentation)
+
+### 7.1 문서화 전략
 
 - **Spring Rest Docs**와 **restdocs-api-spec** 라이브러리를 사용하여 테스트 기반으로 문서를 자동 생성한다.
 - 테스트가 통과하지 않으면 문서가 생성되지 않으므로, 문서의 정확성(신뢰성)을 보장한다.
 - 최종 결과물은 **OpenAPI 3.0 (Swagger) JSON** 포맷으로 제공한다.
 
-### 6.2 문서 작성 및 확인
+### 7.2 문서 작성 및 확인
 
 1. **테스트 작성**: 각 API 엔드포인트에 대해 `RestDocs`를 적용한 테스트 코드(`@AutoConfigureRestDocs`)를 작성한다.
 2. **문서 생성**: 빌드 시(`bootJar` 또는 `openapi3` 태스크) 자동으로 `openapi3.json` 파일이 생성된다.
@@ -111,7 +121,7 @@ Authorization: Bearer <access_token>
   - 배포 후: `GET /v1/spec` 엔드포인트를 통해 JSON 명세서를 조회할 수 있다.
   - 로컬 개발 시: `openapi3` 태스크 실행 후 동일한 엔드포인트에서 조회 가능하다.
 
-### 6.3 필수 포함 정보
+### 7.3 필수 포함 정보
 
 테스트 코드 작성 시 다음 정보를 반드시 문서화해야 한다.
 

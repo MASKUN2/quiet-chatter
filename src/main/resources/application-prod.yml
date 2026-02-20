@@ -5,7 +5,10 @@ spring:
       url: redis://localhost:6379/0
 
 app:
+  cors:
+    allowed-origins:
+      - "https://quiet-chatter.com"
   cookie:
-    domain: quiet-chatter.com
+    domain: "api.quiet-chatter.com"
     secure: true
     same-site: Lax

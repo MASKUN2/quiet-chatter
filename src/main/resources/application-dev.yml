@@ -8,7 +8,12 @@ spring:
     url: jdbc:postgresql://localhost:5432/quiet_chatter_dev
 
 app:
+  cors:
+    allowed-origins:
+      - "https://dev.quiet-chatter.com"
+      - "http://localhost:5173"
+      - "http://127.0.0.1:5173"
   cookie:
-    domain: "quiet-chatter.com"
+    domain: "dev-api.quiet-chatter.com"
     secure: true
     same-site: Lax
