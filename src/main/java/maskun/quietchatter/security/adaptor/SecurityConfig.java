@@ -44,7 +44,7 @@ class SecurityConfig {
                 )
                 .authorizeHttpRequests(authorize -> authorize
                         .requestMatchers(HttpMethod.GET, "/**").permitAll()
-                        // 로그인 및 회원가입은 인증 없이 접근 가능하도록 허용
+                        // Allow login and signup endpoints without authentication
                         .requestMatchers(HttpMethod.POST, "/v1/auth/login/**", "/v1/auth/signup/**").permitAll()
                         .anyRequest().authenticated()
                 )
