@@ -30,7 +30,8 @@
 - **도메인 (Frontend)**: `quiet-chatter.com`
 - **Docker 이미지**: `maskun2/quiet-chatter:latest`
 - **데이터베이스**: PostgreSQL, Redis (DB 0)
-- **배포 트리거**: `prod` 브랜치 푸시 시 자동 배포 (Watchtower 감지)
+- **릴리스 트리거**: `main` 브랜치 머지 시 `release-please` 작동 (태그 생성 및 버전 관리)
+- **배포 트리거**: `prod` 브랜치 푸시(머지) 시 자동 배포 (Watchtower 감지)
 
 ### Development (개발)
 - **도메인 (API)**: `dev-api.quiet-chatter.com`
@@ -39,16 +40,47 @@
 - **데이터베이스**: PostgreSQL, Redis (DB 1)
 - **배포 트리거**: `dev` 브랜치 푸시 시 자동 배포 (Watchtower 감지)
 
-## 배포 파이프라인 (CI/CD)
+## 배포 및 릴리스 파이프라인 (CI/CD)
 
-### Development 환경
+### 1. Development (개발 서버)
 1. `dev` 브랜치 푸시 감지
-2. Gradle 빌드 및 테스트 수행
+2. Gradle 빌드 및 테스트 수행 (`testDocs` 포함)
 3. `quiet-chatter-dev` Docker 이미지 빌드 및 Docker Hub 푸시
 4. **Watchtower**가 새 이미지를 감지하여 개발 서버 컨테이너 자동 재시작
 
-### Production 환경
-1. `prod` 브랜치 푸시 감지
-2. Gradle 빌드 (테스트 제외)
-3. `quiet-chatter` Docker 이미지 빌드 및 Docker Hub 푸시
-4. 운영서버에서 **Watchtower**가 새 이미지를 감지하여 최신 이미지 풀(pull) 및 컨테이너 재시작
+### 2. Release & Production (운영 서버)
+1. **릴리스 관리**: `main` 브랜치 머지 시 `release-please.yml` 실행
+    - 릴리스 PR 생성 또는 머지 시 Git 태그(`v*.*.*`) 발행 및 CHANGELOG 갱신
+2. **운영 배포**: `prod` 브랜치 푸시(머지) 시 `prod-deploy.yml` 실행
+    - Gradle 빌드 (테스트 제외) 및 `openapi3.json` 자동 생성
+    - `quiet-chatter` Docker 이미지 빌드 및 Docker Hub 푸시
+3. 운영서버에서 **Watchtower**가 새 이미지를 감지하여 컨테이너 재시작
+
+---
+
+## 인프라 아키텍처 다이어그램 (Staging Flow)
+
+```mermaid
+graph TD
+    subgraph "Local Development"
+        D[Developer] -- "Push Feature" --> GH_F[Feature Branch]
+    end
+
+    subgraph "GitHub Actions (CI/CD)"
+        GH_F -- "PR to dev" --> DEV[dev branch]
+        DEV -- "Auto Deploy (dev-deploy.yml)" --> DOCKER_DEV[Docker Hub: quiet-chatter-dev]
+        DEV -- "PR to main" --> MAIN[main branch]
+        
+        MAIN -- "Release PR Merge" --> RP[release-please.yml]
+        MAIN -- "Merge to prod" --> PROD[prod branch]
+        PROD -- "Auto Deploy (prod-deploy.yml)" --> DOCKER_PROD[Docker Hub: quiet-chatter]
+    end
+
+    subgraph "AWS LightSail (Deployment)"
+        DOCKER_DEV -- "Watchtower" --> CONT_DEV[Container: app-dev]
+        DOCKER_PROD -- "Watchtower" --> CONT_PROD[Container: app]
+    end
+
+    CONT_DEV --- DB_DEV[(PostgreSQL: dev)]
+    CONT_PROD --- DB_PROD[(PostgreSQL: prod)]
+```
