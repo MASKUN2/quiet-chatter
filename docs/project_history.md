@@ -1,84 +1,85 @@
-# 프로젝트 개발 히스토리
+# Project Development History
 
-본 문서는 프로젝트의 초기 단계부터 현재까지의 개발 흐름, 주요 기술적 의사결정, 그리고 트레이드오프에 대한 기록입니다.
+This document records the development flow, major technical decisions, and trade-offs from the early stages of the project to the present.
 
-## 작성방법
+## How to Write
 
-- 시간순으로 작성한다.
-- `##`은 약 한달 정도의 기간에 해당하는 섹션이며 여러 작업을 묶는 역할이다.`## 기간의 제목 (yyyy-MM)`
-- `###`은 하나의 작업내용을 기술하는 섹션이며 `### 작업제목 : yyyy-MM-dd` 형식으로 작성된다.
-- 작업내용을 작성할때는 불필요한 수식여구 없이 서술형으로 작성한다.
-- 문제와 갈등, 트레이드오프와 기술적 선택의 이유에 대해 작성한다.
-- 작업내용을 작성할때는 구체적으로 본 프로젝트에서 작성된 클래스나 코드를 언급하지 않고 구조와 작동원리에 대해서 설명한다. 단, JDK이나 Spring 에서 제공하는 타입은 언급할 수 있다.
+- Write in chronological order.
+- use `##` for a section covering about a month. Format: `## Title of the Period (yyyy-MM)`
+- Use `###` for a specific task. Format: `### Task Title : yyyy-MM-dd`
+- Use descriptive prose without unnecessary decoration.
+- Explain problems, conflicts, trade-offs, and reasons for technical choices.
+- Explain the structure and principles without mentioning specific class names from this project. You can mention standard JDK or Spring types.
 
 ---
 
-## 우아한 테크코스 오픈미션 (2025-11)
+## Woowa Tech Course Open Mission (2025-11)
 
 "Quiet Chatter: You Belong Here"
-내향적인 독서가들을 위한 익명 독후감 소셜 네트워크 서비스를 목표로 시작되었습니다. 3주간의 프리코스 기간 동안 학습한 객체지향 원칙, TDD, 클린 코드를 실제 제품 레벨에 적용하는 것을 최우선 목표로 삼았습니다.
+This project started as an anonymous book review social network for introverted readers. The main goal was to apply OOP principles, TDD, and Clean Code learned during the 3-week precourse to a real product.
 
-### 초기 인프라 및 기반 구축 : 2025-11-08
+### Initial Infrastructure Setup : 2025-11-08
 
-제한된 시간 내에 완성도 있는 프로토타입을 구축하기 위해 Java 21, Spring Boot, PostgreSQL, Thymeleaf와 같은 익숙한 기술 스택을 선정했습니다. React와 같은 SPA 프레임워크는 사용자 경험 면에서 유리하지만 높은 학습 곡선과 구축 비용을 고려하여, 백엔드 로직에 집중하고 UI 복잡도를 낮출 수 있는 Thymeleaf(SSR)를 선택했습니다. 호스팅 환경은 EC2 대비 비용 효율성과 관리 용이성이 뛰어난 AWS LightSail을 활용했으며, GitHub Actions와 Docker Compose를 기반으로 CI/CD 파이프라인을 구축하여 서버 환경의 일관성을 보장했습니다. 도메인 모델링에서는 분산 환경에서의 확장성과 식별력을 고려하여 일반적인 `Long` Auto Increment 대신 `UUID`를 ID 전략으로 도입했습니다. 테스트 환경은 로컬 H2 DB 대신 운영 환경과 동일한 PostgreSQL을 TestContainers로 구동하여 신뢰성을 확보했습니다.
+I chose familiar technology like Java 21, Spring Boot, PostgreSQL, and Thymeleaf to build a quality prototype quickly. While React is good for user experience, I chose Thymeleaf (SSR) to focus on backend logic and keep the UI simple. For hosting, I used AWS LightSail because it is cost-effective and easy to manage. I built a CI/CD pipeline with GitHub Actions and Docker Compose. For the domain model, I used `UUID` instead of `Long` Auto Increment to prepare for distributed environments. I used TestContainers to run PostgreSQL for tests to match the production environment.
 
-### 외부 연동 및 테스트 고도화 : 2025-11-12
+### External Integration and Test Improvement : 2025-11-12
 
-네이버 도서 검색 API 연동 시 비용과 시간이 소요되는 외부 통신 문제를 해결하기 위해 테스트 전략을 고도화했습니다. 외부 API 테스트는 `@Tag`를 사용하여 단위 테스트와 분리하고, `@RestClientTest`를 활용한 서버 모킹(Mocking)을 통해 안정적인 테스트 환경을 구축했습니다. 또한 복잡한 엔티티 생성 로직을 테스트 코드에서 분리하고 가독성을 높이기 위해 Instancio와 같은 테스트 픽스처 라이브러리를 도입했습니다. 도서 데이터의 정합성을 위해 이미 존재하는 도서는 정보를 갱신하고, 없는 경우 신규 등록하는 Merge or Persist 전략을 적용했습니다. 보안 측면에서는 가비아 도메인을 구입하고 Nginx 리버스 프록시와 Let's Encrypt를 활용한 HTTPS를 적용하여 데이터 전송의 안전성을 확보했습니다.
+I improved my testing strategy to handle the Naver Book Search API. I separated external API tests using `@Tag` and used `@RestClientTest` to mock the server. I also used Instancio to create test data easily. For book data, I used a "Merge or Persist" strategy: update if the book exists, or create if it doesn't. For security, I bought a domain, used Nginx as a reverse proxy, and applied HTTPS with Let's Encrypt.
 
-### 인증 및 연관관계 설계 : 2025-11-15
+### Auth and Relationship Design : 2025-11-15
 
-익명성을 보장하면서도 원활한 서비스를 제공하기 위해 Spring Security를 기반으로 커스텀 인증 시스템을 구축했습니다. 비로그인 사용자도 `Anonymous` 상태에서 특정 액션을 수행하면 `Guest` 권한으로 자동 승격되도록 필터를 구현했으며, Thymeleaf 환경에 맞춰 세션 기반 인증을 채택했습니다. JPA 연관관계 설계 시에는 애그리거트(Aggregate) 간의 결합도를 낮추기 위해 객체 참조 대신 ID 참조 방식을 선택했습니다. 이는 객체 그래프 탐색의 편리함을 일부 포기하는 트레이드오프가 있었지만, 도메인 경계를 명확히 하고 불필요한 연관 객체 생성을 방지하여 테스트 복잡도를 획기적으로 낮추는 효과를 얻었습니다. 단, 라이프사이클을 공유하는 강한 결합의 하위 엔티티는 객체 참조를 유지했습니다.
+I built a custom auth system with Spring Security to keep users anonymous but allow features. If an anonymous user does certain actions, they are promoted to `Guest`. I used session-based auth to match Thymeleaf. For JPA, I used ID references instead of object references between Aggregates to lower coupling. This made the domain boundaries clear and simplified tests.
 
-### 동시성 제어 및 성능 최적화 : 2025-11-18
+### Concurrency and Performance : 2025-11-18
 
-트래픽 급증 시 발생할 수 있는 DB 락 경합과 성능 저하 문제를 해결하기 위해 좋아요(Like) 기능에 '지연된 쓰기' 전략을 도입했습니다. 요청 수신 시 즉시 `202 Accepted`를 응답하고 작업을 인메모리 큐에 적재한 뒤, 단일 백그라운드 스레드가 이를 배치 처리하도록 구현했습니다. 이 과정에서 JPA의 Dirty Checking이 유발하는 영속성 컨텍스트 관리 비용을 회피하기 위해 JDBC Template Batch Update를 사용하여 성능을 극대화했습니다. 또한 메모리 상에서 상쇄되는 좋아요(On/Off 반복) 요청을 전처리하여 DB 부하를 효율적으로 관리했습니다.
+To handle many "Like" requests, I used a "Delayed Write" strategy. The server responds with `202 Accepted` immediately, puts the task in a queue, and a background thread processes them in batches. I used JDBC Template Batch Update to avoid the overhead of JPA's persistence context. I also filtered out repeated On/Off requests in memory to reduce DB load.
 
-### 아키텍처 리팩토링 및 안정화 : 2025-11-23
+### Architecture Refactoring : 2025-11-23
 
-보안 강화를 위해 Nginx 레벨에서 불법적인 리소스 요청을 차단하고 Rate Limiting을 적용하여 가용성 공격에 대비했습니다. 기존의 계층형 패키지 구조가 클래스 탐색을 어렵게 만드는 문제를 개선하기 위해 도메인 중심으로 패키지를 재구성했습니다. 모듈 간 불필요한 의존을 방지하기 위해 `public` 접근자를 최소화하고 `package-private`을 적극 활용하여 가시성을 제한했습니다. 또한 랜덤 북톡 추천 기능의 응답 속도를 보장하기 위해 Stale-While-Revalidate 캐싱 전략을 도입했습니다. 대량 데이터의 무작위 추천 성능을 위해 전체 정렬 대신 ID 추출 후 조회(Sampling) 방식을 적용했으며, `ThreadPoolTaskExecutor`를 활용한 비동기 캐시 갱신으로 응답성을 높였습니다.
+I added Rate Limiting at the Nginx level to prevent attacks. I reorganized packages around the domain to make it easier to find classes. I used `package-private` access modifiers to hide implementation details. For random "Talk" recommendations, I used a "Stale-While-Revalidate" cache. To pick random items quickly, I sampled IDs instead of sorting the whole table. I updated the cache asynchronously using `ThreadPoolTaskExecutor`.
 
 ---
 
-## AI 에이전트 협업 고도화 (2026-01)
+## AI Agent Collaboration (2026-01)
 
-개발 중단 이후, AI 에이전트와의 협업을 통해 레거시 코드의 복잡도를 낮추고 유지보수성을 높이는 리팩토링과 신규 기능 개발을 재개했습니다.
+After a break, I resumed development with an AI agent to clean up legacy code and add new features.
 
-### 프론트엔드/백엔드 분리 및 React 도입 : 2026-01-20
+### Separation of Front/Back and Adding React : 2026-01-20
 
-기존의 Thymeleaf 기반 서버 사이드 렌더링(SSR) 방식은 빠른 프로토타입 개발에는 유리했으나, 복잡한 사용자 인터랙션 구현과 모바일 환경 확장에 한계가 있었습니다. 이를 해결하기 위해 백엔드와 프론트엔드를 완전히 분리하는 아키텍처로 전환했습니다. 백엔드는 RESTful API 제공에 집중하도록 경량화하고, 프론트엔드는 React와 TypeScript, Vite를 도입하여 별도의 프로젝트(quiet-chatter-front-end)로 구축했습니다. 이를 통해 사용자 경험을 개선하고, 각 영역의 관심사를 명확히 분리하여 유지보수성과 개발 효율성을 높였습니다.
+Thymeleaf was good for prototypes, but it was hard to build complex UI or mobile versions. I split the project into a backend RESTful API and a frontend React project (quiet-chatter-front-end) using TypeScript and Vite. This improved the user experience and made maintenance easier.
 
-### 인증 아키텍처 개편 및 최적화 : 2026-01-21
-기존의 세션 기반 인증을 모바일 확장성과 서버 무상태성(Stateless)을 고려하여 JWT(JSON Web Token) 기반으로 전면 개편했습니다. 이 과정에서 매 요청마다 발생하는 DB 조회 부하를 해소하기 위해 Redis를 도입하고 Look-aside 패턴의 캐싱 전략을 적용하여 인증 처리 속도를 개선했습니다. 또한, 비로그인 사용자의 진입 장벽을 낮추는 '게스트 자동 승급' 메커니즘을 필터 레벨에서 재설계하여, 인증 토큰이 없는 요청도 투명하게 임시 계정으로 전환되고 토큰이 발급되도록 구현했습니다.
+### Auth Architecture Update : 2026-01-21
 
-### 톡 도메인 단순화 : 2026-01-25
+I changed from session-based auth to JWT (JSON Web Token) for mobile compatibility and a stateless server. I used Redis for caching to reduce DB lookups. I also redesigned the "Guest auto-promotion" in a filter so that users without tokens are transparently given temp accounts and tokens.
 
-JDBC Batch 처리나 단순 조회 시 복잡도를 높이는 과도한 VO(Value Object) 사용과 임베디드 타입 문제를 해결했습니다. 임베디드 타입으로 관리되던 시간 정보를 직관적인 `LocalDate` 타입의 필드로 변경하고, 별도의 객체로 관리되던 반응 카운트를 원시 타입 필드로 전환하여 구조를 단순화했습니다. 또한 상태 관리를 명확히 하기 위해 숨김 여부를 나타내는 `boolean` 필드를 추가했습니다.
+### Simplifying the Talk Domain : 2026-01-25
 
-### 자동 숨김 처리 : 2026-01-25
+I removed complex Value Objects (VO) and embedded types that made JDBC batch processing difficult. I changed time info to a simple `LocalDate` field and changed reaction counts to primitive types. I also added a `boolean` field for the hidden status.
 
-데이터 규모를 고려하여 복잡한 Spring Batch 대신 Spring Scheduling과 JPA Bulk Update(`@Modifying`)를 활용한 효율적인 자동 숨김 처리를 구현했습니다. 조회 성능을 보장하기 위해 숨김 날짜와 숨김 여부 컬럼에 복합 인덱스를 추가하여 대량 데이터 처리 시의 성능 저하를 예방했습니다.
+### Auto-Hidden Feature : 2026-01-25
 
-### 기본 엔티티 및 시간 타입 변경 : 2026-01-25
+I used Spring Scheduling and JPA Bulk Update (`@Modifying`) instead of a heavy Spring Batch. I added a composite index on the hidden status and date columns to keep searches fast.
 
-타임존 처리에 엄격한 `Instant` 대신, 로컬 타임존(KST) 기준의 비즈니스 로직 처리에 적합한 `LocalDateTime`으로 시간 타입을 변경하여 개발 편의성과 직관성을 높였습니다. 또한 모든 엔티티의 상위 클래스에 마지막 수정 시간을 추적하는 필드를 추가하여 데이터 변경 추적 기능을 강화했습니다.
+### Entity and Time Type Changes : 2026-01-25
 
-### 톡 수정 및 삭제 기능 : 2026-01-26
+I changed time types from `Instant` to `LocalDateTime` (KST) to make development easier. I also added a "last modified" field to all entities to track changes.
 
-톡 내용 수정 시 숨김 날짜를 자동으로 연장하여 컨텐츠의 수명을 늘리는 정책을 구현했습니다. 삭제 기능은 실제 데이터를 삭제하는 대신 숨김 처리를 하는 Soft Delete 방식을 적용하여 데이터 보존성을 확보했습니다. 수정 여부 판단 로직은 별도의 컬럼을 두는 대신 마지막 수정 시간 필드의 존재 여부로 확인하도록 변경하여 데이터 중복을 제거하고 효율성을 높였습니다.
+### Edit and Delete Features : 2026-01-26
 
-### 웹 요청 추적 및 모니터링 강화 : 2026-01-29
+When a "Talk" is edited, its hidden date is automatically extended. For deletion, I used "Soft Delete" (just hiding it) instead of deleting the data. I check if a post was edited by looking for the "last modified" time instead of using a separate column.
 
-로그의 추적성을 높이기 위해 SLF4J MDC(Mapped Diagnostic Context)를 활용한 필터를 도입했습니다. 모든 HTTP 요청에 대해 고유한 Request ID를 발급하고, 요청 메서드와 URI 정보를 로그 컨텍스트에 포함시켰습니다. 이를 통해 멀티 스레드 환경에서도 개별 요청의 처리 과정을 명확히 식별하고, 장애 발생 시 원인을 신속하게 파악할 수 있는 기반을 마련했습니다.
+### Logging and Monitoring : 2026-01-29
 
-### 책 검색 무한 스크롤 지원 : 2026-01-29
+I added an SLF4J MDC filter to track requests. Every HTTP request gets a unique Request ID. The logs now include the method and URI, making it easier to debug issues in a multi-threaded environment.
 
-프론트엔드의 사용자 경험을 개선하기 위해 책 검색 결과에 무한 스크롤(Infinite Scroll)을 적용했습니다. 이를 위해 백엔드에서는 대량의 데이터 요청을 효율적으로 처리할 수 있도록 커서 기반 또는 오프셋 기반의 페이징 로직을 최적화하여, 사용자가 끊김 없이 데이터를 탐색할 수 있는 환경을 제공했습니다.
+### Infinite Scroll for Book Search : 2026-01-29
 
-### API 명세 자동화 및 표준화 : 2026-01-30
+I added infinite scroll to the book search results. The backend was optimized to handle paging efficiently so users can browse without pauses.
 
-프론트엔드와의 협업 효율성을 높이기 위해 Spring Rest Docs와 OpenAPI(Swagger)를 결합한 명세 자동화 파이프라인을 구축했습니다. 테스트 코드를 통해 검증된 API 동작만이 문서화되도록 강제하여 문서와 실제 코드 간의 불일치 문제를 원천 차단했습니다. 생성된 JSON 포맷의 명세서는 별도의 엔드포인트를 통해 서빙되어, Swagger UI 등의 도구에서 즉시 활용할 수 있도록 구성했습니다. 또한, API 응답 포맷을 표준화하고 로그인 사용자 정보를 조회하는 기능을 추가하여 클라이언트 연동 편의성을 높였습니다.
+### API Spec Automation : 2026-01-30
 
-### 서브도메인 인증 및 환경 분리 : 2026-01-31
+I built a pipeline using Spring Rest Docs and OpenAPI (Swagger). Only verified API behaviors are documented, so the docs always match the code. The JSON spec is served via an endpoint for tools like Swagger UI. I also standardized the response format.
 
-프론트엔드와 백엔드가 서로 다른 서브도메인을 사용하는 환경에서도 인증 상태가 유지되도록 쿠키 정책을 재설계했습니다. 인증 토큰 발급 시 쿠키의 도메인 속성을 상위 도메인으로 설정하여, 서브도메인 간에 쿠키가 공유되도록 구현했습니다. 이 과정에서 운영 환경과 로컬 개발 환경의 보안 정책(Secure, SameSite 등)을 분리하여 관리할 수 있도록 설정 파일을 세분화하고, 타입 안전한 설정 객체를 도입하여 쿠키 속성 관리의 안정성을 확보했습니다.
+### Subdomain Auth and Environments : 2026-01-31
+
+I updated the cookie policy so auth works across different subdomains. The cookie domain is set to the parent domain. I also separated configurations for local and production environments (Secure, SameSite, etc.) using type-safe config objects.

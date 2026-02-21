@@ -1,34 +1,36 @@
-# 개발 트래커 (Development Tracker)
+# Development Tracker
 
-## 2. 스프린트 일정 (2월)
+## 2. Sprint Schedule (February)
 
-### 1: 준비 및 문서화 (~01/30)
+### 1: Preparation and Documentation (~01/30)
 
-- [x] 기존 요구사항 및 개발 기능 문서화
-- [x] 통합 요구사항 정리 및 태스크 도출
-- [x] 스프린트 일정 확정 및 시작
+- [x] Document existing requirements and features
+- [x] Organize requirements and derive tasks
+- [x] Confirm sprint schedule and start
 
-### 스프린트 1 ( ~ 02-07)
+### Sprint 1 (~ 02-07)
 
-- api 버저닝: 단순화하기 위해서 uri 경로 버저닝 사용 : v1
-- 외부 책 검색 API에서 ISBN이 없는 것은 필터 아웃
-- 책 검색 무한스크롤 : 페이징 기반이 아닌 자연스러운 탐색을 위한 선택
-- 게스트 사용자에게 랜덤한 한글 사용자명 부여
-- 로그인 정보를 확인하는 api 추가,
-- MDC 로깅 필터 추가
-- 유저 접속정보 확인 네비게이션 바 UI 추가
+- API Versioning: Use URI path versioning for simplicity: `v1`
+- Filter out books without ISBN from external APIs
+- Infinite scroll for book search (to make browsing feel natural)
+- Assign random Korean usernames to guest users
+- Add API to check login status
+- Add MDC logging filter
+- Add navigation bar UI to show user connection status
 
-### 스프린트 2 ( ~ 02-17)
-- 사용자 초화면 접근시 곧바로 게스트 로그인 처리
-- 히든 댓글 숨기기
-- [ ] 네이버 로그인 기능 추가
-- [ ] 배포 스테이지 전략 추가 dev 서버 , prod 서버
-- [ ] 네이버 로그인 검수요청
-- [ ] 메타 광고 시작, 본격적인 서비스 론칭
+### Sprint 2 (~ 02-17)
 
-### 스프린트 3 (~ 02-19)
-- [ ] 사용자 이벤트 로깅 집계 보고서 배치 로직 추가
-- [ ] warn 이상 로그레벨시 on call 기능 추가
+- Process guest login immediately when a user visits the splash screen
+- Hide hidden comments
+- [ ] Add Naver login feature
+- [ ] Add deployment stage strategy (dev and prod servers)
+- [ ] Request Naver login review
+- [ ] Start Meta ads and official service launch
 
-### 백로그
-- [ ] 작가 데이터 연동
+### Sprint 3 (~ 02-19)
+
+- [ ] Add batch logic for user event logging reports
+- [ ] Add "on call" feature for log levels of `warn` or higher
+
+### Backlog
+- [ ] Sync author data

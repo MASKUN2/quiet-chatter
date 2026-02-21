@@ -1,34 +1,32 @@
-# 애플리케이션 아키텍쳐 가이드
+# Application Architecture Guide
 
-본 프로젝트는 **헥사고날 아키텍처(Hexagonal Architecture, Ports and Adapters)** 를 기반으로 설계되었습니다.
-비즈니스 로직의 순수성을 보존하고, 외부 기술의 변경이 도메인 로직에 영향을 주지 않도록 격리하는 것을 목표로 합니다.
+This project is built using **Hexagonal Architecture (Ports and Adapters)**.
+The goal is to keep the business logic pure and separate it from external technical changes.
 
-## 핵심 원칙: 계층 사이의 의존 방향 (Dependency Rule)
+## Core Principle: Dependency Rule
 
-소스 코드의 의존성 화살표는 항상 `Adaptor -> Application -> Domain` 방향으로 흐릅니다.
+The dependency arrows in the source code always flow in this direction: `Adapter -> Application -> Domain`.
 
-- 도메인 계층 (Domain Layer) : 엔티티(Entity), 값 객체(VO), 도메인 로직이 이곳에 존재합니다.
-- 응용 계층 (Application Layer) : 애플리케이션의 유스케이스(Use Case)를 담당합니다. 도메인 로직을 하나의 유즈케이스로 조합하며 트랜잭션과 실행흐름을 관리합니다. 외부와 소통하기 위한 (
-  In/out)Ports (인터페이스)가 정의됩니다.
-- 어댑터 계층 (Adaptor Layer) : 애플리케이션을 외부 세계와 연결합니다. 요청의 흐름에 따라 (in/out) Adaptor로 분류됩니다.
+- **Domain Layer**: Contains Entities, Value Objects (VO), and domain logic.
+- **Application Layer**: Handles Use Cases. It combines domain logic into a use case and manages transactions. It defines **Ports** (interfaces) to talk to the outside world.
+- **Adapter Layer**: Connects the application to the outside world. It is divided into **Inbound** and **Outbound** Adapters.
 
 ---
 
-## 구현 가이드
+## Implementation Guide
 
-### 도메인 패키지
+### Domain Packages
 
-도메인 별로 최상위 패키지가 분리되어 있습니다. 각 도메인 패키지 내부는 아키텍처의 계층에 따라 구성됩니다.
+Each domain has its own top-level package. Inside each package, the code is organized by architecture layers.
 
-### 패키지 접근제한자 사용
+### Use Package-Private Access
 
-의존성이 낮은 설계를 유지하기 default(package private) 접근제한자 사용을 권장합니다. 테스트 등 외부 참조가 필요할 때는 인터페이스를 통한 런타임 구성 (DI)을 권장합니다.
+Use `default` (package-private) access modifiers when possible to keep the design clean. If you need to reference something from outside (like in a test), use Dependency Injection (DI) through interfaces.
 
-### 도메인 객체에서 Spring Date JPA 의존을 허용
+### Spring Data JPA in Domain Objects
 
-개발의 편의성을 위해서 도메인 엔티티와 VO의 경우 Spring Date JPA 의존을 제한적으로 허용합니다.
+For convenience, we allow a limited dependency on Spring Data JPA within Domain Entities and VOs.
 
-### 응용계층에서 엔티티를 반환
+### Returning Entities from Application Layer
 
-이는 표현계층(adaptor layer)의 관심사에 애플리케이션 계층이 의존하지 않기 위함입니다. 도메인 로직이 노출이 되더라도 트랜젝션 경계를 벗어나기 때문에 실무적으로는 별 문제가 없습니다. 단 통계 등 반환되는
-정보가 그 자체로 도메인 객체인경우에는 이를 반환합니다.
+The application layer returns Entities. This is done so the application layer doesn't depend on the adapter layer's concerns. Since it happens outside the transaction boundary, it is usually fine even if domain logic is exposed. If the returned information is a domain object itself (like for statistics), return that object.

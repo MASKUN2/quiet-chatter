@@ -1,8 +1,8 @@
-# 커밋 메시지 컨벤션
+# Commit Message Convention
 
-이 문서는 [AngularJS Git Commit Message Conventions](https://gist.github.com/stephenparish/9941e89d80e2bc58a153)을 기반으로 작성되었습니다.
+This document is based on the [AngularJS Git Commit Message Conventions](https://gist.github.com/stephenparish/9941e89d80e2bc58a153).
 
-## 커밋 메시지 형식
+## Format
 
 ```
 <type>(<scope>): <subject>
@@ -12,47 +12,44 @@
 <footer>
 ```
 
-가독성을 위해 한 줄은 100자를 넘기지 않도록 합니다.
+Keep each line under 100 characters for better readability.
 
-## 1. 제목 (Subject Line)
+## 1. Subject Line
 
-변경 사항에 대한 간결한 설명을 포함합니다.
+A short summary of the change.
 
-### `<type>` (필수)
+### `<type>` (Required)
 
-* `feat`: 새로운 기능 추가
-* `fix`: 버그 수정
-* `docs`: 문서 수정
-* `style`: 코드 포맷팅, 세미콜론 누락 등 (비즈니스 로직 변경 없음)
-* `refactor`: 코드 리팩토링
-* `test`: 테스트 코드 추가
-* `chore`: 빌드 업무 수정, 패키지 매니저 설정 등
+* `feat`: New feature
+* `fix`: Bug fix
+* `docs`: Documentation changes
+* `style`: Formatting, missing semicolons, etc. (No logic changes)
+* `refactor`: Code refactoring
+* `test`: Adding or fixing tests
+* `chore`: Build tasks, package manager configs, etc.
 
-### `<scope>` (선택)
+### `<scope>` (Optional)
 
-변경 사항이 적용된 위치를 명시합니다.
-예: `auth`, `logging`, `Member`, `PaymentService` 등
+The location of the change (e.g., `auth`, `logging`, `Member`, `PaymentService`).
 
-### `<subject>` (필수)
+### `<subject>` (Required)
 
-* 명령문, 현재 시제를 사용합니다. (예: "change" O, "changed" X, "changes" X)
-    * 한국어의 경우: "~변경" 또는 "~함" 등으로 간결하게 작성
-* 첫 글자는 소문자로 시작합니다. (영어 작성 시)
-* 끝에 마침표(.)를 찍지 않습니다.
+* Use the imperative, present tense: "change", not "changed" or "changes".
+* Use lowercase for the first letter.
+* Do not end with a period (.).
 
-## 2. 본문 (Body)
+## 2. Body
 
-* 제목과 마찬가지로 명령문, 현재 시제를 사용합니다.
-* **변경 이유**와 **이전 동작과의 차이점**을 설명합니다.
+* Use the imperative, present tense (like the subject).
+* Explain **why** you made the change and **how it differs** from previous behavior.
 
-## 3. 바닥글 (Footer)
+## 3. Footer
 
-### Breaking Changes (주요 변경 사항)
+### Breaking Changes
 
-모든 주요 변경 사항(Breaking Changes)은 바닥글에 명시해야 합니다.
-변경 내용에 대한 설명, 정당성, 마이그레이션 가이드를 포함합니다.
+All breaking changes must be mentioned in the footer. Include a description of the change, why you did it, and a migration guide.
 
-### 이슈 참조 (Referencing Issues)
+### Referencing Issues
 
-해결된 버그나 관련 이슈는 바닥글에 별도 라인으로 작성하며 `Closes` 키워드를 사용합니다.
-예: `Closes #123`
+Link closed bugs or related issues using the `Closes` keyword on a separate line.
+Example: `Closes #123`

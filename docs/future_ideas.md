@@ -1,45 +1,42 @@
 # Future Ideas & Improvements
 
-이 문서는 프로젝트의 미래 발전 방향, 기술적 개선 아이디어, 그리고 효율적인 협업 프로세스에 대한 제안을 기록하는 공간입니다.
+This document tracks ideas for the future of the project, technical improvements, and better collaboration.
 
-## 1. API 명세 기반의 프론트엔드 협업 자동화
+## 1. Automation for Frontend Collaboration
 
-현재 백엔드에서는 `Spring Rest Docs` + `restdocs-api-spec`을 통해 테스트 기반의 신뢰성 있는 `OpenAPI 3.0 (JSON)` 명세서를 `/v1/spec` 엔드포인트로
-제공하고 있습니다.
-이를 프론트엔드 개발 프로세스와 결합하여 생산성과 안정성을 극대화하는 방안을 제안합니다.
+The backend provides a reliable `OpenAPI 3.0 (JSON)` spec via the `/v1/spec` endpoint using `Spring Rest Docs` and `restdocs-api-spec`.
+We can connect this with the frontend process to improve productivity.
 
-### 1.1 타입 및 코드 자동 생성 (Code Generation)
+### 1.1 Type and Code Generation
 
-API 명세서를 보고 수동으로 타입을 정의하는 것이 아니라, 자동 생성 도구를 도입하여 "백엔드 변경 -> 프론트엔드 컴파일 에러 -> 즉시 수정"의 사이클을 구축합니다.
+Instead of manually defining types on the frontend, we can use tools to auto-generate them. This creates a cycle: "Backend changes -> Frontend compile error -> Immediate fix."
 
-* **도구 추천:**
-    * **openapi-typescript:** JSON 스펙을 읽어 TypeScript `interface`를 자동으로 생성합니다. 가장 가볍고 유연하여 기존 프로젝트에 도입하기 쉽습니다.
-    * **Orval / TanStack Query (React Query):** 타입뿐만 아니라 데이터 페칭을 위한 `Hook` 코드(`useQuery`, `useMutation`)까지 생성해줍니다.
+* **Recommended Tools:**
+    * **openapi-typescript:** Reads JSON specs and auto-generates TypeScript `interfaces`. It is light and easy to add.
+    * **Orval / TanStack Query (React Query):** Generates both types and `Hooks` (`useQuery`, `useMutation`) for fetching data.
 
-* **예상 워크플로우:**
-    1. 프론트엔드 개발자가 로컬에서 `npm run api-sync` 실행.
-    2. 스크립트가 `http://api-server/v1/spec`에서 최신 JSON을 다운로드.
-    3. `openapi-typescript`가 `src/types/api.d.ts` 파일을 갱신.
-    4. 변경된 타입(예: `Boolean` -> `boolean`)으로 인해 코드에서 컴파일 에러 발생.
-    5. 개발자가 이를 인지하고 즉시 수정.
+* **Example Workflow:**
+    1. A frontend developer runs `npm run api-sync` locally.
+    2. The script downloads the latest JSON from `http://api-server/v1/spec`.
+    3. `openapi-typescript` updates `src/types/api.d.ts`.
+    4. If a type changed (e.g., `Boolean` to `boolean`), a compile error occurs.
+    5. The developer notices and fixes it immediately.
 
-### 1.2 시각화 도구 활용 (Documentation UI)
+### 1.2 Visualization Tools (Documentation UI)
 
-JSON 파일은 사람이 읽기 어려우므로, 이를 시각화하여 보여주는 도구를 활용합니다.
+JSON files are hard for humans to read. We can use tools to visualize them.
 
 * **Swagger UI / Redoc:**
-    * 프론트엔드 로컬 환경이나 별도의 문서 서버에서 Swagger UI를 띄우고, 백엔드의 `/v1/spec` URL을 입력하여 문서를 열람합니다.
-    * 백엔드 서버에 `springdoc-openapi-ui`를 내장하는 것보다, 프론트엔드나 인프라 레벨에서 별도로 띄우는 것이 백엔드를 가볍게 유지하는 데 유리합니다.
+    * Run Swagger UI locally or on a separate server, and use the backend's `/v1/spec` URL.
+    * This keeps the backend server "light" by not embedding `springdoc-openapi-ui`.
 
-### 1.3 API 변경 감지 및 알림 (Breaking Change Detection)
+### 1.3 Change Detection and Alerts (Breaking Change Detection)
 
-백엔드 배포 시, API에 하위 호환성을 깨뜨리는 변경(Breaking Change)이 있는지 자동으로 검사합니다.
+When the backend is deployed, we can automatically check if any changes break compatibility.
 
 * **OpenAPI Diff:**
-    * CI 파이프라인에서 "이전 버전의 스펙"과 "현재 빌드된 스펙"을 비교합니다.
-    * **Breaking Change 감지 시:**
-        * PR(Pull Request)에 경고 코멘트 자동 작성.
-        * 슬랙/디스코드 등 메신저로 "🚨 API 변경됨: `didLike` 필드 타입 변경" 알림 전송.
-    * 도구: `oasdiff`, `openapi-diff`
-
----
+    * In the CI pipeline, compare the "previous version spec" with the "current build spec".
+    * **If a Breaking Change is found:**
+        * Automatically add a warning comment to the PR.
+        * Send an alert to Slack or Discord (e.g., "🚨 API Changed: `didLike` field type changed").
+    * Tools: `oasdiff`, `openapi-diff`
