@@ -65,32 +65,16 @@ Use Spring MVC's `ProblemDetail` class to generate standardized error responses.
 - **404 Not Found**: The requested resource does not exist.
 - **500 Internal Server Error**: An unexpected server error occurred.
 
-## 5. Security Implementation
-
-### 5.1 Authentication (JWT)
-
-- **Primary Method**: Use HttpOnly Cookies for both `access_token` and `refresh_token`.
-- **Secondary Method**: Use the `Authorization: Bearer <token>` header (only for testing or clients that do not support cookies).
-- **Implementation Rules**:
-    - Use `OncePerRequestFilter` to extract and validate tokens.
-    - Refresh tokens must be sent using cookies only, for security reasons.
-
-### 5.2 CORS Configuration
-
-- CORS policies (Allowed Origins) are managed using Spring Profiles (`AppCorsProperties`).
-- **Production and Dev Domains**: These are defined in the **[infrastructure_policy.md](https://github.com/maskun2/quiet-chatter-docs/blob/main/infrastructure_policy.md)** file in the shared documentation.
-- **Implementation Rules**: Ensure `AllowCredentials: true` is configured so that cross-origin requests can include cookies.
-
-## 6. API Documentation Strategy
+## 5. API Documentation Strategy
 
 We use **Test-Driven Documentation** to make sure our API documentation is always accurate.
 
-### 6.1 Tools
+### 5.1 Tools
 
 - **Spring RestDocs**: Generates documentation snippets from passing tests.
 - **restdocs-api-spec**: Converts these snippets into an **OpenAPI 3.0 (JSON)** specification file.
 
-### 6.2 Workflow
+### 5.2 Workflow
 
 1. **Write the Test**: Write your tests using `@RestClientTest` or `@WebMvcTest` with support for `RestDocs`.
 2. **Build**: Run the command `./gradlew bootJar`. This automatically runs the tests and creates the `openapi3.json` file.

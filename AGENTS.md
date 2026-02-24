@@ -19,8 +19,10 @@ This document is a guideline for AI agents to understand this project and help w
 
 Please refer to the following documents based on your current task:
 
-- **[API Implementation Guide](/docs/guide/api_guide.md)**: Rules for URI design, authentication, and RestDocs.
-- **[Project Structure & Infra](/docs/guide/project_structure.md)**: Details on the Hexagonal Architecture and CI/CD pipelines.
+- **[API Implementation Guide](/docs/guide/api_guide.md)**: Rules for URI design, REST patterns, and RestDocs.
+- **[Architecture Guide](/docs/guide/architecture_guide.md)**: Details on the Hexagonal Application Architecture.
+- **[Infrastructure Guide](/docs/guide/infrastructure_deployment_guide.md)**: Server CI/CD, environments, and deployment info.
+- **[Security Guide](/docs/guide/security_guide.md)**: Rules for JWT Authentication and CORS configuration.
 - **[Code Style Guide](/docs/guide/code_style_guide.md)**: Rules for Java conventions and clean code.
 - **[Commit Message Guide](/docs/guide/commit_message_guide.md)**: Rules for formatting git commit messages.
 - **[Service & Policy](https://github.com/maskun2/quiet-chatter-docs)**: External repository for project requirements, history, and policies.

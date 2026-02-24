@@ -1,31 +1,8 @@
-# Project Structure and Architecture Guide
+# Infrastructure and Deployment Guide
 
-This guide explains the logical design (**Hexagonal Architecture**) and the physical deployment pipeline of our backend project.
+This guide explains the physical deployment pipeline, cloud environments, and CI/CD setup of our backend project. For logical code organization, see `architecture_guide.md`.
 
-## 1. Logical Architecture (Hexagonal)
-
-We use the **Ports and Adapters** pattern, also known as Hexagonal Architecture. This pattern isolates our core business logic from external frameworks, databases, and APIs.
-
-### 1.1 Core Principle: The Dependency Rule
-
-Dependencies must always point **inward** toward the core domain. The layers are structured as follows: `Adapter -> Application -> Domain`.
-
-1. **Domain Layer (Core)**: This layer holds our pure business logic, including Entities and Value Objects (VOs). It must not contain framework dependencies. *Note: We allow minimal JPA annotations here for practical reasons.*
-2. **Application Layer (Use Cases)**: This layer coordinates domain objects to perform tasks. It defines **Ports** (Java Interfaces) that explain how external components can communicate with the application.
-3. **Adapter Layer (Infrastructure)**: This layer contains the technical details for communicating with the outside world.
-    - **Inbound Adapters**: Components that call the application (e.g., Web Controllers, Scheduled Tasks).
-    - **Outbound Adapters**: Components called by the application (e.g., JPA Repositories, Redis Clients, External API Clients).
-
-### 1.2 Package Structure
-
-We divide the code into feature modules (e.g., `member`, `book`, `talk`). Each module is independent.
-
-- **Encapsulation**: Use `package-private` (default) access modifiers to hide internal classes.
-- **Interfaces**: Expose public functions only through clearly defined interfaces.
-
----
-
-## 2. Physical Architecture (Infrastructure)
+## 1. Physical Architecture
 
 The application runs as a containerized Docker service on AWS LightSail. It connects to PostgreSQL for persistent data and Redis for caching.
 
@@ -48,7 +25,7 @@ C4Context
     Rel(api_server, redis, "Lettuce")
 ```
 
-### 2.1 Staging Environments
+### 1.1 Staging Environments
 
 - **Environments**: We maintain two active environments: `dev` and `prod`.
 - **Properties**: Managed by Spring Profiles (`application-dev.yml` and `application-prod.yml`).
@@ -60,17 +37,17 @@ C4Context
 
 ---
 
-## 3. CI/CD Pipeline
+## 2. CI/CD Pipeline
 
 We use **GitHub Actions** for Continuous Integration (building and testing) and **Watchtower** for Continuous Deployment.
 
-### 3.1 Build and Test (CI)
+### 2.1 Build and Test (CI)
 
 - **Triggers**: Automated workflows run when a Pull Request is opened against the `dev` or `main` branches.
 - **Tests**: The pipeline runs `./gradlew test` to verify unit and integration tests.
 - **Documentation**: It also automatically generates the OpenAPI documentation using RestDocs.
 
-### 3.2 Deployment Flow (CD)
+### 2.2 Deployment Flow (CD)
 
 Our deployment follows these automated steps:
 
