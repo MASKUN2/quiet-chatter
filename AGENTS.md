@@ -4,9 +4,9 @@ This document is a guideline for AI agents to understand this project and help w
 
 ## 1. Project Overview
 
-- **Goal**: SNS for readers (book-themed social network).
+- **Goal**: Create a book-themed social network (SNS for readers).
 - **Architecture**: Hexagonal Architecture.
-- **Role**: This project is the backend API server.
+- **Role**: This project serves as the backend API server.
 
 ## 2. Tech Stack
 
@@ -17,43 +17,36 @@ This document is a guideline for AI agents to understand this project and help w
 
 ## 3. Main Guidelines
 
-Please check these documents depending on your task:
+Please refer to the following documents based on your current task:
 
-- **[API Implementation Guide](/docs/guide/api_guide.md)
-  **: URI conventions, authentication implementation, and RestDocs workflow.
-- **[Project Structure & Infra](/docs/guide/project_structure.md)**: Hexagonal architecture, deployment, and pipeline.
-- **[Code Style Guide](/docs/guide/code_style_guide.md)**: Java conventions, testing rules.
-- **[Commit Message Guide](/docs/guide/commit_message_guide.md)**: Commit message conventions and rules.
-- **[Service & Policy](https://github.com/maskun2/quiet-chatter-docs)
-  **: For Requirements, Project History, and policies, please refer to the shared documentation repository.
+- **[API Implementation Guide](/docs/guide/api_guide.md)**: Rules for URI design, authentication, and RestDocs.
+- **[Project Structure & Infra](/docs/guide/project_structure.md)**: Details on the Hexagonal Architecture and CI/CD pipelines.
+- **[Code Style Guide](/docs/guide/code_style_guide.md)**: Rules for Java conventions and clean code.
+- **[Commit Message Guide](/docs/guide/commit_message_guide.md)**: Rules for formatting git commit messages.
+- **[Service & Policy](https://github.com/maskun2/quiet-chatter-docs)**: External repository for project requirements, history, and policies.
 
-## 4. Agent Working Process (Workflow)
+## 4. Agent Working Process
 
 ### A. Planning and Design Rules
 
-- **Use Industry Standards**: Recommend popular technologies and designs that many people use.
-- **Give One Clear Path**: Do not give multiple choices like "A or B". Decide on the **best single path
-  ** for this project and explain it clearly.
-- **Be Specific
-  **: Don't say "fix settings". Instead, say something like "Add AppCorsProperties and inject it into SecurityConfig".
-- **Decide Early**: Make technical decisions during the planning stage so the developer can review them right away.
+- **Use Industry Standards**: Always recommend popular, proven technologies and design patterns.
+- **Give One Clear Path**: Do not offer multiple options like "A or B". Instead, decide on the best single path for this project and explain your choice clearly.
+- **Be Specific**: Do not give vague instructions like "fix the settings". Provide exact steps, such as "Add AppCorsProperties and inject it into SecurityConfig".
+- **Decide Early**: Make technical decisions during the planning phase so the developer can review them immediately.
 
 ### B. Implementation Rules
 
-- **Follow Standards
-  **: Use the latest standard practices in the Java/Spring Boot ecosystem. Use proven design patterns (SOLID, OOP) and clean code.
-- **Test First**: Always write test code (Unit/Integration) when adding features.
-- **Documentation**: Update `RestDocs` tests when API changes. This keeps `openapi3.json` up to date. **Do not commit
-  the JSON file itself.**
+- **Follow Standards**: Apply the latest standard practices for Java and Spring Boot. Use proven design patterns (SOLID, OOP) and write clean code.
+- **Test First**: Always write test code (Unit or Integration tests) when adding new features.
+- **Update Documentation**: Update `RestDocs` tests whenever an API changes. This keeps `openapi3.json` up to date automatically.
+- **Never Commit JSON Specs**: Do not commit the `openapi3.json` file. It is generated automatically during deployment.
 
 ### C. Database Changes
 
-- When changing the database schema (adding/removing fields), you must write a **Flyway migration script** (
-  `src/main/resources/db/migration`).
-- Use `IF NOT EXISTS` and set default values to keep existing data safe.
+- **Use Flyway**: When changing the database schema (adding or removing tables/columns), you must write a Flyway migration script in `src/main/resources/db/migration`.
+- **Be Safe**: Use `IF NOT EXISTS` and set default values to protect existing data.
 
 ### D. Verification
 
-- After finishing work, run `./gradlew test` to check if everything works.
-- If you change an API, run `./gradlew openapi3` to check the spec. **Do not commit the generated JSON file.
-  ** (It is created automatically during deployment.)
+- **Run Tests**: After finishing your work, run `./gradlew test` to ensure all tests pass.
+- **Check API Spec**: If you modified an API, run `./gradlew openapi3` to verify the generated specification. Reminder: Do not commit the generated JSON file.

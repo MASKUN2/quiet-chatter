@@ -1,98 +1,95 @@
-# Project Structure & Architecture Guide
+# Project Structure and Architecture Guide
 
-This document explains both the logical code organization (**Hexagonal Architecture**) and the physical infrastructure (
-**Deployment & Pipeline**) of the backend project.
+This guide explains the logical design (**Hexagonal Architecture**) and the physical deployment pipeline of our backend project.
 
 ## 1. Logical Architecture (Hexagonal)
 
-We follow the **Ports and Adapters** pattern to isolate core business logic from external concerns (Web, DB, Messaging).
+We use the **Ports and Adapters** pattern, also known as Hexagonal Architecture. This pattern isolates our core business logic from external frameworks, databases, and APIs.
 
-### 1.1 Core Principle: Dependency Rule
+### 1.1 Core Principle: The Dependency Rule
 
-Dependencies must point **inward**: `Adapter -> Application -> Domain`.
+Dependencies must always point **inward** toward the core domain. The layers are structured as follows: `Adapter -> Application -> Domain`.
 
-- **Domain Layer**: Pure business logic. Entities and Value Objects (VO). No framework dependencies (except minimal JPA
-  annotations for pragmatism).
-- **Application Layer**: Use Cases (Services). Orchestrates domain objects and defines **Ports** (interfaces) for
-  external communication.
-- **Adapter Layer**: Implementation details.
-    - **Inbound**: Web Controllers, Scheduled Tasks.
-    - **Outbound**: JPA Repositories, Redis Clients, External APIs.
+1. **Domain Layer (Core)**: This layer holds our pure business logic, including Entities and Value Objects (VOs). It must not contain framework dependencies. *Note: We allow minimal JPA annotations here for practical reasons.*
+2. **Application Layer (Use Cases)**: This layer coordinates domain objects to perform tasks. It defines **Ports** (Java Interfaces) that explain how external components can communicate with the application.
+3. **Adapter Layer (Infrastructure)**: This layer contains the technical details for communicating with the outside world.
+    - **Inbound Adapters**: Components that call the application (e.g., Web Controllers, Scheduled Tasks).
+    - **Outbound Adapters**: Components called by the application (e.g., JPA Repositories, Redis Clients, External API Clients).
 
 ### 1.2 Package Structure
 
-Each feature module (e.g., `member`, `book`, `talk`) is self-contained.
+We divide the code into feature modules (e.g., `member`, `book`, `talk`). Each module is independent.
 
-- Use `package-private` access modifiers by default to hide implementation details.
-- Public classes should only be exposed via clear interfaces.
+- **Encapsulation**: Use `package-private` (default) access modifiers to hide internal classes.
+- **Interfaces**: Expose public functions only through clearly defined interfaces.
 
 ---
 
 ## 2. Physical Architecture (Infrastructure)
 
-The application runs as a containerized service on AWS LightSail, supported by PostgreSQL and Redis.
+The application runs as a containerized Docker service on AWS LightSail. It connects to PostgreSQL for persistent data and Redis for caching.
 
 ```mermaid
-    C4Context
-    title Quiet Chatter : Infrastructure Overview
+C4Context
+    title Quiet Chatter - Infrastructure Overview
+    
     Person(user, "User")
-
-    Boundary(system, "Cloud Environment", "AWS Light Sail") {
-        Container(ws, "Nginx Proxy", "Nginx", "SSL Termination / Routing")
-        Container(api_server, "Backend API", "Spring Boot 3.x", "Port: 8080")
-        Container(db, "Primary DB", "PostgreSQL", "Data Persistence")
-        Container(redis, "Cache/Session", "Redis", "Tokens & Cache")
+    
+    Boundary(system, "Cloud Environment (AWS LightSail)") {
+        System(ws, "Nginx Proxy", "SSL Termination & Routing")
+        System(api_server, "Backend API", "Spring Boot 3.x (Port 8080)")
+        SystemDb(db, "Primary Database", "PostgreSQL")
+        SystemDb(redis, "Cache & Session", "Redis")
     }
-
-    BiRel(user, ws, "HTTPS")
-    BiRel(ws, api_server, "HTTP")
-    BiRel(api_server, db, "JDBC")
-    BiRel(api_server, redis, "Lettuce")
+    
+    Rel(user, ws, "HTTPS")
+    Rel(ws, api_server, "HTTP")
+    Rel(api_server, db, "JDBC")
+    Rel(api_server, redis, "Lettuce")
 ```
 
-### 2.1 Staging Strategy
+### 2.1 Staging Environments
 
-- **Environments**: We maintain `dev` and `prod` environments.
-- **Configuration**: Managed via Spring Profiles (`application-dev.yml`, `application-prod.yml`).
+- **Environments**: We maintain two active environments: `dev` and `prod`.
+- **Properties**: Managed by Spring Profiles (`application-dev.yml` and `application-prod.yml`).
 - **Data Isolation**:
-    - **Dev**: Uses separate DB schema/instance and Redis DB 1.
-    - **Prod**: Uses production DB schema and Redis DB 0.
+    - **Development (`dev`)**: Uses its own database schema and connects to Redis Database `1`.
+    - **Production (`prod`)**: Uses the main schema and connects to Redis Database `0`.
 
-*(For specific domain URLs and deployment policies, refer
-to **[infrastructure_policy.md](https://github.com/maskun2/quiet-chatter-docs/blob/main/infrastructure_policy.md)** in
-the shared documentation.)*
+> **Note**: For exact domain names and detailed server policies, see **[infrastructure_policy.md](https://github.com/maskun2/quiet-chatter-docs/blob/main/infrastructure_policy.md)** in the shared documentation repository.
 
 ---
 
 ## 3. CI/CD Pipeline
 
-We use **GitHub Actions** for automation and **Watchtower** for deployment.
+We use **GitHub Actions** for Continuous Integration (building and testing) and **Watchtower** for Continuous Deployment.
 
-### 3.1 Build & Test (CI)
+### 3.1 Build and Test (CI)
 
-- Triggered on PRs to `dev` or `main`.
-- Runs `./gradlew test` (Unit/Integration tests).
-- Generates API documentation via RestDocs.
+- **Triggers**: Automated workflows run when a Pull Request is opened against the `dev` or `main` branches.
+- **Tests**: The pipeline runs `./gradlew test` to verify unit and integration tests.
+- **Documentation**: It also automatically generates the OpenAPI documentation using RestDocs.
 
 ### 3.2 Deployment Flow (CD)
 
-1. **Release**: Merging to `main` triggers `semantic-release` to tag a new version.
-2. **Build Image**: GitHub Actions builds the Docker image (`maskun2/quiet-chatter`) and pushes it to Docker Hub.
-3. **Deploy**:
-    - **Watchtower** (running on the server) detects the new image tag.
-    - Automatically pulls the image and restarts the Spring Boot container with zero-downtime (rolling update if
-      configured, or minimal downtime).
+Our deployment follows these automated steps:
+
+1. **Release Versioning**: Merging code into the `main` branch triggers `semantic-release`, which tags the new release version.
+2. **Build Docker Image**: A GitHub Action builds an updated Docker image (`maskun2/quiet-chatter`) and pushes it to Docker Hub.
+3. **Automatic Update**:
+    - **Watchtower**, a tool running directly on the AWS server, monitors Docker Hub for updates.
+    - When it detects the new image tag, it automatically downloads the image and restarts the Spring Boot container, ensuring very minimal or zero downtime.
 
 ```mermaid
 graph TD
-    subgraph "CI/CD Pipeline"
-        GIT[GitHub Repo] -- "Push/Merge" --> ACTIONS[GitHub Actions]
-        ACTIONS -- "Build & Test" --> JAR[Spring Boot JAR]
-        JAR -- "Docker Build" --> IMAGE[Docker Image]
-        IMAGE -- "Push" --> HUB[Docker Hub]
+    subgraph CI/CD Pipeline
+        git[GitHub Repository] -->|Push or Merge| actions[GitHub Actions]
+        actions -->|Build and Test| jar[Build Spring Boot JAR]
+        jar -->|Build Image| image[Create Docker Image]
+        image -->|Upload| hub[Push to Docker Hub]
     end
 
-    subgraph "Server (AWS)"
-        HUB -- "Pull (Watchtower)" --> CONTAINER[Running Container]
+    subgraph AWS Server
+        hub -->|Watchtower Detects Update| container[Restart Running Container]
     end
 ```
