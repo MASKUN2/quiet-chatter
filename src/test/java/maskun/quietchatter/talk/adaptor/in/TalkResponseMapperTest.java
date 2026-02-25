@@ -56,7 +56,7 @@ class TalkResponseMapperTest {
     @DisplayName("인증 정보가 있는 경우 내 반응이 매핑된다")
     void mapToResponse_WithAuth() {
         // Given
-        AuthMember authMember = new AuthMember(UUID.randomUUID(), Role.REGULAR);
+        AuthMember authMember = new AuthMember(UUID.randomUUID(), Role.REGULAR, maskun.quietchatter.member.domain.Status.ACTIVE);
         List<Talk> talks = ofList(Talk.class).size(2).create();
         Talk talk1 = talks.get(0);
         Talk talk2 = talks.get(1);

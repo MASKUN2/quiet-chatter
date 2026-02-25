@@ -36,7 +36,7 @@ class AuthMemberRedisCacheTest implements WithTestContainerDatabases {
 
     @Test
     void serializableValue() {
-        AuthMember authMember = new AuthMember(UUID.randomUUID(), Role.REGULAR);
+        AuthMember authMember = new AuthMember(UUID.randomUUID(), Role.REGULAR, maskun.quietchatter.member.domain.Status.ACTIVE);
         RedisSerializer<AuthMember> valueSerializer = (RedisSerializer<AuthMember>) redisTemplate.getValueSerializer();
         byte[] serialized = valueSerializer.serialize(authMember);
         assertThat(serialized).isNotNull();
@@ -47,7 +47,7 @@ class AuthMemberRedisCacheTest implements WithTestContainerDatabases {
     @Test
     void saveAndFind() {
         UUID id = UUID.randomUUID();
-        AuthMember authMember = new AuthMember(id, Role.REGULAR);
+        AuthMember authMember = new AuthMember(id, Role.REGULAR, maskun.quietchatter.member.domain.Status.ACTIVE);
 
         authMemberRedisCache.save(authMember);
         AuthMember found = authMemberRedisCache.findById(id).orElseThrow();

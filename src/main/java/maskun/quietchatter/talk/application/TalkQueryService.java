@@ -26,6 +26,12 @@ class TalkQueryService implements TalkQueryable, RecommendTalkQueryable {
 
     @Override
     @Transactional(readOnly = true)
+    public Page<Talk> findByMemberId(java.util.UUID memberId, org.springframework.data.domain.Pageable pageRequest) {
+        return talkRepository.findByMemberIdAndIsHiddenFalseOrderByCreatedAtDesc(memberId, pageRequest);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
     public RecommendTalks get() {
         return recommendTalkRepository.get();
     }

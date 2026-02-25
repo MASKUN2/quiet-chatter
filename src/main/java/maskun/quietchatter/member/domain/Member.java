@@ -40,4 +40,16 @@ public class Member extends BaseEntity {
         member.providerId = providerId;
         return member;
     }
+
+    public void activate() {
+        this.status = Status.ACTIVE;
+    }
+
+    public void deactivate() {
+        this.status = Status.DEACTIVATED;
+    }
+
+    public void updateNickname(String nickname) {
+        this.nickname = nickname;
+    }
 }

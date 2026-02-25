@@ -50,7 +50,7 @@ class ReactionCommandApiTest {
     void addReaction() throws Exception {
         UUID memberId = UUID.randomUUID();
         UUID talkId = UUID.randomUUID();
-        AuthMember authMember = new AuthMember(memberId, Role.REGULAR);
+        AuthMember authMember = new AuthMember(memberId, Role.REGULAR, maskun.quietchatter.member.domain.Status.ACTIVE);
         ReactionWebRequest request = new ReactionWebRequest(talkId, Reaction.Type.LIKE);
 
         willDoNothing().given(reactionModifiable).add(any(ReactionTarget.class));
@@ -79,7 +79,7 @@ class ReactionCommandApiTest {
     void removeReaction() throws Exception {
         UUID memberId = UUID.randomUUID();
         UUID talkId = UUID.randomUUID();
-        AuthMember authMember = new AuthMember(memberId, Role.REGULAR);
+        AuthMember authMember = new AuthMember(memberId, Role.REGULAR, maskun.quietchatter.member.domain.Status.ACTIVE);
         ReactionWebRequest request = new ReactionWebRequest(talkId, Reaction.Type.LIKE);
 
         willDoNothing().given(reactionModifiable).remove(any(ReactionTarget.class));

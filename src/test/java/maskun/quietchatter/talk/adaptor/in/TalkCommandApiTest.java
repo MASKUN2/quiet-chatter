@@ -55,7 +55,7 @@ class TalkCommandApiTest {
         UUID memberId = UUID.randomUUID();
         UUID bookId = UUID.randomUUID();
         UUID talkId = UUID.randomUUID();
-        AuthMember authMember = new AuthMember(memberId, Role.REGULAR);
+        AuthMember authMember = new AuthMember(memberId, Role.REGULAR, maskun.quietchatter.member.domain.Status.ACTIVE);
 
         TalkCreateWebRequest request = new TalkCreateWebRequest(bookId, "Great book!", Instant.now().plusSeconds(3600));
 
@@ -97,7 +97,7 @@ class TalkCommandApiTest {
     void updateTalk() throws Exception {
         UUID memberId = UUID.randomUUID();
         UUID talkId = UUID.randomUUID();
-        AuthMember authMember = new AuthMember(memberId, Role.REGULAR);
+        AuthMember authMember = new AuthMember(memberId, Role.REGULAR, maskun.quietchatter.member.domain.Status.ACTIVE);
 
         TalkUpdateWebRequest request = new TalkUpdateWebRequest("Updated content");
 
@@ -129,7 +129,7 @@ class TalkCommandApiTest {
     void deleteTalk() throws Exception {
         UUID memberId = UUID.randomUUID();
         UUID talkId = UUID.randomUUID();
-        AuthMember authMember = new AuthMember(memberId, Role.REGULAR);
+        AuthMember authMember = new AuthMember(memberId, Role.REGULAR, maskun.quietchatter.member.domain.Status.ACTIVE);
 
         willDoNothing().given(talkCommandable).hide(talkId, memberId);
 
