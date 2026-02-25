@@ -1,18 +1,21 @@
 package maskun.quietchatter.security.adaptor.in;
 
-import jakarta.servlet.http.HttpServletResponse;
-import lombok.RequiredArgsConstructor;
-import maskun.quietchatter.member.application.in.RandomNickNameSupplier;
-import maskun.quietchatter.security.adaptor.AuthTokenService;
-import maskun.quietchatter.security.application.in.AuthMemberNotFoundException;
-import maskun.quietchatter.security.application.in.AuthMemberService;
-import maskun.quietchatter.security.application.in.AuthMemberService.NaverProfile;
-import maskun.quietchatter.security.domain.AuthMember;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+
+import jakarta.servlet.http.HttpServletResponse;
+import lombok.RequiredArgsConstructor;
+import maskun.quietchatter.member.application.in.RandomNickNameSupplier;
+import maskun.quietchatter.member.domain.Status;
+import maskun.quietchatter.security.adaptor.AuthTokenService;
+import maskun.quietchatter.security.application.in.AuthMemberNotFoundException;
+import maskun.quietchatter.security.application.in.AuthMemberService;
+import maskun.quietchatter.security.application.in.AuthMemberService.NaverProfile;
+import maskun.quietchatter.security.application.in.MemberDeactivatedException;
+import maskun.quietchatter.security.domain.AuthMember;
 
 @RestController
 @RequestMapping("/v1/auth")
@@ -29,6 +32,10 @@ class AuthLoginApi {
 
         try {
             AuthMember authMember = authMemberService.getByNaverId(profile.providerId());
+            if (authMember.status() == Status.DEACTIVATED) {
+                String reactivationToken = authTokenService.createReactivationToken(authMember.id());
+                throw new MemberDeactivatedException(reactivationToken);
+            }
             issueTokens(response, authMember);
             return ResponseEntity.ok(NaverLoginResponse.registered());
         } catch (AuthMemberNotFoundException e) {

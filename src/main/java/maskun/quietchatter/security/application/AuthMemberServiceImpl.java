@@ -1,5 +1,13 @@
 package maskun.quietchatter.security.application;
 
+import java.util.Objects;
+import java.util.Optional;
+import java.util.UUID;
+
+import org.jspecify.annotations.NullMarked;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
 import maskun.quietchatter.member.application.in.MemberQueryable;
 import maskun.quietchatter.member.application.in.MemberRegistrable;
 import maskun.quietchatter.member.domain.Member;
@@ -10,13 +18,6 @@ import maskun.quietchatter.security.application.in.AuthMemberNotFoundException;
 import maskun.quietchatter.security.application.in.AuthMemberService;
 import maskun.quietchatter.security.application.out.AuthMemberCache;
 import maskun.quietchatter.security.domain.AuthMember;
-import org.jspecify.annotations.NullMarked;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-
-import java.util.Objects;
-import java.util.Optional;
-import java.util.UUID;
 
 @NullMarked
 @Service
@@ -100,6 +101,6 @@ class AuthMemberServiceImpl implements AuthMemberService {
     }
 
     private AuthMember getAuthMember(Member member) {
-        return new AuthMember(Objects.requireNonNull(member.getId()), member.getRole());
+        return new AuthMember(Objects.requireNonNull(member.getId()), member.getRole(), member.getStatus());
     }
 }

@@ -49,7 +49,7 @@ class AuthMeApiTest {
     @DisplayName("인증된 사용자 정보 조회")
     void me_Authenticated() throws Exception {
         UUID memberId = UUID.randomUUID();
-        AuthMember authMember = new AuthMember(memberId, Role.REGULAR);
+        AuthMember authMember = new AuthMember(memberId, Role.REGULAR, maskun.quietchatter.member.domain.Status.ACTIVE);
         Member member = Member.newNaverMember("naverId", "testUser");
 
         given(memberQueryable.findById(any(UUID.class))).willReturn(Optional.of(member));
