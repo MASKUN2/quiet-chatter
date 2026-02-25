@@ -1,3 +1,16 @@
+# [1.2.0](https://github.com/MASKUN2/quiet-chatter/compare/v1.1.0...v1.2.0) (2026-02-25)
+
+
+### Bug Fixes
+
+* permit reactivate endpoint in SecurityConfig ([f084258](https://github.com/MASKUN2/quiet-chatter/commit/f084258c40bfe5041cb80b3ca2369355541f4add))
+
+
+### Features
+
+* Add final response status logging in MdcFilter ([dcbf87b](https://github.com/MASKUN2/quiet-chatter/commit/dcbf87bf567bac2ef54a78ff1bd5c5e69a8dbdb7))
+* Implement My Page and Reactivation APIs ([dc0e092](https://github.com/MASKUN2/quiet-chatter/commit/dc0e09231ee57e904968553cd615cf4a42d7f281))
+
 # [1.1.0](https://github.com/MASKUN2/quiet-chatter/compare/v1.0.0...v1.1.0) (2026-02-20)
 
 

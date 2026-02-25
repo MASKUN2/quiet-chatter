@@ -68,7 +68,7 @@ class AuthMemberServiceTest {
     @Test
     void cacheHit() {
         UUID myId = UUID.randomUUID();
-        AuthMember authMember = new AuthMember(myId, Role.REGULAR);
+        AuthMember authMember = new AuthMember(myId, Role.REGULAR, maskun.quietchatter.member.domain.Status.ACTIVE);
 
         when(authMemberCache.findById(myId)).thenReturn(Optional.of(authMember));
 

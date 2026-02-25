@@ -1,5 +1,10 @@
 package maskun.quietchatter.talk.application;
 
+import java.util.UUID;
+
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
 import lombok.RequiredArgsConstructor;
 import maskun.quietchatter.book.application.out.BookRepository;
 import maskun.quietchatter.member.application.out.MemberRepository;
@@ -7,10 +12,6 @@ import maskun.quietchatter.talk.application.in.TalkCommandable;
 import maskun.quietchatter.talk.application.in.TalkCreateRequest;
 import maskun.quietchatter.talk.application.out.TalkRepository;
 import maskun.quietchatter.talk.domain.Talk;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-
-import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
@@ -55,5 +56,16 @@ class TalkCommandService implements TalkCommandable {
         if (!talk.getMemberId().equals(memberId)) {
             throw new IllegalArgumentException("본인의 톡만 수정/삭제할 수 있습니다.");
         }
+    }
+
+    @Override
+    @Transactional
+    public void hideAllByMember(UUID memberId) {
+        org.springframework.data.domain.Pageable unpaged = org.springframework.data.domain.Pageable.unpaged();
+        org.springframework.data.domain.Page<Talk> memberTalks = talkRepository.findByMemberIdAndIsHiddenFalseOrderByCreatedAtDesc(memberId, unpaged);
+        for (Talk talk : memberTalks.getContent()) {
+            talk.hide();
+        }
+        talkRepository.saveAll(memberTalks.getContent());
     }
 }

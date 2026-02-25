@@ -1,92 +1,94 @@
 # Code Style Guide
 
-이 문서는 `Google Java Style Guide`와 `Clean Code Principles`를 통합하여 프로젝트의 코드 스타일과 개발 원칙을 정의합니다.
+This document defines the code style and development rules for our project. It follows the **Google Java Style Guide** and **Clean Code Principles**.
 
-## 1. 소스 파일 구조
+## 1. Source File Structure
 
-### 패키지 및 임포트
+### Packages and Imports
 
-- 패키지 구문은 줄바꿈 없이 작성한다.
-- 와일드카드(`*`) 임포트 대신 명시적인 임포트를 사용한다.
-- 임포트 구문은 줄바꿈 없이 작성한다.
-- 임포트 순서:
-    1. static 임포트
-    2. non-static 임포트
+- Write package statements on a single line. Do not line-break them.
+- Use explicit imports (e.g., `java.util.List`). Do not use wildcard imports (`*`).
+- **Import Order**:
+    1. Static imports
+    2. Non-static imports
+    *(Separate these two groups with a blank line and sort each group alphabetically.)*
+- **No Static Class Imports**: Do not use static imports for entire classes.
 
-    - 각 그룹은 빈 줄로 구분하며, 그룹 내에서는 ASCII 순서로 정렬한다.
-- 클래스에 static 임포트를 사용하지 않고 일반 임포트를 사용한다.
+### Class Definition
 
-### 클래스 정의
+- Write only **one** top-level class per source file.
+- Order the members of the class logically (e.g., fields, constructors, public methods, private methods).
+- Group overloaded methods together so they appear consecutively.
 
-- 소스 파일당 하나의 최상위 클래스를 정의한다.
-- 클래스 멤버는 논리적 순서로 배치한다.
-- 오버로드된 메서드는 분리하지 않고 연속해서 작성한다.
+## 2. Formatting
 
-## 2. 포매팅
+### Braces
 
-### 중괄호 (Braces)
+- Always use braces for `if`, `else`, `for`, `do`, and `while` statements, even if the body is only one line.
+- Use the **K&R style** (Egyptian brackets):
+    - The opening brace `{` stays on the same line as the statement.
+    - The closing brace `}` starts on a new line.
+    - The closing brace `}` is followed by a new line, unless it is immediately followed by `else`, `catch`, or `finally`.
 
-- `if`, `else`, `for`, `do`, `while` 구문에는 본문이 비어있거나 한 줄이어도 중괄호를 사용한다.
-- K&R 스타일(Egyptian brackets)을 따른다.
-    - 여는 중괄호는 줄바꿈 없이 같은 줄 끝에 작성한다.
-    - 닫는 중괄호 앞에는 줄바꿈을 한다.
-    - 닫는 중괄호 뒤에는 줄바꿈을 한다 (구문이 끝나지 않은 `else`, `catch` 등 제외).
+### Indentation and Line Length
 
-### 들여쓰기 및 줄바꿈
+- Use **4 spaces** for block indentation. Do not use tabs.
+- Write only one statement per line.
+- The maximum line length is **120 characters**.
+- If a line is too long, break it and indent the continuation line with **8 spaces** (+8 spaces).
 
-- 블록 들여쓰기는 +4 스페이스를 사용한다.
-- 한 줄에 하나의 구문만 작성한다.
-- 열 제한(Column limit)은 120자이다.
-- 줄바꿈 시 다음 줄은 +8 스페이스 이상 들여쓴다.
+### Whitespace
 
-### 공백 (Whitespace)
+- **Vertical Spacing**: Use blank lines to divide logical blocks of code (e.g., between methods or variable declarations).
+- **Horizontal Spacing**:
+    - Add spaces around operators (e.g., `a + b`).
+    - Add spaces after commas, colons, and semicolons.
+    - Add a space between a keyword and its opening parenthesis (e.g., `if (condition)`).
 
-- 수직 공백: 논리적인 코드 구분을 위해 빈 줄을 사용한다.
-- 수평 공백: 예약어와 괄호 사이, 연산자 양쪽, 콤마/콜론/세미콜론 뒤에 공백을 둔다.
+## 3. Naming Rules
 
-## 3. 네이밍
+### General Rules
 
-### 식별자 공통
+- Use only standard ASCII letters and numbers.
+- Do not use prefixes or suffixes like `mName` or `name_`.
 
-- ASCII 문자와 숫자만 사용한다.
-- 접두사/접미사(예: `mName`, `name_`)를 사용하지 않는다.
+### Specific Formats
 
-### 종류별 규칙
+- **Package Names**: All lowercase, with no underscores (e.g., `com.example.deepspace`).
+- **Classes and Interfaces**: Use `UpperCamelCase` (e.g., `ImmutableList`).
+- **Methods**: Use `lowerCamelCase` (e.g., `sendMessage`).
+- **Constants**: Use `CONSTANT_CASE` (all uppercase letters separated by underscores). This is strictly for `static final` immutable fields.
+- **Variables and Parameters**: Use `lowerCamelCase` for fields, local variables, and method parameters.
+- **Type Variables (Generics)**: Use a single uppercase letter (e.g., `T`) or a class style name ending with `T` (e.g., `RequestT`).
 
-- **패키지**: 소문자만 사용하며 언더스코어 없이 연속된 단어로 작성한다 (예: `com.example.deepspace`).
-- **클래스/인터페이스**: UpperCamelCase (예: `ImmutableList`).
-- **메서드**: lowerCamelCase (예: `sendMessage`).
-- **상수**: CONSTANT_CASE (모두 대문자, 언더스코어 구분). `static final` 불변 객체에 해당한다.
-- **필드/파라미터/지역변수**: lowerCamelCase.
-- **타입 변수**: 대문자 하나(예: `T`, `E`) 또는 클래스 스타일+T(예: `RequestT`).
+## 4. Clean Code Practices
 
-## 4. 프로그래밍 관례 (Clean Code & Practices)
+### Method Design
 
-### 메서드 설계
+- **Single Responsibility**: A method must do exactly one thing.
+- **Indentation Limit**: Try to limit indentation to one level inside a method.
+- **Arguments Limit**: A method should have no more than 3 parameters.
+- **No Else Blocks**: Avoid using `else`. Use the "Early Return" pattern instead to handle special cases or errors early.
 
-- **한 가지 역할**: 메서드는 한 가지 기능만 수행하도록 구현한다.
-- **들여쓰기 제한**: 한 메서드에 오직 한 단계의 들여쓰기(indentation)만 허용한다.
-- **인자 수 제한**: 메서드의 인자 수는 3개 이하로 제한한다 (4개 이상 금지).
-- **else 사용 지양**: `else` 예약어를 쓰지 않고, 빠른 반환(Early Return) 패턴을 사용한다.
+### Class and Object Design
 
-### 클래스 및 객체 설계
+- **Small Classes**: Keep classes small and focused. Avoid classes that have more than 3 instance variables.
+- **Value Objects**: Wrap primitive values and strings in Value Objects (VO) when they have a specific meaning or domain logic.
+- **First-Class Collections**: If a class wraps a collection, it should not have any other member variables.
+- **No Getters/Setters in Domain Objects**: Hide internal data. Send conceptual messages to objects instead of extracting their data. (Note: DTOs are an exception and may use getters/setters.)
 
-- **작은 클래스**: 클래스를 작게 유지하고, 3개 이상의 인스턴스 변수를 가진 클래스 구현을 피한다.
-- **포장(Wrapping)**: 모든 원시값과 문자열을 VO(Value Object)로 포장한다.
-- **일급 컬렉션**: 컬렉션을 포함하는 클래스는 반드시 다른 멤버 변수가 없어야 한다(일급 컬렉션 적용).
-- **Getter/Setter 지양**: 핵심 로직을 구현하는 도메인 객체에는 getter/setter를 사용하지 않고 객체에 메시지를 보낸다. (단, DTO는 허용)
+### Code Quality
 
-### 코드 품질 및 유지보수
+- **Null Safety**: Assume parameters and return values are non-null by default. Use `@NullMarked` at the package or class level. Use `@Nullable` explicitly only when handling null is intended.
+- **Ternary Operators**: Avoid using ternary operators (`? :`). Write clear `if-else` statements or use early returns instead.
+- **Clear Messages**: Write all error and log messages in clear, simple English.
+- **Law of Demeter**: A method should not navigate through multiple objects. Use only one dot (`.`) per line when accessing object properties.
+- **Override Annotation**: Always add the `@Override` annotation when overriding a method from a parent class or interface.
+- **Exception Handling**: Never catch an exception and handle it with an empty block. At minimum, log the error.
+- **Static Member Access**: Always access static members through the class name, not through an object instance (e.g., `Foo.staticMethod()`, not `fooInstance.staticMethod()`).
 
-- **Null 안전성**: JSpecify의 `@NullMarked`를 패키지 레벨 또는 클래스 레벨에 사용하여 기본적으로 모든 파라미터와 반환값이 non-null임을 명시한다. Null이 허용되는 경우에만 `@Nullable`을 명시한다.
-- **삼항연산자 지양** : 삼항연산자 사용을 지양한다.
-- **디미터 법칙**: 코드 한 줄에 점(.)을 하나만 허용한다. (예: `location.current.representation` -> 리팩토링 대상)
-- **@Override 필수**: 상위 클래스 메서드 오버라이드 시 반드시 `@Override`를 붙인다.
-- **예외 처리**: 예외를 잡고 아무것도 하지 않는 코드를 작성하지 않는다.
-- **Static 멤버 접근**: 클래스 이름을 통해 접근한다 (예: `Foo.staticMethod()`).
+## 5. Javadoc Comments
 
-## 5. Javadoc
-
-- **형식**: `/** ... */` 형식을 사용한다.
-- **요약**: 첫 문장은 간결한 요약으로 시작한다.
-- **사용 대상**: `public` 클래스 및 `public`/`protected` 멤버에 작성한다.
+- **Format**: Use the standard `/** ... */` block syntax.
+- **Summary**: The first sentence of the comment should be a short summary of the class or method.
+- **Usage**: Write Javadoc comments for all `public` classes, as well as `public` and `protected` members.

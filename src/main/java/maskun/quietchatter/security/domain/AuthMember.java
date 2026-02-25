@@ -1,12 +1,15 @@
 package maskun.quietchatter.security.domain;
 
-import maskun.quietchatter.member.domain.Role;
+import java.util.UUID;
+
 import org.jspecify.annotations.NullMarked;
 
-import java.util.UUID;
+import maskun.quietchatter.member.domain.Role;
+import maskun.quietchatter.member.domain.Status;
 
 @NullMarked
 public record AuthMember(
         UUID id,
-        Role role
+        Role role,
+        Status status
 ) {}

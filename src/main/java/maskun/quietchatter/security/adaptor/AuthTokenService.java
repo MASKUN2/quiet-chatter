@@ -1,23 +1,30 @@
 package maskun.quietchatter.security.adaptor;
 
-import io.jsonwebtoken.*;
-import io.jsonwebtoken.security.Keys;
-import jakarta.servlet.http.Cookie;
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
-import maskun.quietchatter.security.application.out.RefreshTokenCache;
-import org.jspecify.annotations.NullMarked;
-import org.jspecify.annotations.Nullable;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.stereotype.Service;
-
-import javax.crypto.SecretKey;
 import java.sql.Date;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.NoSuchElementException;
 import java.util.Optional;
 import java.util.UUID;
+
+import javax.crypto.SecretKey;
+
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Service;
+
+import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.ExpiredJwtException;
+import io.jsonwebtoken.Jws;
+import io.jsonwebtoken.JwtException;
+import io.jsonwebtoken.JwtParser;
+import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.security.Keys;
+import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+import maskun.quietchatter.security.application.out.RefreshTokenCache;
 
 @NullMarked
 @Service
@@ -27,8 +34,10 @@ public class AuthTokenService {
     private static final Duration ACCESS_TOKEN_LIFE_TIME = Duration.ofMinutes(30);
     private static final Duration REFRESH_TOKEN_LIFETIME = Duration.ofDays(30);
     private static final Duration REGISTER_TOKEN_LIFETIME = Duration.ofHours(2);
+    private static final Duration REACTIVATION_TOKEN_LIFETIME = Duration.ofHours(2);
     private static final String CLAIM_PURPOSE = "purpose";
     private static final String PURPOSE_REGISTER = "register";
+    private static final String PURPOSE_REACTIVATE = "reactivate";
 
     private final RefreshTokenCache refreshTokenCache;
     private final JwtParser jwtParser;
@@ -60,6 +69,24 @@ public class AuthTokenService {
             throw new AuthTokenException("invalid token purpose");
         }
         return payload.getSubject();
+    }
+
+    public String createReactivationToken(UUID memberId) {
+        var exp = Date.from(Instant.now().plus(REACTIVATION_TOKEN_LIFETIME));
+        return Jwts.builder().signWith(secretKey)
+                .subject(memberId.toString())
+                .claim(CLAIM_PURPOSE, PURPOSE_REACTIVATE)
+                .expiration(exp)
+                .compact();
+    }
+
+    public UUID parseReactivationToken(String reactivationToken) {
+        Claims payload = parse(reactivationToken).getPayload();
+        String purpose = payload.get(CLAIM_PURPOSE, String.class);
+        if (!PURPOSE_REACTIVATE.equals(purpose)) {
+            throw new AuthTokenException("invalid token purpose");
+        }
+        return UUID.fromString(payload.getSubject());
     }
 
     public String parseRefreshTokenAndGetTokenId(String refreshToken) throws AuthTokenException {

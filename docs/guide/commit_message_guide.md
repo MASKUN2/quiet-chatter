@@ -1,10 +1,12 @@
-# 커밋 메시지 컨벤션
+# Commit Message Convention
 
-이 문서는 [AngularJS Git Commit Message Conventions](https://gist.github.com/stephenparish/9941e89d80e2bc58a153)을 기반으로 작성되었습니다.
+This document introduces rules based on the [AngularJS Git Commit Message Conventions](https://gist.github.com/stephenparish/9941e89d80e2bc58a153). By following these conventions, we keep our project history clean and readable.
 
-## 커밋 메시지 형식
+## Format Structure
 
-```
+Your commit messages should follow this exact template:
+
+```text
 <type>(<scope>): <subject>
 
 <body>
@@ -12,47 +14,54 @@
 <footer>
 ```
 
-가독성을 위해 한 줄은 100자를 넘기지 않도록 합니다.
+> **Note**: Try to keep each line under 100 characters to ensure the history is easy to read in the terminal and on GitHub.
 
-## 1. 제목 (Subject Line)
+## 1. Subject Line
 
-변경 사항에 대한 간결한 설명을 포함합니다.
+The subject line is a short summary of your change.
 
-### `<type>` (필수)
+### `<type>` (Required)
 
-* `feat`: 새로운 기능 추가
-* `fix`: 버그 수정
-* `docs`: 문서 수정
-* `style`: 코드 포맷팅, 세미콜론 누락 등 (비즈니스 로직 변경 없음)
-* `refactor`: 코드 리팩토링
-* `test`: 테스트 코드 추가
-* `chore`: 빌드 업무 수정, 패키지 매니저 설정 등
+You must use one of the following words:
 
-### `<scope>` (선택)
+- `feat`: Adding a new feature.
+- `fix`: Fixing a bug.
+- `docs`: Changing documentation (e.g., `README.md`, `guide` files).
+- `style`: Formatting code (e.g., missing semicolons, spacing). No logic is changed.
+- `refactor`: Restructuring or rewriting code without changing its external behavior.
+- `test`: Adding missing tests or fixing existing tests.
+- `chore`: Updating build tasks, configuration files, or dependencies.
 
-변경 사항이 적용된 위치를 명시합니다.
-예: `auth`, `logging`, `Member`, `PaymentService` 등
+### `<scope>` (Optional)
 
-### `<subject>` (필수)
+Specify the part of the code you modified inside parentheses.
+Example scopes: `auth`, `logging`, `Member`, `PaymentService`.
 
-* 명령문, 현재 시제를 사용합니다. (예: "change" O, "changed" X, "changes" X)
-    * 한국어의 경우: "~변경" 또는 "~함" 등으로 간결하게 작성
-* 첫 글자는 소문자로 시작합니다. (영어 작성 시)
-* 끝에 마침표(.)를 찍지 않습니다.
+### `<subject>` (Required)
 
-## 2. 본문 (Body)
+Explain exactly what was done in clear English.
 
-* 제목과 마찬가지로 명령문, 현재 시제를 사용합니다.
-* **변경 이유**와 **이전 동작과의 차이점**을 설명합니다.
+- **Imperative Mood**: Use the present tense imperative. Write "change" or "add", not "changed", "changes", or "added".
+- **Lowercase**: Start the subject with a lowercase letter.
+- **No Period**: Do not place a period (`.`) at the end of the subject line.
 
-## 3. 바닥글 (Footer)
+## 2. Body
 
-### Breaking Changes (주요 변경 사항)
+If the subject line is not enough, add a detailed body to explain the commit.
 
-모든 주요 변경 사항(Breaking Changes)은 바닥글에 명시해야 합니다.
-변경 내용에 대한 설명, 정당성, 마이그레이션 가이드를 포함합니다.
+- Use the present tense imperative, just like the subject line.
+- Explain **why** you are making the change and **what is different** from the previous behavior.
 
-### 이슈 참조 (Referencing Issues)
+## 3. Footer
 
-해결된 버그나 관련 이슈는 바닥글에 별도 라인으로 작성하며 `Closes` 키워드를 사용합니다.
-예: `Closes #123`
+Use the footer for special references.
+
+### Breaking Changes
+
+If your commit breaks backward compatibility, write a `BREAKING CHANGE:` block in the footer.
+You must describe exactly what changed, why it changed, and provide a guide on how to migrate to the new code.
+
+### Referencing Issues
+
+If your commit resolves an issue tracked in GitHub or Jira, use the `Closes` keyword on a separate line.
+- Example: `Closes #123`

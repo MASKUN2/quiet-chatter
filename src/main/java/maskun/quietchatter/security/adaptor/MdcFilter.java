@@ -1,18 +1,19 @@
 package maskun.quietchatter.security.adaptor;
 
-import jakarta.servlet.FilterChain;
-import jakarta.servlet.ServletException;
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
-import lombok.extern.slf4j.Slf4j;
+import java.io.IOException;
+import java.util.UUID;
+
 import org.jspecify.annotations.NullMarked;
 import org.slf4j.MDC;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.filter.OncePerRequestFilter;
 
-import java.io.IOException;
-import java.util.UUID;
+import jakarta.servlet.FilterChain;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+import lombok.extern.slf4j.Slf4j;
 
 @NullMarked
 @Slf4j
@@ -49,6 +50,7 @@ class MdcFilter extends OncePerRequestFilter {
             log.error("Request Error - TraceID: {}, Message: {}", traceId, e.getMessage(), e);
             throw e;
         } finally {
+            log.info("Request End - TraceID: {}, Status: {}", traceId, response.getStatus());
             MDC.clear();
         }
     }

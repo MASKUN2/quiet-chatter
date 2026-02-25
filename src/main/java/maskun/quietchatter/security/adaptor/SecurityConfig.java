@@ -1,7 +1,7 @@
 package maskun.quietchatter.security.adaptor;
 
-import lombok.RequiredArgsConstructor;
-import maskun.quietchatter.security.application.in.AuthMemberService;
+import java.util.List;
+
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
@@ -9,15 +9,15 @@ import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
+import static org.springframework.security.config.http.SessionCreationPolicy.STATELESS;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.AnonymousAuthenticationFilter;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
-import java.util.List;
-
-import static org.springframework.security.config.http.SessionCreationPolicy.STATELESS;
+import lombok.RequiredArgsConstructor;
+import maskun.quietchatter.security.application.in.AuthMemberService;
 
 @Configuration
 @EnableWebSecurity
@@ -44,8 +44,8 @@ class SecurityConfig {
                 )
                 .authorizeHttpRequests(authorize -> authorize
                         .requestMatchers(HttpMethod.GET, "/**").permitAll()
-                        // Allow login and signup endpoints without authentication
-                        .requestMatchers(HttpMethod.POST, "/v1/auth/login/**", "/v1/auth/signup/**").permitAll()
+                        // Allow login, signup, and reactivate endpoints without authentication
+                        .requestMatchers(HttpMethod.POST, "/v1/auth/login/**", "/v1/auth/signup/**", "/v1/auth/reactivate").permitAll()
                         .anyRequest().authenticated()
                 )
                 .formLogin(AbstractHttpConfigurer::disable)

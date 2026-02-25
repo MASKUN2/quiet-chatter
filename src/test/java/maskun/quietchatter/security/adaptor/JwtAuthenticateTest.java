@@ -1,11 +1,14 @@
 package maskun.quietchatter.security.adaptor;
 
-import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.security.Keys;
-import jakarta.servlet.http.Cookie;
-import maskun.quietchatter.WithTestContainerDatabases;
-import maskun.quietchatter.security.application.in.AuthMemberService;
-import maskun.quietchatter.security.domain.AuthMember;
+import java.sql.Date;
+import java.time.Instant;
+import java.time.temporal.ChronoUnit;
+import java.util.List;
+
+import javax.crypto.SecretKey;
+
+import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.not;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,19 +23,19 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.test.web.servlet.MockMvc;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.cookie;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import javax.crypto.SecretKey;
-import java.sql.Date;
-import java.time.Instant;
-import java.time.temporal.ChronoUnit;
-import java.util.List;
-
-import static org.hamcrest.Matchers.equalTo;
-import static org.hamcrest.Matchers.not;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.security.Keys;
+import jakarta.servlet.http.Cookie;
+import maskun.quietchatter.WithTestContainerDatabases;
+import maskun.quietchatter.security.application.in.AuthMemberService;
+import maskun.quietchatter.security.domain.AuthMember;
 
 @SpringBootTest
 @AutoConfigureMockMvc
@@ -95,7 +98,7 @@ class JwtAuthenticateTest implements WithTestContainerDatabases {
         // given
         maskun.quietchatter.member.domain.Member memberEntity = maskun.quietchatter.member.domain.Member.newNaverMember("naverId", "nickname");
         memberRepository.save(memberEntity);
-        AuthMember member = new AuthMember(memberEntity.getId(), memberEntity.getRole());
+        AuthMember member = new AuthMember(memberEntity.getId(), memberEntity.getRole(), maskun.quietchatter.member.domain.Status.ACTIVE);
 
         String accessToken = authTokenService.createNewAccessToken(member.id());
         Cookie accessCookie = new Cookie("access_token", accessToken);
@@ -112,7 +115,7 @@ class JwtAuthenticateTest implements WithTestContainerDatabases {
         // given
         maskun.quietchatter.member.domain.Member memberEntity = maskun.quietchatter.member.domain.Member.newNaverMember("naverId", "nickname");
         memberRepository.save(memberEntity);
-        AuthMember member = new AuthMember(memberEntity.getId(), memberEntity.getRole());
+        AuthMember member = new AuthMember(memberEntity.getId(), memberEntity.getRole(), maskun.quietchatter.member.domain.Status.ACTIVE);
         
         // Create expired access token
         SecretKey key = Keys.hmacShaKeyFor(jwtSecretKey.getBytes());

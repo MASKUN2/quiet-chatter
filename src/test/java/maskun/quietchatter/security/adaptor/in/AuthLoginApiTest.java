@@ -100,7 +100,7 @@ class AuthLoginApiTest {
 
         NaverLoginRequest request = new NaverLoginRequest(code, state);
         NaverProfile profile = new NaverProfile(providerId);
-        AuthMember authMember = new AuthMember(memberId, Role.REGULAR);
+        AuthMember authMember = new AuthMember(memberId, Role.REGULAR, maskun.quietchatter.member.domain.Status.ACTIVE);
 
         given(authMemberService.loginWithNaver(code, state)).willReturn(profile);
         given(authMemberService.getByNaverId(providerId)).willReturn(authMember);

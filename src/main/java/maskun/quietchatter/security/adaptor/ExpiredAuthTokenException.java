@@ -1,12 +1,12 @@
 package maskun.quietchatter.security.adaptor;
 
-class ExpiredAuthTokenException extends AuthTokenException {
+public class ExpiredAuthTokenException extends AuthTokenException {
 
-    ExpiredAuthTokenException(String msg, Throwable cause) {
+    public ExpiredAuthTokenException(String msg, Throwable cause) {
         super(msg, cause);
     }
 
-    ExpiredAuthTokenException(String msg) {
+    public ExpiredAuthTokenException(String msg) {
         super(msg);
     }
 }

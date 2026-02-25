@@ -55,7 +55,7 @@ class AuthSignupApiTest {
         UUID memberId = UUID.randomUUID();
 
         SignupRequest request = new SignupRequest(nickname, registerToken);
-        AuthMember authMember = new AuthMember(memberId, Role.REGULAR);
+        AuthMember authMember = new AuthMember(memberId, Role.REGULAR, maskun.quietchatter.member.domain.Status.ACTIVE);
 
         given(authTokenService.parseRegisterToken(registerToken)).willReturn(providerId);
         given(authMemberService.signupWithNaver(providerId, nickname)).willReturn(authMember);
