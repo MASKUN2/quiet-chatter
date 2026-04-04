@@ -1,3 +1,10 @@
+## [1.2.1](https://github.com/MASKUN2/quiet-chatter/compare/v1.2.0...v1.2.1) (2026-04-04)
+
+
+### Bug Fixes
+
+* Update .gitignore to avoid ignoring /out directories globally ([988b9ad](https://github.com/MASKUN2/quiet-chatter/commit/988b9ad1bd1f3ff45ad6a2e57ee63b63ccf7e954))
+
 # [1.2.0](https://github.com/MASKUN2/quiet-chatter/compare/v1.1.0...v1.2.0) (2026-02-25)
 
 
