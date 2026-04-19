@@ -1,54 +1,54 @@
-# AI Agent Guide
+# AI Agent Guide - legacy-quiet-chatter
 
-This document is a guideline for AI agents to understand this project and help with development.
+이 문서는 AI 에이전트가 레거시 프로젝트를 이해하고 개발을 돕기 위한 지침입니다.
 
-## 1. Project Overview
+## 1. 프로젝트 개요
 
-- **Goal**: Create a book-themed social network (SNS for readers).
-- **Architecture**: Hexagonal Architecture.
-- **Role**: This project serves as the backend API server.
+- 목표: 독서 나눔 소셜 네트워크 서비스 (QuietChatter) 구축.
+- 아키텍처: 헥사고날 아키텍처 (Hexagonal Architecture).
+- 역할: 백엔드 API 서버.
 
-## 2. Tech Stack
+## 2. 기술 스택
 
-- **Backend**: Java 21, Spring Boot 3.5.*
-- **Database**: PostgreSQL (Main), Redis (Token/Cache), Flyway (Migration).
-- **Security**: Spring Security (JWT-based).
-- **Infrastructure**: AWS LightSail, Docker, GitHub Actions.
+- 백엔드: Java 21, Spring Boot 3.5.x.
+- 데이터베이스: PostgreSQL, Redis, Flyway.
+- 보안: Spring Security (JWT).
+- 인프라: AWS LightSail, Docker, GitHub Actions.
 
-## 3. Main Guidelines
+## 3. 주요 가이드라인
 
-Please refer to the following documents based on your current task:
+작업 수행 시 다음 문서를 참조하십시오:
 
-- **[API Implementation Guide](/docs/guide/api_guide.md)**: Rules for URI design, REST patterns, and RestDocs.
-- **[Architecture Guide](/docs/guide/architecture_guide.md)**: Details on the Hexagonal Application Architecture.
-- **[Infrastructure Guide](/docs/guide/infrastructure_deployment_guide.md)**: Server CI/CD, environments, and deployment info.
-- **[Security Guide](/docs/guide/security_guide.md)**: Rules for JWT Authentication and CORS configuration.
-- **[Code Style Guide](/docs/guide/code_style_guide.md)**: Rules for Java conventions and clean code.
-- **[Commit Message Guide](/docs/guide/commit_message_guide.md)**: Rules for formatting git commit messages.
-- **[Service & Policy](https://github.com/maskun2/quiet-chatter-docs)**: External repository for project requirements, history, and policies.
+- API 구현 가이드 (docs/guide/api_guide.md): URI 설계, REST 패턴, RestDocs 규칙.
+- 아키텍처 가이드 (docs/guide/architecture_guide.md): 헥사고날 아키텍처 세부 사항.
+- 인프라 가이드 (docs/guide/infrastructure_deployment_guide.md): CI/CD, 환경 설정 및 배포 정보.
+- 보안 가이드 (docs/guide/security_guide.md): JWT 인증 및 CORS 설정.
+- 코드 스타일 가이드 (docs/guide/code_style_guide.md): Java 컨벤션 및 클린 코드 규칙.
+- 커밋 메시지 가이드 (docs/guide/commit_message_guide.md): Git 커밋 메시지 형식.
+- 제품 요구사항 (docs/requirements/prd.md): 서비스 목적, 기능 및 정책.
 
-## 4. Agent Working Process
+## 4. 에이전트 작업 지침
 
-### A. Planning and Design Rules
+모든 작업 시작 전 및 작업 중에 superpowers 스킬 목록을 항상 확인하고 상황에 맞는 스킬을 활성화하여 사용하십시오.
 
-- **Use Industry Standards**: Always recommend popular, proven technologies and design patterns.
-- **Give One Clear Path**: Do not offer multiple options like "A or B". Instead, decide on the best single path for this project and explain your choice clearly.
-- **Be Specific**: Do not give vague instructions like "fix the settings". Provide exact steps, such as "Add AppCorsProperties and inject it into SecurityConfig".
-- **Decide Early**: Make technical decisions during the planning phase so the developer can review them immediately.
+### A. 공통 원칙
+- 모든 서비스는 헥사고날 아키텍처를 따르며, 어댑터 패키지 명칭은 adaptor로 통일합니다.
+- 마크다운 작성 시 강조 서식(bold, italics)과 이모티콘 사용을 절대 금지합니다.
+- 업계 표준 우선: 대중적이고 검증된 기술 및 패턴을 제안하십시오.
+- 단일 경로 제안: 상황에 최적화된 하나의 방안을 선택하고 설명하십시오.
 
-### B. Implementation Rules
+### B. 구현 규칙
 
-- **Follow Standards**: Apply the latest standard practices for Java and Spring Boot. Use proven design patterns (SOLID, OOP) and write clean code.
-- **Test First**: Always write test code (Unit or Integration tests) when adding new features.
-- **Update Documentation**: Update `RestDocs` tests whenever an API changes. This keeps `openapi3.json` up to date automatically.
-- **Never Commit JSON Specs**: Do not commit the `openapi3.json` file. It is generated automatically during deployment.
+- 최신 표준 준수: Java 및 Spring Boot의 최신 표준 관행을 적용하십시오 (SOLID, OOP).
+- 테스트 우선: 기능 추가 시 반드시 테스트 코드(단위 또는 통합 테스트)를 작성하십시오.
+- 문서 최적화: API 변경 시 RestDocs 테스트를 업데이트하여 명세를 유지하십시오.
 
-### C. Database Changes
+### C. 데이터베이스 변경
 
-- **Use Flyway**: When changing the database schema (adding or removing tables/columns), you must write a Flyway migration script in `src/main/resources/db/migration`.
-- **Be Safe**: Use `IF NOT EXISTS` and set default values to protect existing data.
+- Flyway 사용: 스키마 변경 시 src/main/resources/db/migration에 마이그레이션 스크립트를 작성하십시오.
+- 안정성 확보: IF NOT EXISTS 구문과 기본값을 사용하여 기존 데이터를 보호하십시오.
 
-### D. Verification
+### D. 검증 절차
 
-- **Run Tests**: After finishing your work, run `./gradlew test` to ensure all tests pass.
-- **Check API Spec**: If you modified an API, run `./gradlew openapi3` to verify the generated specification. Reminder: Do not commit the generated JSON file.
+- 테스트 실행: 작업 완료 후 ./gradlew test를 실행하여 모든 테스트 통과를 확인하십시오.
+- API 스펙 확인: API 수정 시 ./gradlew openapi3를 실행하여 명세를 검증하십시오 (생성된 JSON은 커밋 금지).
